@@ -14,3 +14,6 @@ docker-compose up dev
 * This will start it in development mode<br/>
 docker-compose up prod
 * This will start it in development mode<br/>
+# docker ssh into node container
+docker ps
+docker exec -it <mycontainer> sh ##for alpine
