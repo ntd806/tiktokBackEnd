@@ -1,11 +1,11 @@
 # tiktok
 # Enviroment
-Nodejs >= 16.0.0
-MongoDB >= 5.0
-Docker
-ElasticSearch
-Redis
-Bunny (using for store video )
+Nodejs >= 16.0.0<br/>
+MongoDB >= 5.0<br/>
+Docker<br/>
+ElasticSearch<br/>
+Redis<br/>
+Bunny (using for store video )<br/>
 # Set up 
 git clone git@github.com:ntd806/tiktokBackEnd.git
 cd root folder
