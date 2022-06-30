@@ -7,7 +7,7 @@ Elasticsearch<br/>
 Redis<br/>
 Bunny (using for store video )<br/>
 # Set up 
-git clone git@github.com:ntd806/tiktokBackEnd.git
+* git clone git@github.com:ntd806/tiktokBackEnd.git
 cd root folder
 * To start our app, write the following command in your terminal<br/>
 docker-compose up dev
