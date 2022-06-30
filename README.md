@@ -3,7 +3,7 @@
 Nodejs >= 16.0.0<br/>
 MongoDB >= 5.0<br/>
 Docker<br/>
-ElasticSearch<br/>
+Elasticsearch<br/>
 Redis<br/>
 Bunny (using for store video )<br/>
 # Set up 
