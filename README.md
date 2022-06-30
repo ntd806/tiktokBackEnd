@@ -17,3 +17,5 @@ docker-compose up prod
 # docker ssh into node container
 docker ps
 docker exec -it <mycontainer> sh ##for alpine
+# Feature modules
+  * To create a module using the CLI, simply execute the $ nest g module cats command.
