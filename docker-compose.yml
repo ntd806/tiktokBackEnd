@@ -51,6 +51,14 @@ services:
             - ./data:/data/db
         ports:
             - "27017:27017"
+    mongo-express:
+        image: mongo-express
+        container_name: mongo-express
+        restart: always
+        ports:
+            - "28081:8081"
+        depends_on:
+            - mongo
     kibana:
         image: docker.elastic.co/kibana/kibana:7.14.1
         container_name: MY_KIBANA
