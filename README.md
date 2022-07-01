@@ -15,7 +15,7 @@ docker-compose up dev
 docker-compose up prod
 * This will start it in development mode<br/>
 # docker ssh into node container
-docker ps
-docker exec -it <mycontainer> sh ##for alpine
+docker ps<br/>
+docker exec -it mycontainer sh ##for alpine<br/>
 # Feature modules
   * To create a module using the CLI, simply execute the $ nest g module cats command.
