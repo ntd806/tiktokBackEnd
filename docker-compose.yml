@@ -15,6 +15,8 @@ services:
         depends_on:
             - mongo
             - elasticsearch
+            - mongo-express
+            - kibana
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -36,8 +38,8 @@ services:
         depends_on:
             - mongo
             - elasticsearch
-        links:
-            - elasticsearch
+            - mongo-express
+            - kibana
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -49,6 +51,9 @@ services:
         container_name: mongo
         image: mongo
         restart: always
+        
+        networks:
+            - nesjs-network
         volumes:
             - ./data:/data/db
         ports:
@@ -75,7 +80,6 @@ services:
             - elasticsearch
         networks: 
             - elasticsearch-network
-
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
         container_name: MY_ELASTICSEARCH
@@ -90,4 +94,8 @@ services:
             - elasticsearch-network
 networks:
     nesjs-network:
+        driver: bridge
     elasticsearch-network:
+volumes:
+    data:
+    esdata:
