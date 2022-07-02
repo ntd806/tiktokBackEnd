@@ -14,8 +14,10 @@ services:
             - 9229:9229
         depends_on:
             - mongo
+            - elasticsearch
         networks:
             - nesjs-network
+            - elasticsearch-network
         volumes:
             - ./tiktok:/usr/src/app
             - /usr/src/app/node_modules
