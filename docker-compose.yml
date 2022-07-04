@@ -18,7 +18,6 @@ services:
             - mongo-express
             - kibana
             - redis
-            - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -43,7 +42,6 @@ services:
             - mongo-express
             - kibana
             - redis
-            - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -87,20 +85,6 @@ services:
     elasticsearch:
         image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
         container_name: MY_ELASTICSEARCH
-        environment:
-            - node.name=elasticsearch
-            - http.port=9200
-            - http.host=0.0.0.0
-            - transport.host=127.0.0.1
-            - cluster.name=es-docker-cluster
-            - discovery.seed_hosts=elasticsearch
-            - cluster.initial_master_nodes=elasticsearch
-            - bootstrap.memory_lock=true
-            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-        ulimits:
-        memlock:
-            soft: -1
-            hard: -1
         ports: 
             - 9200:9200
             - 9300:9300
@@ -114,10 +98,6 @@ services:
         image: 'redis:alpine'
         ports:
             - '6379:6379'
-    nginx:
-        build: ./nginx
-        ports:
-        - '80:80'
 networks:
     nesjs-network:
         driver: bridge

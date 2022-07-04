@@ -4,12 +4,7 @@ import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
 @Module({
-  imports: [
-    DatabaseModule.forRoot(),
-    ConfigModule,
-    LoggerModule
-  ],
-  controllers: [AppController]
+    imports: [DatabaseModule.forRoot(), ConfigModule, LoggerModule],
+    controllers: [AppController]
 })
-export class AppModule {
-}
+export class AppModule {}

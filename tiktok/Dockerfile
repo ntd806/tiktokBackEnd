@@ -4,7 +4,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm install glob rimraf && npm install @nestjs/mongoose && npm install moment && npm install triple-beam && npm install winston && npm install @nestjs/swagger && npm install dotenv
+RUN npm install glob rimraf && npm install @nestjs/mongoose && npm install moment && npm install triple-beam && npm install winston && npm install @nestjs/swagger && npm install dotenv && npm i --save @nestjs/typeorm typeorm
 
 RUN npm install --only=development
 
