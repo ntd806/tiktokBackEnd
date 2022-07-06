@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [ "main" ]
   issues:
-    types: [opened, reopened, deleted, closed]
+    types: [opened, reopened, deleted, closed, push, commit, build]
 
 jobs:
   notify:
