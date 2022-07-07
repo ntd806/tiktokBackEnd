@@ -5,6 +5,7 @@ import { createDocument } from './swagger/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import { HttpExceptionFilter } from './app/core/filter/exception.filter';
+import { Transport } from '@nestjs/microservices';
 
 dotenv.config();
 import 'reflect-metadata';
