@@ -1,6 +1,6 @@
-import LocalAuthenticationGuard from '../authentication/auth.guard';
-import CreateUserDto from '../authentication/dto/user.dto';
-import AuthenticationService from '../authentication/services/authentication.service';
+import LocalAuthenticationGuard from '../../components/authentication/auth.guard';
+import CreateUserDto from '../../components/authentication/dto/user.dto';
+import AuthenticationService from '../../components/authentication/services/authentication.service';
 import {
     Controller,
     Get,
