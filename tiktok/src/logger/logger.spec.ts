@@ -24,7 +24,7 @@ describe('Logger', () => {
     ];
 
     /* tslint:disable-next-line:no-empty */
-    const noop = () => {};
+    const noop = () => undefined;
 
     describe('constructor', () => {
         it('should create winston logger with correct log level', () => {
