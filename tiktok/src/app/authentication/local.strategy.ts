@@ -3,15 +3,12 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import AuthenticationService from '../services/authentication.service';
 
-
 @Injectable()
-export default class LocalStrategy extends PassportStrategy(Strategy){
-    constructor(
-        private readonly authService: AuthenticationService,
-    ) {
+export default class LocalStrategy extends PassportStrategy(Strategy) {
+    constructor(private readonly authService: AuthenticationService) {
         super({
-            ipField: 'ip',
-        })
+            ipField: 'ip'
+        });
     }
 
     async validate(ip: string): Promise<any> {
