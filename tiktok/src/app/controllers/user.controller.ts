@@ -1,6 +1,6 @@
 import LocalAuthenticationGuard from '../authentication/auth.guard';
-import CreateUserDto from '../dto/user.dto';
-import AuthenticationService from '../services/authentication.service';
+import CreateUserDto from '../authentication/dto/user.dto';
+import AuthenticationService from '../authentication/services/authentication.service';
 import {
     Controller,
     Get,
