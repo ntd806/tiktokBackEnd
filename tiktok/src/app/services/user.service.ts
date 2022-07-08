@@ -7,14 +7,14 @@ import User from "../entities/user";
 @Injectable()
 export default class UserService {
     constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
-    public async getByIp(ip: string) {
+    public async getByIp(ip: any) {
         const user = await this.userRepo.findOne(ip);
         if(!user) {
             throw new HttpException('User with this ip does not exist', HttpStatus.NOT_FOUND);
         }
         return user;
     }
-    public async getById(id: string) {
+    public async getById(id: any) {
         const user = await this.userRepo.findOne(id);
         if(!user) {
             throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
