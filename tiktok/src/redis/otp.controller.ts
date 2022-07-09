@@ -6,15 +6,27 @@ export class OtpController {
     constructor(private readonly otpService: OtpService) {}
     @Post('/send-code')
     async sendCode(@Req() request) {
-        return await this.otpService.sendSMS(request.phoneNumber);
+        const data = await this.otpService.sendSMS(request.body.phoneNumber);
+
+        return {
+            code:200,
+            data:data,
+            message: "Successfully"
+        }
     }
 
     @HttpCode(200)
     @Post('/verify-code')
     async verifyCode(@Req() request) {
-        return await this.otpService.verifyCode(
-            request.recipientPhoneNumber,
-            request.smsCode
+        const data = await this.otpService.verifyCode(
+            request.body.recipientPhoneNumber,
+            request.body.smsCode
         );
+
+        return {
+            code:200,
+            data:data,
+            message: "Successfully"
+        }
     }
 }
