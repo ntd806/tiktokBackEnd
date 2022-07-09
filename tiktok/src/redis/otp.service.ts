@@ -11,18 +11,17 @@ export class OtpService {
     ) {}
 
     async sendSMS(phoneNumber: string) {
-        const recipientPhoneNumber = phoneNumber;
         const randomNumber = generateRandomSixDigitsNumber();
         const message = `Hello from TopTop! Your verification code is: ${randomNumber}`;
         await this.redisCacheService.setCode(
-            recipientPhoneNumber,
+            phoneNumber,
             randomNumber
         );
 
         try {
             return await this.client.messages.create({
                 body: message,
-                from: process.env.TWILIO_PHONE_NUMBER,
+                messagingServiceSid: 'MG5ce11b628662b65b653f6abede8066b6',
                 to: phoneNumber
             });
         } catch (e) {
@@ -31,15 +30,16 @@ export class OtpService {
     }
 
     async verifyCode(recipientPhoneNumber: string, smsCode: string) {
-        const value = await this.redisCacheService.get(recipientPhoneNumber);
-        const smsCodeReceived = smsCode;
+        let value = await this.redisCacheService.get(recipientPhoneNumber);
+        value = String(value);
+        const smsCodeReceived = String(smsCode);
+        
+        if (value === smsCodeReceived ) {
+            await this.redisCacheService.del(recipientPhoneNumber);
 
-        if (value !== `${smsCodeReceived}`) {
-            return false;
+            return true;
         }
 
-        await this.redisCacheService.del(recipientPhoneNumber);
-
-        return true;
+        return false;
     }
 }
