@@ -6,13 +6,13 @@ export class OtpController {
     constructor(private readonly otpService: OtpService) {}
     @Post('/send-code')
     async sendCode(@Req() request) {
-        return this.otpService.sendSMS(request.phoneNumber);
+        return await this.otpService.sendSMS(request.phoneNumber);
     }
 
     @HttpCode(200)
     @Post('/verify-code')
     async verifyCode(@Req() request) {
-        return this.otpService.verifyCode(
+        return await this.otpService.verifyCode(
             request.recipientPhoneNumber,
             request.smsCode
         );

@@ -1,22 +1,20 @@
 import { InjectTwilio, TwilioClient } from 'nestjs-twilio';
 import { generateRandomSixDigitsNumber } from './randon-number';
-import { RedisCacheService } from '../../redis/redis.service';
-import { Injectable, Inject, CACHE_MANAGER} from '@nestjs/common';
-import { Cache } from 'cache-manager';
-
+import { RedisCacheService } from './redis.service';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class OtpService {
     public constructor(
-        private redisCacheService: Cache,
         @InjectTwilio() private readonly client: TwilioClient,
+        private redisCacheService: RedisCacheService
     ) {}
 
     async sendSMS(phoneNumber: string) {
         const recipientPhoneNumber = phoneNumber;
         const randomNumber = generateRandomSixDigitsNumber();
         const message = `Hello from TopTop! Your verification code is: ${randomNumber}`;
-        await this.redisCacheService.set(
+        await this.redisCacheService.setCode(
             recipientPhoneNumber,
             randomNumber
         );
@@ -36,9 +34,10 @@ export class OtpService {
         const value = await this.redisCacheService.get(recipientPhoneNumber);
         const smsCodeReceived = smsCode;
 
-        if (value !== smsCodeReceived) {
+        if (value !== `${smsCodeReceived}`) {
             return false;
         }
+
         await this.redisCacheService.del(recipientPhoneNumber);
 
         return true;

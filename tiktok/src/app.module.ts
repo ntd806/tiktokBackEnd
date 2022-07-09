@@ -3,9 +3,8 @@ import { AppController } from './app/controllers/app.controller';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
-import { RedisCacheModule } from './redis/redis.module';
 import { TwilioModule } from 'nestjs-twilio';
-import { OtpModule } from './components/otp/otp.module';
+import { RedisCacheModule } from './redis/redis.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -17,8 +16,7 @@ dotenv.config();
         DatabaseModule.forRoot(),
         ConfigModule,
         LoggerModule,
-        RedisCacheModule,
-        OtpModule
+        RedisCacheModule
     ],
     controllers: [AppController]
 })
