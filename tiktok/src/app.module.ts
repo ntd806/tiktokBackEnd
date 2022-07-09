@@ -3,8 +3,21 @@ import { AppController } from './app/controllers/app.controller';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
+import { TwilioModule } from 'nestjs-twilio';
+import { RedisCacheModule } from './redis/redis.module';
+import * as dotenv from 'dotenv';
+dotenv.config();
 @Module({
-    imports: [DatabaseModule.forRoot(), ConfigModule, LoggerModule],
+    imports: [
+        TwilioModule.forRoot({
+            accountSid: process.env.TWILIO_ACCOUNT_SID,
+            authToken: process.env.TWILIO_AUTH_TOKEN
+        }),
+        DatabaseModule.forRoot(),
+        ConfigModule,
+        LoggerModule,
+        RedisCacheModule
+    ],
     controllers: [AppController]
 })
 export class AppModule {}

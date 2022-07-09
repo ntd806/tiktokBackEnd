@@ -97,8 +97,11 @@ services:
             - elasticsearch-network
     redis:
         image: 'redis:alpine'
+        container_name: redis
         ports:
             - '6379:6379'
+        networks:
+            - nesjs-network
 networks:
     nesjs-network:
         driver: bridge

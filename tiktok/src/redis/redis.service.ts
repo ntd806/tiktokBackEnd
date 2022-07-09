@@ -14,4 +14,7 @@ export class RedisCacheService {
     public async del(key: any) {
         await this.cacheManager.del(key);
     }
+    public async setCode(recipientPhoneNumber: string, randomNumber: number) {
+        await this.cacheManager.set(recipientPhoneNumber, randomNumber);
+    }
 }

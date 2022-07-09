@@ -9,6 +9,8 @@ import {
 import { Cache } from 'cache-manager';
 import * as redisStore from 'cache-manager-ioredis';
 import { RedisCacheService } from './redis.service';
+import { OtpService } from './otp.service';
+import { OtpController } from './otp.controller';
 
 @Module({
     imports: [
@@ -23,8 +25,9 @@ import { RedisCacheService } from './redis.service';
             }
         })
     ],
-    providers: [RedisCacheService],
-    exports: [RedisCacheModule, RedisCacheService]
+    providers: [RedisCacheService, OtpService],
+    exports: [RedisCacheModule, RedisCacheService],
+    controllers: [OtpController]
 })
 export class RedisCacheModule implements OnModuleInit {
     constructor(@Inject(CACHE_MANAGER) private readonly cache: Cache) {}
