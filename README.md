@@ -20,6 +20,7 @@ docker exec -it mycontainer sh ##for alpine<br/>
 # Feature modules
   * To create a module using the CLI, simply execute the $ nest g module cats command.<br/>
   * To create a controller using the CLI, simply execute the $ nest g controller cats command.<br/>
+  * To create a service using the CLI, simply execute the $ nest g service cats command.<br/>
 # Do a Clean Restart of a Docker Instance
 Stop the container(s) using the following command:<br/>
 docker-compose down<br/>
