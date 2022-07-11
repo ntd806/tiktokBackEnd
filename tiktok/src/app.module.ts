@@ -8,6 +8,7 @@ import { DatabaseModule } from './database/database.module';
 import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './redis/redis.module';
 import { LiveModule } from './components/live/live.module';
+import { GameModule } from './components/game/game.module';
 
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -22,7 +23,8 @@ dotenv.config();
         LoggerModule,
         RedisCacheModule,
         LiveModule,
-        AuthModule
+        AuthModule,
+        GameModule
     ],
     controllers: [AppController]
 })
