@@ -6,7 +6,7 @@ import {
     Entity
 } from 'typeorm';
 
-@Entity({ name: 'user' })
+@Entity({ name: 'users' })
 export class User {
     @ObjectIdColumn()
     _id: number;
