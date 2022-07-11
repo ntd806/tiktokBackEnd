@@ -1,13 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import CreateUserDto from '../dto/user.dto';
-import User from '../entities/user';
+import { CreateUserDto } from './dto/user.dto';
+import { User } from './entity/user.entity';
 
 @Injectable()
-export default class UserService {
+export class UserService {
     constructor(@InjectRepository(User) private userRepo: Repository<User>) {}
-    public async getByIp(ip: any) {
+    public async getByIp(ip: any): Promise<User> {
         const user = await this.userRepo.findOne(ip);
         if (!user) {
             throw new HttpException(
@@ -17,7 +17,7 @@ export default class UserService {
         }
         return user;
     }
-    public async getById(id: any) {
+    public async getById(id: any): Promise<User> {
         const user = await this.userRepo.findOne(id);
         if (!user) {
             throw new HttpException(
