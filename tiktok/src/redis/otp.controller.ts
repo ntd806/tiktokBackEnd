@@ -9,10 +9,10 @@ export class OtpController {
         const data = await this.otpService.sendSMS(request.body.phoneNumber);
 
         return {
-            code:200,
-            data:data,
-            message: "Successfully"
-        }
+            code: 200,
+            data: data,
+            message: 'Successfully'
+        };
     }
 
     @HttpCode(200)
@@ -24,9 +24,9 @@ export class OtpController {
         );
 
         return {
-            code:200,
-            data:data,
-            message: "Successfully"
-        }
+            code: 200,
+            data: data,
+            message: 'Successfully'
+        };
     }
 }

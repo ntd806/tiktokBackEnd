@@ -5,6 +5,8 @@ import { LoggerModule } from './logger/logger.module';
 import { DatabaseModule } from './database/database.module';
 import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './redis/redis.module';
+import { LiveModule } from './components/live/live.module';
+
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -16,7 +18,8 @@ dotenv.config();
         DatabaseModule.forRoot(),
         ConfigModule,
         LoggerModule,
-        RedisCacheModule
+        RedisCacheModule,
+        LiveModule
     ],
     controllers: [AppController]
 })
