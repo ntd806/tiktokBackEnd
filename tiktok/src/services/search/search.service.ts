@@ -40,19 +40,19 @@ export class SearchService
     }
 
     public async deleteIndex(indexData: any): Promise<any> {
-        return this.indices
-            .delete(indexData)
-            .then((res) => res)
-            .catch((err) => {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+        // return this.indices
+        //     .delete(indexData)
+        //     .then((res) => res)
+        //     .catch((err) => {
+        //         throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        //     });
     }
 
     public async deleteDocument(indexData: any): Promise<any> {
-        return this.delete(indexData)
-            .then((res) => res)
-            .catch((err) => {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+        // return this.delete(indexData)
+        //     .then((res) => res)
+        //     .catch((err) => {
+        //         throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        //     });
     }
 }

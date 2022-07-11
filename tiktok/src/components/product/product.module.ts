@@ -10,7 +10,7 @@ import { SearchService } from '../../services/search/search.service';
 import { SearchServiceInterface } from '../../services/search/interface/search.service.interface';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Product])],
+    imports: [TypeOrmModule.forFeature([Product, ProductRepository])],
     providers: [
         {
             provide: 'ProductRepositoryInterface',

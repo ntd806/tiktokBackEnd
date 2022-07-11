@@ -17,7 +17,7 @@ export class ProductElasticIndex {
 
     public async updateProductDocument(product: Product): Promise<any> {
         const data = this.productDocument(product);
-        await this.deleteProductDocument(product.id);
+        // await this.deleteProductDocument(product.id);
         return this.searchService.insertIndex(data);
     }
 
@@ -40,9 +40,9 @@ export class ProductElasticIndex {
 
     private productDocument(product: Product): any {
         const bulk = [];
-        bulk.push({
-            index: this.bulkIndex(product.id)
-        });
+        // bulk.push({
+        //     index: this.bulkIndex(product.id)
+        // });
         bulk.push(product);
         return {
             body: bulk,
