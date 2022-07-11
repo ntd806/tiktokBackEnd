@@ -13,10 +13,7 @@ export class OtpService {
     async sendSMS(phoneNumber: string) {
         const randomNumber = generateRandomSixDigitsNumber();
         const message = `Hello from TopTop! Your verification code is: ${randomNumber}`;
-        await this.redisCacheService.setCode(
-            phoneNumber,
-            randomNumber
-        );
+        await this.redisCacheService.setCode(phoneNumber, randomNumber);
 
         try {
             return await this.client.messages.create({
@@ -33,8 +30,8 @@ export class OtpService {
         let value = await this.redisCacheService.get(recipientPhoneNumber);
         value = String(value);
         const smsCodeReceived = String(smsCode);
-        
-        if (value === smsCodeReceived ) {
+
+        if (value === smsCodeReceived) {
             await this.redisCacheService.del(recipientPhoneNumber);
 
             return true;
