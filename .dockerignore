@@ -1,4 +1,5 @@
 /tiktok/node_modules
 /tiktok/npm-debug.log
 /tiktok/Dockerfile
+/tiktok/package-lock.json
 .dockerignore
