@@ -5,8 +5,6 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { Auth } from './entity/auth.entity';
 import { Repository } from 'typeorm';
-import { DatabaseModule } from '../../database/database.module';
-import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 
 @Module({
     imports: [

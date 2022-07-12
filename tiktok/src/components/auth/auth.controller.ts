@@ -1,26 +1,19 @@
 import {
     Body,
     Controller,
-    HttpCode,
-    HttpStatus,
     Post,
-    Get,
-    UseGuards,
-    Request
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { Auth } from './entity/auth.entity';
-
 
 @Controller('/api/v1/auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
     @Post('register')
-    async signup(@Body() dto: AuthDto){
+    async signup(@Body() dto: AuthDto) {
         const data = await this.authService.signup(dto);
-        if(data) {
+        if (data) {
             return {
                 code: 201,
                 data: data,
@@ -33,6 +26,5 @@ export class AuthController {
                 message: 'phone exists'
             };
         }
-        
     }
 }

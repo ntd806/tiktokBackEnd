@@ -6,18 +6,19 @@ import { Auth } from '../entity/auth.entity';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(@InjectRepository(Auth) private authRepo: Repository<Auth>) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey: process.env.JWT_SECRET
+            secretOrKey: process.env.SECRET
         });
     }
 
-    async validate(payload: { sub: number; email: string }) {
+    async validate(payload: { sub: string}) {
+        console.log(payload.sub);
         const auth = await this.authRepo.find({
             where: {
-                _id: payload.sub
+                phone: payload.sub
             }
         });
         return auth;
