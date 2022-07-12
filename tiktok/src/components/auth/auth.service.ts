@@ -1,57 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
-import { User } from './entity/user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Auth } from './entity/auth.entity';
 
 @Injectable()
 export class AuthService {
-    constructor(private readonly jwt: JwtService) {}
+    constructor(
+        private readonly jwt: JwtService,
+        @InjectRepository(Auth)
+        private readonly authRepository: Repository<Auth>
+    ) {}
 
     async signup(dto: AuthDto) {
-        return true;
-        // const newUser = await this.userRepo.create(dto);
-        // await this.userRepo.save(newUser);
-        // return this.signToken(newUser.phone, newUser.email);
+        const user = await this.authRepository.findOne({
+            where: { phone: dto.phone }
+        });
+        if (user) {
+            return false;
+        } else {
+            const auth = new Auth();
+            auth.phone = dto.phone;
+            auth.ip = dto.ip;
+            auth.mac = dto.mac;
+            const newUser = await this.authRepository.save(auth);
+            return this.signToken(newUser.phone);
+        }
+        
     }
 
-    async signin(dto: AuthDto) {
-        // find the user by email
-        // const user =
-        //   await this.userRepo.findOne({
-        //     where: {
-        //       email: dto.email,
-        //     },
-        //   });
-        // // if user does not exist throw exception
-        // if (!user)
-        //   throw new ForbiddenException(
-        //     'Credentials incorrect',
-        //   );
-        // compare password
-        // const pwMatches = await argon.verify(
-        //   user.password,
-        //   dto.password,
-        // );
-        // // if password incorrect throw exception
-        // if (!pwMatches)
-        //   throw new ForbiddenException(
-        //     'Credentials incorrect',
-        //   );
-        // return this.signToken(user.phone, user.email);
-    }
-
-    async signToken(
-        phone: string,
-        email: string
-    ): Promise<{ access_token: string }> {
+    async signToken(phone: string): Promise<{ access_token: string }> {
         const payload = {
-            sub: phone,
-            email
+            sub: phone
         };
-        const secret = process.env.JWT_SECRET;
+        const secret = process.env.SECRET;
 
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '15m',
+            expiresIn: '120m',
             secret: secret
         });
 
