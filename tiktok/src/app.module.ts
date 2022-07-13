@@ -4,6 +4,7 @@ import { AppController } from './app/controllers/app.controller';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './components/auth/auth.module';
+import { UserModule } from './components/user/user.module';
 // import { ProductModule } from './components/product/product.module';
 import { DatabaseModule } from './database/database.module';
 import { TwilioModule } from 'nestjs-twilio';
@@ -24,7 +25,8 @@ dotenv.config();
         RedisCacheModule,
         LiveModule,
         AuthModule,
-        GameModule
+        GameModule,
+        UserModule
     ],
     controllers: [AppController]
 })

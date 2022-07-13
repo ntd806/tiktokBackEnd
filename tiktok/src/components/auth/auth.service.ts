@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
 import { User } from './model/user.schema';
@@ -22,7 +22,6 @@ export class AuthService {
             newAuth.save();
             return this.signToken(newAuth.phone);
         }
-        
     }
 
     async signToken(phone: string): Promise<{ access_token: string }> {
