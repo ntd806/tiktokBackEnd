@@ -11,7 +11,6 @@ import { GetUser } from '../auth/decorator';
 import { UserDto } from './dto/user.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
-import { User } from './entity/user.entity';
 
 @UseGuards(JwtStrategy)
 @Controller('/api/v1/user')

@@ -11,9 +11,6 @@ import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './redis/redis.module';
 import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
-import { Auth } from './components/auth/entity/auth.entity';
-import { User } from './components/user/entity/user.entity';
-
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -23,13 +20,6 @@ dotenv.config();
             authToken: process.env.TWILIO_AUTH_TOKEN
         }),
         DatabaseModule.forRoot(),
-        TypeOrmModule.forRoot({
-            type: 'mongodb',
-            host: 'mongo',
-            port: 27017,
-            database: 'tiktok',
-            entities: [Auth, User]
-        }),
         ConfigModule,
         LoggerModule,
         RedisCacheModule,

@@ -1,22 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { UserDto } from './dto/user.dto';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './entity/user.entity';
+import { User } from './model/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class UserService {
     constructor(
-        @InjectRepository(User)
-        private readonly userRepository: Repository<User>
+        @InjectModel(User.name)
+        private readonly userModel: Model<User>
     ) {}
 
     async updateUser(user: User, dto: UserDto) {
-        user.sex = dto.sex;
-        user.fullname = dto.fullname;
-        user.birthdate = dto.birthdate;
-        const newUser = await this.userRepository.save(user);
+        await user.update(dto);
+        await user.save();
+        const newUser = await this.userModel.find({_id: user.id});
         return newUser;
     }
 }
