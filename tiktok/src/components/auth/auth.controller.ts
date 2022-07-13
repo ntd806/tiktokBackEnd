@@ -10,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { Auth } from './entity/auth.entity';
 
 
 @Controller('/api/v1/auth')

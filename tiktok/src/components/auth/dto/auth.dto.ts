@@ -1,12 +1,12 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsObject } from 'class-validator';
 
 export class AuthDto {
     @IsNotEmpty()
-    @IsString()
-    ip: string;
+    @IsObject()
+    ip: object;
 
-    @IsString()
-    mac: string;
+    @IsObject()
+    mac: object;
 
     @IsNotEmpty()
     @IsString()

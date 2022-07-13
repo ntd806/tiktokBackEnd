@@ -1,31 +1,26 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthDto } from './dto/auth.dto';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Auth } from './entity/auth.entity';
+import { User } from './model/user.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly jwt: JwtService,
-        @InjectRepository(Auth)
-        private readonly authRepository: Repository<Auth>
+        @InjectModel(User.name)
+        private readonly authModel: Model<User>
     ) {}
 
     async signup(dto: AuthDto) {
-        const user = await this.authRepository.findOne({
-            where: { phone: dto.phone }
-        });
+        const user = await this.authModel.findOne({ phone: dto.phone });
         if (user) {
             return false;
         } else {
-            const auth = new Auth();
-            auth.phone = dto.phone;
-            auth.ip = dto.ip;
-            auth.mac = dto.mac;
-            const newUser = await this.authRepository.save(auth);
-            return this.signToken(newUser.phone);
+            const newAuth = await this.authModel.create(dto);
+            newAuth.save();
+            return this.signToken(newAuth.phone);
         }
         
     }
