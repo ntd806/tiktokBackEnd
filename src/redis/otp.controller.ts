@@ -1,6 +1,7 @@
 import { Controller, Post, Req, HttpCode } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { OtpService } from './otp.service';
-
+@ApiTags('authencation')
 @Controller('/api/v1/auth')
 export class OtpController {
     constructor(private readonly otpService: OtpService) {}

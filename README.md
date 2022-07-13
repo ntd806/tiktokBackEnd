@@ -36,4 +36,4 @@ docker volume rm $(docker volume ls -q)<br/>
 Restart the containers using the following command:<br/>
 docker-compose up dev<br/>
 Use this to delete everything:<br/>
-docker system prune -a --volumesdocker system prune -a --volumes<p align="center">
+docker system prune -a --volumes<p align="center">
