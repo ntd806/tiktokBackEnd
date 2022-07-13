@@ -1,6 +1,5 @@
 import { Injectable, HttpService } from '@nestjs/common';
-import { Live } from './entity/Live.entity';
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Injectable()
 export class LiveService {
