@@ -1,4 +1,5 @@
 import { Module, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app/controllers/app.controller';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';

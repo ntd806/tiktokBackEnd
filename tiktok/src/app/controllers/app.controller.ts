@@ -8,4 +8,6 @@ export class AppController {
             status: 'ok from company service'
         };
     }
+
+    
 }
