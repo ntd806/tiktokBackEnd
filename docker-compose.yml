@@ -105,11 +105,11 @@ services:
         networks:
             - nesjs-network
     nginx:
-    build: ./nginx
-    ports:
-    - 80:80
-    # depends_on:
-    # - dev
+        build: ./nginx
+        ports:
+            - 80:80
+        # depends_on:
+            # - dev
 networks:
     nesjs-network:
         driver: bridge

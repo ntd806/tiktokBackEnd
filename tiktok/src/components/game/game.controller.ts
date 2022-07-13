@@ -29,15 +29,13 @@ export class GameController {
         name:'limit',
         type: 'number',
         description: 'enter limit of record',
-        value:10,
-        // required:true,
+        required:true,
     })
     @ApiParam({
         name:'offset',
         type: 'number',
         description: 'enter offset of record',
-        value: 1,
-        // required:true,
+        required:true,
     })
     public async getAllGame(
         @Res() res,

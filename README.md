@@ -24,9 +24,13 @@ docker exec -it mycontainer sh ##for alpine<br/>
 # Do a Clean Restart of a Docker Instance
 Stop the container(s) using the following command:<br/>
 docker-compose down<br/>
+To delete all the images:<br/>
+docker rmi -f $(docker images -aq)<br/>
 Delete all containers using the following command:<br/>
 docker rm -f $(docker ps -a -q)<br/>
 Delete all volumes using the following command:<br/>
 docker volume rm $(docker volume ls -q)<br/>
 Restart the containers using the following command:<br/>
 docker-compose up dev<br/>
+Use this to delete everything:<br/>
+docker system prune -a --volumes
