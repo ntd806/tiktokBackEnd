@@ -104,16 +104,16 @@ services:
             - '6379:6379'
         networks:
             - nesjs-network
-networks:
-    nesjs-network:
-        driver: bridge
-    elasticsearch-network:
-nginx:
+    nginx:
     build: ./nginx
     ports:
     - 80:80
     # depends_on:
     # - dev
+networks:
+    nesjs-network:
+        driver: bridge
+    elasticsearch-network:
 volumes:
     data:
     esdata:
