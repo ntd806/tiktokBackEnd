@@ -398,3 +398,5 @@ tiktok/.env
 tiktok/dist
 data
 esdata
+.env
+dist

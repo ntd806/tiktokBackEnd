@@ -9,6 +9,9 @@ Bunny (using for store video )<br/>
 # Set up 
 * git clone git@github.com:ntd806/tiktokBackEnd.git<br/>
 cd root folder<br/>
+# coppy file .env.example to .env
+cp -b .env.example .env
+# Start project
 * To start our app, write the following command in your terminal<br/>
 docker-compose up dev<br/>
 * This will start it in development mode<br/>
@@ -33,4 +36,4 @@ docker volume rm $(docker volume ls -q)<br/>
 Restart the containers using the following command:<br/>
 docker-compose up dev<br/>
 Use this to delete everything:<br/>
-docker system prune -a --volumes
+docker system prune -a --volumesdocker system prune -a --volumes<p align="center">
