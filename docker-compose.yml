@@ -18,6 +18,7 @@ services:
             - mongo-express
             - kibana
             - redis
+            - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -42,6 +43,7 @@ services:
             - mongo-express
             - kibana
             - redis
+            - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -106,6 +108,12 @@ networks:
     nesjs-network:
         driver: bridge
     elasticsearch-network:
+nginx:
+    build: ./nginx
+    ports:
+    - 80:80
+    # depends_on:
+    # - dev
 volumes:
     data:
     esdata:

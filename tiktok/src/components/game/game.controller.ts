@@ -11,7 +11,7 @@ import {
     Param,
     Query
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiParam, ApiOperation} from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
@@ -22,6 +22,23 @@ export class GameController {
     constructor(private GameService: GameService) {}
 
     @Get()
+    @ApiOperation({
+        summary: 'Get all games'
+    })
+    @ApiParam({
+        name:'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        value:10,
+        // required:true,
+    })
+    @ApiParam({
+        name:'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        value: 1,
+        // required:true,
+    })
     public async getAllGame(
         @Res() res,
         @Query() paginationQuery: PaginationQueryDto
@@ -64,10 +81,7 @@ export class GameController {
         @Body() UpdateGameDto: UpdateGameDto
     ) {
         try {
-            const Game = await this.GameService.update(
-                gameId,
-                UpdateGameDto
-            );
+            const Game = await this.GameService.update(gameId, UpdateGameDto);
             if (!Game) {
                 throw new NotFoundException('Game does not exist!');
             }
