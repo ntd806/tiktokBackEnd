@@ -11,7 +11,7 @@ import {
     Param,
     Query
 } from '@nestjs/common';
-import { ApiTags, ApiParam, ApiOperation} from '@nestjs/swagger';
+import { ApiTags, ApiParam, ApiOperation, ApiOkResponse} from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
@@ -46,6 +46,9 @@ export class GameController {
     }
 
     @Get('/:id')
+    @ApiOperation({
+        summary: 'Get game by id'
+    })
     public async getGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
             throw new NotFoundException('Game ID does not exist');
@@ -57,6 +60,9 @@ export class GameController {
     }
 
     @Post()
+    @ApiOperation({
+        summary: 'Add new game'
+    })
     public async addGame(@Res() res, @Body() CreateGameDto: CreateGameDto) {
         try {
             const Game = await this.GameService.create(CreateGameDto);
@@ -73,6 +79,9 @@ export class GameController {
     }
 
     @Put('/:id')
+    @ApiOperation({
+        summary: 'Update game'
+    })
     public async updateGame(
         @Res() res,
         @Param('id') gameId: string,
@@ -96,6 +105,9 @@ export class GameController {
     }
 
     @Delete('/:id')
+    @ApiOperation({
+        summary: 'Delete game'
+    })
     public async deleteGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
             throw new NotFoundException('Game ID does not exist');

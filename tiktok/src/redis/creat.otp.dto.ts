@@ -1,4 +1,9 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export default class CreateOtpDto {
-    public phoneNumber: string;
-    public smsCode: string;
+    @ApiProperty()
+    phoneNumber: string;
+
+    @ApiProperty()
+    smsCode: string;
 }
