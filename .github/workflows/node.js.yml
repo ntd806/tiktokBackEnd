@@ -34,6 +34,7 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: cp -b .env.example .env
     - run: npm ci
     - run: pm2 stop 0
     - run: pm2 start 0
