@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SearchServiceInterface } from '../interface/search.service.interface';
 import { productIndex } from '../constant/product.elastic';
-import { Product } from '../../../components/product/entity/product.entity';
+import { Product } from '../../../components/video/entity/video.entity';
 
 @Injectable()
 export class ProductElasticIndex {

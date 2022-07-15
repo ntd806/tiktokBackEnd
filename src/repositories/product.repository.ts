@@ -2,8 +2,8 @@ import { BaseAbstractRepository } from './base/base.abstract.repository';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductRepositoryInterface } from '../components/product/interface/product.repository.interface';
-import { Product } from '../components/product/entity/product.entity';
+import { ProductRepositoryInterface } from '../components/video/interface/video.repository.interface';
+import { Product } from '../components/video/entity/video.entity';
 
 @Injectable()
 export class ProductRepository

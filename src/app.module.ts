@@ -11,6 +11,7 @@ import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './redis/redis.module';
 import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
+import { ProductModule } from './components/video/video.module'; 
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -26,7 +27,8 @@ dotenv.config();
         LiveModule,
         AuthModule,
         GameModule,
-        UserModule
+        UserModule,
+        ProductModule
     ],
     controllers: [AppController]
 })

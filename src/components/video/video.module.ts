@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from './entity/product.entity';
-import { ProductRepositoryInterface } from './interface/product.repository.interface';
+import { Product } from './entity/video.entity';
+import { ProductRepositoryInterface } from './interface/video.repository.interface';
 import { ProductRepository } from '../../repositories/product.repository';
-import { ProductServiceInterface } from './interface/product.service.interface';
-import { ProductController } from './product.controller';
-import { ProductService } from './product.service';
+import { ProductServiceInterface } from './interface/video.service.interface';
+import { ProductController } from './video.controller';
+import { ProductService } from './video.service';
 import { SearchService } from '../../services/search/search.service';
 import { SearchServiceInterface } from '../../services/search/interface/search.service.interface';
 

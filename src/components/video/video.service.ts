@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { ProductRepositoryInterface } from './interface/product.repository.interface';
-import { ProductServiceInterface } from './interface/product.service.interface';
-import { CreateProductDto } from './dto/create-product.dto';
-import { Product } from './entity/product.entity';
-import { ProductSearchObject } from './model/product.search.object';
+import { ProductRepositoryInterface } from './interface/video.repository.interface';
+import { ProductServiceInterface } from './interface/video.service.interface';
+import { CreateProductDto } from './dto/create.video.dto';
+import { Product } from './entity/video.entity';
+import { ProductSearchObject } from './model/video.search.object';
 import { SearchServiceInterface } from '../../services/search/interface/search.service.interface';
 
 @Injectable()
