@@ -11,7 +11,7 @@ import {
     Param,
     Query
 } from '@nestjs/common';
-import { ApiTags, ApiParam, ApiOperation} from '@nestjs/swagger';
+import { ApiTags, ApiParam, ApiOperation } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
@@ -26,16 +26,16 @@ export class GameController {
         summary: 'Get all games'
     })
     @ApiParam({
-        name:'limit',
+        name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required:true,
+        required: true
     })
     @ApiParam({
-        name:'offset',
+        name: 'offset',
         type: 'number',
         description: 'enter offset of record',
-        required:true,
+        required: true
     })
     public async getAllGame(
         @Res() res,

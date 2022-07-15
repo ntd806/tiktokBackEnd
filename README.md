@@ -40,3 +40,10 @@ Use this to delete everything:<br/>
 docker system prune -a --volumes<p align="center">
 How do I discard unstaged changes in Git?<br/>
 git stash save --keep-index --include-untracked<br/>
+# Nestjs Error: Cannot find module './app.controller'<br/>
+Run:<br/>
+npm run prebuild<br/>
+or<br/>
+rimraf dist<br/>
+or<br/>
+rm -rf dist<br/>
