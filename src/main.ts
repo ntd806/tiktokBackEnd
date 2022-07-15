@@ -11,7 +11,7 @@ dotenv.config();
 import 'reflect-metadata';
 (async () => {
     const app = await NestFactory.create(AppModule, { cors: true });
-    // app.useGlobalFilters(new HttpExceptionFilter());
+    app.useGlobalFilters(new HttpExceptionFilter());
     const configService = app.get(ConfigService);
     SwaggerModule.setup('api/v1', app, createDocument(app));
     await app.listen(configService.get().port);

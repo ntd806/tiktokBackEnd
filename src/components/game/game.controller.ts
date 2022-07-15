@@ -16,7 +16,7 @@ import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
 
-@ApiTags('games')
+@ApiTags('game')
 @Controller('/api/v1/game')
 export class GameController {
     constructor(private GameService: GameService) {}

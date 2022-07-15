@@ -21,6 +21,7 @@ docker-compose up prod<br/>
 docker ps<br/>
 docker exec -it mycontainer sh ##for alpine<br/>
 # Feature modules
+  * run npm install -g @nestjs/cli
   * To create a module using the CLI, simply execute the $ nest g module cats command.<br/>
   * To create a controller using the CLI, simply execute the $ nest g controller cats command.<br/>
   * To create a service using the CLI, simply execute the $ nest g service cats command.<br/>
@@ -36,4 +37,6 @@ docker volume rm $(docker volume ls -q)<br/>
 Restart the containers using the following command:<br/>
 docker-compose up dev<br/>
 Use this to delete everything:<br/>
-docker system prune -a --volumesdocker system prune -a --volumes<p align="center">
+docker system prune -a --volumes<p align="center">
+How do I discard unstaged changes in Git?<br/>
+git stash save --keep-index --include-untracked<br/>
