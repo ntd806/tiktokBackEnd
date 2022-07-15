@@ -1,4 +1,4 @@
 import { BaseInterfaceRepository } from '../../../repositories/base/base.interface.repository';
-import { Product } from '../entity/video.entity';
+import { Video } from '../entity/video.entity';
 
-export type ProductRepositoryInterface = BaseInterfaceRepository<Product>;
+export type VideoRepositoryInterface = BaseInterfaceRepository<Video>;

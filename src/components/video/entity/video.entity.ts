@@ -1,7 +1,7 @@
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 
-@Entity({ name: 'products' })
-export class Product {
+@Entity({ name: 'videos' })
+export class Video {
     @ObjectIdColumn()
     id: string;
 
@@ -18,7 +18,17 @@ export class Product {
     @Column({
         type: 'string'
     })
-    price: string;
+    url: string;
+
+    @Column({
+        type: 'string'
+    })
+    time: string;
+
+    @Column({
+        type: 'string'
+    })
+    tag: string;
 
     @Column({
         type: 'date'

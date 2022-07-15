@@ -1,30 +1,31 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Product } from './entity/video.entity';
-import { ProductRepositoryInterface } from './interface/video.repository.interface';
-import { ProductRepository } from '../../repositories/product.repository';
-import { ProductServiceInterface } from './interface/video.service.interface';
-import { ProductController } from './video.controller';
-import { ProductService } from './video.service';
+import { Video } from './entity/video.entity';
+import { VideoRepositoryInterface } from './interface/video.repository.interface';
+import { VideoService } from './video.service';
+import { VideoRepository } from '../../repositories/video.repository';
+import { VideoServiceInterface } from './interface/video.service.interface';
+import { VideoController } from './video.controller';
+import {  } from './video.service';
 import { SearchService } from '../../services/search/search.service';
 import { SearchServiceInterface } from '../../services/search/interface/search.service.interface';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Product, ProductRepository])],
+    imports: [TypeOrmModule.forFeature([Video, VideoRepository])],
     providers: [
         {
-            provide: 'ProductRepositoryInterface',
-            useClass: ProductRepository
+            provide: 'VideoRepositoryInterface',
+            useClass: VideoRepository
         },
         {
-            provide: 'ProductServiceInterface',
-            useClass: ProductService
+            provide: 'VideoServiceInterface',
+            useClass: VideoService
         },
         {
             provide: 'SearchServiceInterface',
             useClass: SearchService
         }
     ],
-    controllers: [ProductController]
+    controllers: [VideoController]
 })
-export class ProductModule {}
+export class VideoModule {}

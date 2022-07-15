@@ -1,4 +1,4 @@
-import { productIndex } from '../../../services/search/constant/product.elastic';
+import { VideoIndex } from '../../../services/search/constant/video.elastic';
 
 export class ElasticSearchBody {
     size: number;
@@ -12,10 +12,10 @@ export class ElasticSearchBody {
     }
 }
 
-export class ProductSearchObject {
+export class VideoSearchObject {
     public static searchObject(q: any) {
         const body = this.elasticSearchBody(q);
-        return { index: productIndex._index, body, q };
+        return { index: VideoIndex._index, body, q };
     }
 
     public static elasticSearchBody(q: any): ElasticSearchBody {

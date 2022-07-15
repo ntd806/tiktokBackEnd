@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateProductDto {
+export class CreateVideoDto {
     @IsNotEmpty()
     @IsString()
     name: string;
@@ -11,5 +11,13 @@ export class CreateProductDto {
 
     @IsNotEmpty()
     @IsString()
-    price: string;
+    url: string;
+
+    @IsNotEmpty()
+    @IsString()
+    tag: string;
+
+    @IsNotEmpty()
+    @IsString()
+    time: string;
 }

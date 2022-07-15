@@ -1,10 +1,10 @@
-import { CreateProductDto } from '../dto/create.video.dto';
-import { Product } from '../entity/video.entity';
+import { CreateVideoDto } from '../dto/create.video.dto';
+import { Video } from '../entity/video.entity';
 
-export interface ProductServiceInterface {
-    create(productDto: CreateProductDto): Promise<Product>;
+export interface VideoServiceInterface {
+    create(videoDto: CreateVideoDto): Promise<Video>;
 
-    update(productId: any, updateProduct: any): Promise<Product>;
+    update(videoId: any, updateVideo: any): Promise<Video>;
 
     search(q: any): Promise<any>;
 }

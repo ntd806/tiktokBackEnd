@@ -8,34 +8,34 @@ import {
     Post,
     Query
 } from '@nestjs/common';
-import { ProductServiceInterface } from './interface/video.service.interface';
-import { CreateProductDto } from './dto/create.video.dto';
-import { Product } from './entity/video.entity';
+import { VideoServiceInterface } from './interface/video.service.interface';
+import { CreateVideoDto } from './dto/create.video.dto';
+import { Video } from './entity/video.entity';
 
-@Controller('products')
-export class ProductController {
+@Controller('videos')
+export class VideoController {
     constructor(
-        @Inject('ProductServiceInterface')
-        private readonly productService: ProductServiceInterface
+        @Inject('videoServiceInterface')
+        private readonly videoService: VideoServiceInterface
     ) {}
 
     @Post()
     public async create(
-        @Body() productDto: CreateProductDto
-    ): Promise<Product> {
-        return this.productService.create(productDto);
+        @Body() videoDto: CreateVideoDto
+    ): Promise<Video> {
+        return this.videoService.create(videoDto);
     }
 
     @Patch('/:id')
     public async update(
         @Param('id') id: string,
-        @Body() updateProduct: any
-    ): Promise<Product> {
-        return this.productService.update(id, updateProduct);
+        @Body() updateVideo: any
+    ): Promise<Video> {
+        return this.videoService.update(id, updateVideo);
     }
 
     @Get('/search')
     public async search(@Query() query: any): Promise<any> {
-        return this.productService.search(query.q);
+        return this.videoService.search(query.q);
     }
 }
