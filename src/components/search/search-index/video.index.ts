@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { SearchServiceInterface } from '@services/search/interface/search.service.interface';
-import { productIndex } from '@services/search/constant/product.elastic';
+import { SearchServiceInterface } from '../interface/search.interface';
+import { videoIndex } from '../constant/video.search';
 import { Product } from '@components/product/entity/product.entity';
 
 @Injectable()
@@ -23,8 +23,8 @@ export class ProductElasticIndex {
 
     private async deleteProductDocument(prodId: number): Promise<any> {
         const data = {
-            index: productIndex._index,
-            type: productIndex._type,
+            index: videoIndex._index,
+            type: videoIndex._type,
             id: prodId.toString()
         };
         return this.searchService.deleteDocument(data);
@@ -32,8 +32,8 @@ export class ProductElasticIndex {
 
     private bulkIndex(productId: number): any {
         return {
-            _index: productIndex._index,
-            _type: productIndex._type,
+            _index: videoIndex._index,
+            _type: videoIndex._type,
             _id: productId
         };
     }
@@ -46,8 +46,8 @@ export class ProductElasticIndex {
         bulk.push(product);
         return {
             body: bulk,
-            index: productIndex._index,
-            type: productIndex._type
+            index: videoIndex._index,
+            type: videoIndex._type
         };
     }
 }
