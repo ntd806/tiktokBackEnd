@@ -1,7 +1,9 @@
+import { MaxLength, IsNotEmpty, IsEmail, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export default class CreateOtpDto {
+export class CreateOtpDto {
     @ApiProperty()
+    @IsNotEmpty()
     phoneNumber: string;
 
     @ApiProperty()

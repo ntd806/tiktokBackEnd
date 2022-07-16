@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 
 
 
@@ -16,6 +16,15 @@ export class AuthController {
 
     @ApiOperation({
         summary: 'Register user'
+    })
+
+    @ApiResponse({
+        status: 201,
+        description: `ok`
+    })
+    @ApiResponse({
+        status: 400, 
+        description: `phone exists`
     })
     @Post('register')
     async signup(@Body() dto: AuthDto) {
@@ -29,7 +38,6 @@ export class AuthController {
         } else {
             return {
                 code: 400,
-                data: data,
                 message: 'phone exists'
             };
         }

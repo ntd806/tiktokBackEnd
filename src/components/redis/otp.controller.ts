@@ -1,7 +1,8 @@
-import { Controller, Post, Req, HttpCode } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Post, Req, HttpCode, Body } from '@nestjs/common';
+import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { OtpService } from './otp.service';
-import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiBody } from '@nestjs/swagger';
+import { CreateOtpDto } from './creat.otp.dto';
 @ApiTags('OTP')
 @Controller('/api/v1/otp')
 export class OtpController {
@@ -10,9 +11,13 @@ export class OtpController {
     @ApiOperation({
         summary: 'Send sms otp to phone number'
     })
+    @ApiResponse({
+        status: 200, 
+        description: 'Successfully'
+    })
     @Post('/send-code')
-    async sendCode(@Req() request) {
-        const data = await this.otpService.sendSMS(request.body.phoneNumber);
+    async sendCode(@Body() CreateOtpDto: CreateOtpDto) {
+        const data = await this.otpService.sendSMS(CreateOtpDto.phoneNumber);
 
         return {
             code: 200,
@@ -24,12 +29,16 @@ export class OtpController {
     @ApiOperation({
         summary: 'Verify otp'
     })
+    @ApiResponse({
+        status: 200, 
+        description: 'Successfully'
+    })
     @HttpCode(200)
     @Post('/verify-code')
-    async verifyCode(@Req() request) {
+    async verifyCode(@Body() CreateOtpDto: CreateOtpDto) {
         const data = await this.otpService.verifyCode(
-            request.body.recipientPhoneNumber,
-            request.body.smsCode
+            CreateOtpDto.phoneNumber,
+            CreateOtpDto.smsCode
         );
 
         return {

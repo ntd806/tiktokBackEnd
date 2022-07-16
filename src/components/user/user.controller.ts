@@ -7,11 +7,10 @@ import {
     UseGuards
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { GetUser } from '../auth/decorator';
 import { UserDto } from './dto/user.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
-import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 @UseGuards(JwtStrategy)
 @ApiTags('user')
 @Controller('/api/v1/user')
@@ -21,20 +20,9 @@ export class UserController {
     @ApiOperation({
         summary: 'Get info user'
     })
-    @ApiOkResponse({ description: 
-        `{
-            code: 201,
-            data: {
-                "_id": "xx",
-                "ip": "xx",
-                "mac": "xx",
-                "phone": "xx",
-                "sex": "xx",
-                "birthday": "xx"
-                "__v": 0
-            },
-            message: 'ok'
-        }` 
+    @ApiResponse({
+        status: 200, 
+        description: 'Get successfully'
     })
     @UseGuards(JwtGuard)
     @Get('info')
@@ -44,12 +32,16 @@ export class UserController {
         return {
             code: 200,
             data: req.user,
-            message: 'update successfully'
+            message: 'Get successfully'
         };
     }
 
     @ApiOperation({
         summary: 'Update user'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Update successfully'
     })
     @UseGuards(JwtGuard)
     @Post('update')
@@ -61,7 +53,7 @@ export class UserController {
         return {
             code: 200,
             data: data,
-            message: 'update successfully'
+            message: 'Update successfully'
         };
     }
 }
