@@ -5,13 +5,18 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+
+
 
 @ApiTags('auth')
 @Controller('/api/v1/auth')
 export class AuthController {
     constructor(private authService: AuthService) {}
 
+    @ApiOperation({
+        summary: 'Register user'
+    })
     @Post('register')
     async signup(@Body() dto: AuthDto) {
         const data = await this.authService.signup(dto);

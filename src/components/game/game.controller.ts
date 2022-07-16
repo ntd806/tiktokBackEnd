@@ -45,6 +45,9 @@ export class GameController {
         return res.status(HttpStatus.OK).json(games);
     }
 
+    @ApiOperation({
+        summary: 'Get game by id'
+    })
     @Get('/:id')
     public async getGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
@@ -56,6 +59,9 @@ export class GameController {
         return res.status(HttpStatus.OK).json(Game);
     }
 
+    @ApiOperation({
+        summary: 'Add new game'
+    })
     @Post()
     public async addGame(@Res() res, @Body() CreateGameDto: CreateGameDto) {
         try {
@@ -72,6 +78,9 @@ export class GameController {
         }
     }
 
+    @ApiOperation({
+        summary: 'Update game by id'
+    })
     @Put('/:id')
     public async updateGame(
         @Res() res,
@@ -95,6 +104,9 @@ export class GameController {
         }
     }
 
+    @ApiOperation({
+        summary: 'Delete game by id'
+    })
     @Delete('/:id')
     public async deleteGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {

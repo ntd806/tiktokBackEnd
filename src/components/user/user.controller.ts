@@ -11,13 +11,31 @@ import { GetUser } from '../auth/decorator';
 import { UserDto } from './dto/user.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 @UseGuards(JwtStrategy)
 @ApiTags('user')
 @Controller('/api/v1/user')
 export class UserController {
     constructor(private userService: UserService) {}
 
+    @ApiOperation({
+        summary: 'Get info user'
+    })
+    @ApiOkResponse({ description: 
+        `{
+            code: 201,
+            data: {
+                "_id": "xx",
+                "ip": "xx",
+                "mac": "xx",
+                "phone": "xx",
+                "sex": "xx",
+                "birthday": "xx"
+                "__v": 0
+            },
+            message: 'ok'
+        }` 
+    })
     @UseGuards(JwtGuard)
     @Get('info')
     async info(
@@ -30,6 +48,9 @@ export class UserController {
         };
     }
 
+    @ApiOperation({
+        summary: 'Update user'
+    })
     @UseGuards(JwtGuard)
     @Post('update')
     async updateUser(
