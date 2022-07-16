@@ -1,49 +1,49 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SearchServiceInterface } from '../interface/search.interface';
 import { videoIndex } from '../constant/video.search';
-import { Product } from '@components/product/entity/product.entity';
+import { Movies } from '../../movies/entity/movies.entity';
 
 @Injectable()
-export class ProductElasticIndex {
+export class MoviesElasticIndex {
     constructor(
         @Inject('SearchServiceInterface')
         private readonly searchService: SearchServiceInterface<any>
     ) {}
 
-    public async insertProductDocument(product: Product): Promise<any> {
-        const data = this.productDocument(product);
+    public async insertMoviesDocument(movies: Movies): Promise<any> {
+        const data = this.MoviesDocument(movies);
         return this.searchService.insertIndex(data);
     }
 
-    public async updateProductDocument(product: Product): Promise<any> {
-        const data = this.productDocument(product);
-        await this.deleteProductDocument(product.id);
+    public async updateMoviesDocument(movies: Movies): Promise<any> {
+        const data = this.MoviesDocument(movies);
+        await this.deleteMoviesDocument(movies.id);
         return this.searchService.insertIndex(data);
     }
 
-    private async deleteProductDocument(prodId: number): Promise<any> {
+    private async deleteMoviesDocument(moviesId: number): Promise<any> {
         const data = {
             index: videoIndex._index,
             type: videoIndex._type,
-            id: prodId.toString()
+            id: moviesId.toString()
         };
         return this.searchService.deleteDocument(data);
     }
 
-    private bulkIndex(productId: number): any {
+    private bulkIndex(moviesId: number): any {
         return {
             _index: videoIndex._index,
             _type: videoIndex._type,
-            _id: productId
+            _id: moviesId
         };
     }
 
-    private productDocument(product: Product): any {
+    private MoviesDocument(movies: Movies): any {
         const bulk = [];
         bulk.push({
-            index: this.bulkIndex(product.id)
+            index: this.bulkIndex(movies.id)
         });
-        bulk.push(product);
+        bulk.push(movies);
         return {
             body: bulk,
             index: videoIndex._index,

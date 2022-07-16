@@ -32,7 +32,7 @@ export class SearchService
     public async searchIndex(searchData: any): Promise<any> {
         return this.search(searchData)
             .then((res) => {
-                return res.body.hits.hits;
+                return res;
             })
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
