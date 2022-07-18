@@ -1,7 +1,7 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { ConfigModule } from '../config/config.module';
 import { ConfigService } from '../config/config.service';
-import { DbConfigError, DbError } from './db.error';
+import { DbConfigError } from './db.error';
 import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose';
 
 @Module({})

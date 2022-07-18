@@ -4,7 +4,7 @@ import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 @ApiTags('movies')
 @Controller('/api/v1/movies')
 export class MoviesController {
-    constructor(){}
+    constructor() {}
 
     @ApiOperation({
         summary: 'Get movie'
@@ -13,8 +13,7 @@ export class MoviesController {
     `"ok"` 
     })
     @Get()
-    public get(){
-        return "ok";
+    public get() {
+        return 'ok';
     }
-
 }

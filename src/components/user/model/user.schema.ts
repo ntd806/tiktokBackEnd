@@ -12,16 +12,16 @@ export class User extends Document {
     birthdate: Date;
 
     @Prop({ type: 'object' })
-    ip: object;
-    
+    ip: any;
+
     @Prop({ type: 'object' })
-    mac: object;
-    
+    mac: any;
+
     @Prop()
     phone: string;
 
     @Prop({ type: 'object' })
-    like: object;
+    like: any;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
