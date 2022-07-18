@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { SearchServiceInterface } from '../interface/search.interface';
 import { videoIndex } from '../constant/video.search';
-import { Movies } from '../../movies/entity/movies.entity';
+import { Movies } from './movies.entity';
 
 @Injectable()
 export class MoviesElasticIndex {
