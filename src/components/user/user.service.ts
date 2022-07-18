@@ -14,7 +14,7 @@ export class UserService {
     async updateUser(user: User, dto: UserDto) {
         await user.update(dto);
         await user.save();
-        const newUser = await this.userModel.find({_id: user.id});
+        const newUser = await this.userModel.find({ _id: user.id });
         return newUser;
     }
 }
