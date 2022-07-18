@@ -11,7 +11,7 @@ import {
     Param,
     Query
 } from '@nestjs/common';
-import { ApiTags, ApiParam, ApiOperation} from '@nestjs/swagger';
+import { ApiTags, ApiParam, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
@@ -37,6 +37,10 @@ export class GameController {
         description: 'enter offset of record',
         required:true,
     })
+    @ApiResponse({
+        status: 200, 
+        description: 'Get all game success'
+    })
     public async getAllGame(
         @Res() res,
         @Query() paginationQuery: PaginationQueryDto
@@ -45,6 +49,17 @@ export class GameController {
         return res.status(HttpStatus.OK).json(games);
     }
 
+    @ApiOperation({
+        summary: 'Get game by id'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Get game by id success'
+    })
+    @ApiResponse({
+        status: 404, 
+        description: 'Game ID does not exist'
+    })
     @Get('/:id')
     public async getGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
@@ -56,6 +71,17 @@ export class GameController {
         return res.status(HttpStatus.OK).json(Game);
     }
 
+    @ApiOperation({
+        summary: 'Add new game'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Game has been created successfully'
+    })
+    @ApiResponse({
+        status: 400, 
+        description: 'Error: Game not created!'
+    })
     @Post()
     public async addGame(@Res() res, @Body() CreateGameDto: CreateGameDto) {
         try {
@@ -72,6 +98,21 @@ export class GameController {
         }
     }
 
+    @ApiOperation({
+        summary: 'Update game by id'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Game has been successfully updated'
+    })
+    @ApiResponse({
+        status: 400, 
+        description: 'Error: Game not updated!'
+    })
+    @ApiResponse({
+        status: 404, 
+        description: 'Game ID does not exist'
+    })
     @Put('/:id')
     public async updateGame(
         @Res() res,
@@ -95,6 +136,17 @@ export class GameController {
         }
     }
 
+    @ApiOperation({
+        summary: 'Delete game by id'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Game has been deleted'
+    })
+    @ApiResponse({
+        status: 404, 
+        description: 'Game ID does not exist'
+    })
     @Delete('/:id')
     public async deleteGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
