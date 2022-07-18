@@ -23,9 +23,7 @@ export class MoviesController {
     ) {}
 
     @Post()
-    public async create(
-        @Body() productDto: CreateVideoDto
-    ): Promise<Movies> {
+    public async create(@Body() productDto: CreateVideoDto): Promise<Movies> {
         return this.productService.create(productDto);
     }
 
