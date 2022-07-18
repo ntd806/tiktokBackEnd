@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { SearchServiceInterface } from './interface/search.interface';
-
+import { SearchController } from './search.controller';
 @Module({
     providers: [
         {
@@ -9,6 +9,7 @@ import { SearchServiceInterface } from './interface/search.interface';
             useClass: SearchService
         }
     ],
-    exports: [SearchModule]
+    exports: [SearchModule],
+    controllers: [SearchController]
 })
 export class SearchModule {}
