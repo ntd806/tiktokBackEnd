@@ -1,4 +1,4 @@
-import { Controller, Post, Req, HttpCode, Body } from '@nestjs/common';
+import { Controller, Post, HttpCode, Body, Query, Get } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { OtpService } from './otp.service';
 import { ApiOperation, ApiBody } from '@nestjs/swagger';
@@ -46,5 +46,17 @@ export class OtpController {
             data: data,
             message: 'Successfully'
         };
+    }
+
+    @ApiOperation({
+        summary: 'Get otp'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Successfully'
+    })
+    @Get('')
+    public async getCode(@Query('phoneNumber') phoneNumber:string){
+        return this.otpService.getCode(phoneNumber);
     }
 }
