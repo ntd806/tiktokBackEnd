@@ -12,16 +12,17 @@ export class User extends Document {
     birthdate: Date;
 
     @Prop({ type: 'object' })
-    ip: object;
-    
+    ip: any;
+
     @Prop({ type: 'object' })
-    mac: object;
-    
+    mac: any;
+
     @Prop()
     phone: string;
 
     @Prop({ type: 'array' })
     like: [{ video_id: String }];
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

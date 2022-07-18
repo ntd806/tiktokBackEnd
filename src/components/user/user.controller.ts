@@ -27,9 +27,7 @@ export class UserController {
     })
     @UseGuards(JwtGuard)
     @Get('info')
-    async info(
-        @Request() req
-    ) {
+    async info(@Request() req) {
         return {
             code: 200,
             data: req.user,
@@ -46,10 +44,7 @@ export class UserController {
     })
     @UseGuards(JwtGuard)
     @Post('update')
-    async updateUser(
-        @Request() req,
-        @Body() dto: UserDto
-    ) {
+    async updateUser(@Request() req, @Body() dto: UserDto) {
         const data = await this.userService.updateUser(req.user, dto);
         return {
             code: 200,
