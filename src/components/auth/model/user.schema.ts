@@ -13,10 +13,10 @@ export class User extends Document {
 
     @Prop({ type: 'object' })
     ip: object;
-    
+
     @Prop({ type: 'object' })
     mac: object;
-    
+
     @Prop()
     phone: string;
 

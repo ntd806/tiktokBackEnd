@@ -26,16 +26,16 @@ export class GameController {
         summary: 'Get all games'
     })
     @ApiParam({
-        name:'limit',
+        name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required:true,
+        required: true
     })
     @ApiParam({
-        name:'offset',
+        name: 'offset',
         type: 'number',
         description: 'enter offset of record',
-        required:true,
+        required: true
     })
     @ApiResponse({
         status: 200, 
