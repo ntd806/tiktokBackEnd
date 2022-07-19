@@ -1,5 +1,4 @@
-import { Module, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { Module } from '@nestjs/common';
 import { AppController } from './app/controllers/app.controller';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
@@ -10,7 +9,6 @@ import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './components/redis/redis.module';
 import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
-import { SearchModule } from './components/search/search.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -27,7 +25,6 @@ dotenv.config();
         AuthModule,
         GameModule,
         UserModule,
-        SearchModule,
     ],
     controllers: [AppController]
 })
