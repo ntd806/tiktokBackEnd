@@ -20,14 +20,14 @@ export class GameService {
             .find()
             .skip(offset)
             .limit(limit)
-            .populate('organization')
+            // .populate('organization')
             .exec();
     }
 
     public async findOne(gameId: string): Promise<Game> {
         const Game = await this.gameModel
             .findById({ _id: gameId })
-            .populate('organization')
+            // .populate('organization')
             .exec();
 
         if (!Game) {
