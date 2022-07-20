@@ -84,4 +84,36 @@ export class UserController {
         }
         
     }
+
+    @ApiOperation({
+        summary: 'Unlike video'
+    })
+    @ApiResponse({
+        status: 200, 
+        description: 'Unlike video successfully'
+    })
+    @ApiResponse({
+        status: 400, 
+        description: 'Unlike video false'
+    })
+    @UseGuards(JwtGuard)
+    @Post('unlike-video')
+    async unlikeVideo(
+        @Request() req,
+        @Body() dto: LikeDto
+    ) {
+        const data = await this.userService.unlikeVideo(req.user, dto.video_id);
+        if(data) {
+            return {
+                code: 200,
+                message: 'Unlike video successfully'
+            };
+        } else {
+            return {
+                code: 400,
+                message: 'Unlike video false'
+            };
+        }
+        
+    }
 }

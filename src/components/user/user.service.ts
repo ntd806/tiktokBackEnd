@@ -43,4 +43,28 @@ export class UserService {
         await user.save();
         return true;
     }
+
+    async unlikeVideo(user: User, video_id: string) {
+        console.log(user);
+        let likeUpdate = [];
+        if (typeof user.like == 'undefined') {
+            return false;
+        } else {
+            likeUpdate = user.like;
+            const index = likeUpdate.find(({ video_id }) => video_id === video_id)
+            if(index) {
+                likeUpdate = likeUpdate.splice(index, 1);;
+            } else {
+                return false;
+            }
+        }
+        await this.userModel.findOneAndUpdate(
+            { _id: user._id },
+            {
+              like: likeUpdate
+            }
+          );
+        await user.save();
+        return true;
+    }
 }
