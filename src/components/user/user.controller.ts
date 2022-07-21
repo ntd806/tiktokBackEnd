@@ -109,7 +109,6 @@ export class UserController {
         }
     }
 
-
     @ApiOperation({
         summary: 'Verify phone number'
     })
@@ -124,7 +123,10 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Post('verify-phone-number')
     async verifyPhoneNumber(@Request() req, @Body() dto: UserDto) {
-        const data = await this.userService.verifyPhoneNumber(req.user, dto.phone);
+        const data = await this.userService.verifyPhoneNumber(
+            req.user,
+            dto.phone
+        );
 
         if (!data) {
             return {
@@ -132,7 +134,7 @@ export class UserController {
                 data: false,
                 message: 'Phone number is taken'
             };
-        } 
+        }
 
         return {
             code: 200,
