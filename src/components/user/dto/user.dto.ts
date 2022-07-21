@@ -1,7 +1,23 @@
-import { IsString, IsDateString, IsObject } from 'class-validator';
+import { IsString, IsDateString, IsNotEmpty } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    ip: string;
+
+    @ApiProperty()
+    @IsString()
+    mac: string;
+
+    @ApiProperty({
+        description: 'Phone number of user'
+    })
+    @IsNotEmpty()
+    @IsString()
+    phone: string;
+
     @ApiProperty({
         description: 'Birthday of user'
     })
@@ -19,22 +35,4 @@ export class UserDto {
     })
     @IsString()
     fullname: string;
-
-    @ApiProperty({
-        description: 'phone of user'
-    })
-    @IsString()
-    phone: string;
-
-    @ApiProperty({
-        description: 'ip of user'
-    })
-    @IsObject()
-    ip: object;
-
-    @ApiProperty({
-        description: 'mac of user'
-    })
-    @IsObject()
-    mac: object;
 }
