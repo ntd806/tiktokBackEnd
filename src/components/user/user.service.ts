@@ -20,40 +20,41 @@ export class UserService {
     }
 
     async likeVideo(user: User, video_id: string) {
-        console.log(user);
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
-            likeUpdate = [{video_id: video_id}];
+            likeUpdate = [{ video_id: video_id }];
         } else {
             likeUpdate = user.like;
-            const index = likeUpdate.find(({ video_id }) => video_id === video_id)
-            if(index) {
+            const index = likeUpdate.find(
+                ({ video_id }) => video_id === video_id
+            );
+            if (index) {
                 return false;
             } else {
-                likeUpdate.push({video_id: video_id});
+                likeUpdate.push({ video_id: video_id });
             }
-            
         }
         await this.userModel.findOneAndUpdate(
             { _id: user._id },
             {
-              like: likeUpdate
+                like: likeUpdate
             }
-          );
+        );
         await user.save();
         return true;
     }
 
     async unlikeVideo(user: User, video_id: string) {
-        console.log(user);
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
             return false;
         } else {
             likeUpdate = user.like;
-            const index = likeUpdate.find(({ video_id }) => video_id === video_id)
-            if(index) {
-                likeUpdate = likeUpdate.splice(index, 1);;
+            const index = likeUpdate.find(
+                ({ video_id }) => video_id === video_id
+            );
+            if (index) {
+                likeUpdate = likeUpdate.splice(index, 1);
             } else {
                 return false;
             }
@@ -61,10 +62,18 @@ export class UserService {
         await this.userModel.findOneAndUpdate(
             { _id: user._id },
             {
-              like: likeUpdate
+                like: likeUpdate
             }
-          );
+        );
         await user.save();
+        return true;
+    }
+
+    async verifyPhoneNumber(user: User, phone: string) {
+        if (user.phone === phone) {
+            return false;
+        }
+
         return true;
     }
 }

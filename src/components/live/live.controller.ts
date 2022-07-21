@@ -14,11 +14,10 @@ export class LiveController {
         summary: 'Get list live'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Ok'
     })
     @Get()
-    
     public async getLiveList(): Promise<Live> {
         return this.liveService.getLiveList();
     }

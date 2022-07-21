@@ -12,7 +12,7 @@ export class OtpController {
         summary: 'Send sms otp to phone number'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Successfully'
     })
     @Post('/send-code')
@@ -30,7 +30,7 @@ export class OtpController {
         summary: 'Verify otp'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Successfully'
     })
     @HttpCode(200)
@@ -52,11 +52,11 @@ export class OtpController {
         summary: 'Get otp'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Successfully'
     })
     @Get('')
-    public async getCode(@Query('phoneNumber') phoneNumber:string){
+    public async getCode(@Query('phoneNumber') phoneNumber: string) {
         return this.otpService.getCode(phoneNumber);
     }
 }
