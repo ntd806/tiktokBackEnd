@@ -1,9 +1,12 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
-import { ApiTags, ApiResponse, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
-
-
+import {
+    ApiTags,
+    ApiResponse,
+    ApiOkResponse,
+    ApiOperation
+} from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('/api/v1/auth')
@@ -13,13 +16,12 @@ export class AuthController {
     @ApiOperation({
         summary: 'Register user'
     })
-
     @ApiResponse({
         status: 201,
         description: `ok`
     })
     @ApiResponse({
-        status: 400, 
+        status: 400,
         description: `phone exists`
     })
     @Post('register')

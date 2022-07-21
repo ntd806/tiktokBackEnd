@@ -4,7 +4,6 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 @ApiTags('health')
 @Controller('/api/v1')
 export class AppController {
-
     @ApiOperation({
         summary: 'Check sever is live'
     })

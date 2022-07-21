@@ -9,9 +9,7 @@ export class MoviesController {
     @ApiOperation({
         summary: 'Get movie'
     })
-    @ApiOkResponse({ description: 
-    `"ok"` 
-    })
+    @ApiOkResponse({ description: `"ok"` })
     @Get()
     public get() {
         return 'ok';

@@ -38,7 +38,7 @@ export class GameController {
         required: true
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Get all game success'
     })
     public async getAllGame(
@@ -53,11 +53,11 @@ export class GameController {
         summary: 'Get game by id'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Get game by id success'
     })
     @ApiResponse({
-        status: 404, 
+        status: 404,
         description: 'Game ID does not exist'
     })
     @Get('/:id')
@@ -75,11 +75,11 @@ export class GameController {
         summary: 'Add new game'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Game has been created successfully'
     })
     @ApiResponse({
-        status: 400, 
+        status: 400,
         description: 'Error: Game not created!'
     })
     @Post()
@@ -102,15 +102,15 @@ export class GameController {
         summary: 'Update game by id'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Game has been successfully updated'
     })
     @ApiResponse({
-        status: 400, 
+        status: 400,
         description: 'Error: Game not updated!'
     })
     @ApiResponse({
-        status: 404, 
+        status: 404,
         description: 'Game ID does not exist'
     })
     @Put('/:id')
@@ -140,11 +140,11 @@ export class GameController {
         summary: 'Delete game by id'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Game has been deleted'
     })
     @ApiResponse({
-        status: 404, 
+        status: 404,
         description: 'Game ID does not exist'
     })
     @Delete('/:id')

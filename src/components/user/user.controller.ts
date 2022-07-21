@@ -22,7 +22,7 @@ export class UserController {
         summary: 'Get info user'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Get successfully'
     })
     @UseGuards(JwtGuard)
@@ -39,7 +39,7 @@ export class UserController {
         summary: 'Update user'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Update successfully'
     })
     @UseGuards(JwtGuard)
@@ -57,21 +57,18 @@ export class UserController {
         summary: 'Like video'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Like video successfully'
     })
     @ApiResponse({
-        status: 400, 
+        status: 400,
         description: 'Like video false'
     })
     @UseGuards(JwtGuard)
     @Post('like-video')
-    async likeVideo(
-        @Request() req,
-        @Body() dto: LikeDto
-    ) {
+    async likeVideo(@Request() req, @Body() dto: LikeDto) {
         const data = await this.userService.likeVideo(req.user, dto.video_id);
-        if(data) {
+        if (data) {
             return {
                 code: 200,
                 message: 'Like video successfully'
@@ -82,28 +79,24 @@ export class UserController {
                 message: 'Like video false'
             };
         }
-        
     }
 
     @ApiOperation({
         summary: 'Unlike video'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'Unlike video successfully'
     })
     @ApiResponse({
-        status: 400, 
+        status: 400,
         description: 'Unlike video false'
     })
     @UseGuards(JwtGuard)
     @Post('unlike-video')
-    async unlikeVideo(
-        @Request() req,
-        @Body() dto: LikeDto
-    ) {
+    async unlikeVideo(@Request() req, @Body() dto: LikeDto) {
         const data = await this.userService.unlikeVideo(req.user, dto.video_id);
-        if(data) {
+        if (data) {
             return {
                 code: 200,
                 message: 'Unlike video successfully'
@@ -114,6 +107,37 @@ export class UserController {
                 message: 'Unlike video false'
             };
         }
-        
+    }
+
+
+    @ApiOperation({
+        summary: 'Verify phone number'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'Verify phone number successfully'
+    })
+    @ApiResponse({
+        status: 400,
+        description: 'Phone number is taken'
+    })
+    @UseGuards(JwtGuard)
+    @Post('verify-phone-number')
+    async verifyPhoneNumber(@Request() req, @Body() dto: UserDto) {
+        const data = await this.userService.verifyPhoneNumber(req.user, dto.phone);
+
+        if (!data) {
+            return {
+                code: 400,
+                data: false,
+                message: 'Phone number is taken'
+            };
+        } 
+
+        return {
+            code: 200,
+            data: true,
+            message: 'Verify phone number successfully'
+        };
     }
 }
