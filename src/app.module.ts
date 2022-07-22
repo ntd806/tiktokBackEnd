@@ -1,4 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, Scope } from '@nestjs/common';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { HttpExceptionFilter } from './vender/core/filter/exception.filter';
+import { LoggingInterceptor } from './vender/core/interceptors/logging.interceptor';
+import { RequestService } from './vender/core/request.service';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './components/auth/auth.module';
@@ -28,6 +32,18 @@ dotenv.config();
         UserModule,
         SearchModule,
         MoviesModule
+    ],
+    providers: [
+        RequestService,
+        {
+            provide: APP_INTERCEPTOR,
+            scope: Scope.REQUEST,
+            useClass: LoggingInterceptor
+        },
+        {
+            provide: APP_FILTER,
+            useClass: HttpExceptionFilter
+        }
     ],
     controllers: []
 })

@@ -1,9 +1,14 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { Injectable, HttpService, Logger} from '@nestjs/common';
 import { map } from 'rxjs/operators';
+import { RequestService } from 'src/vender/core/request.service';
 
 @Injectable()
 export class LiveService {
-    constructor(private readonly httpService: HttpService) {}
+    private readonly logger = new Logger(LiveService.name);
+    constructor(
+        private readonly requestService: RequestService,
+        private readonly httpService: HttpService
+    ) {}
     /**
      * URL of live streamming server
      *
@@ -26,6 +31,7 @@ export class LiveService {
     private options: any = {};
 
     public async getLiveList(): Promise<any> {
+        this.logger.log('userId:', this.requestService.getUserId());
         return this.httpService
             .post(this.url, this.data, this.options)
             .pipe(map((resp) => resp.data.streamKey));
