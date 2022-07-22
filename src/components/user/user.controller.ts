@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
+import { VerifyDto } from './dto/verify.dto';
 import { LikeDto } from './dto/like.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
@@ -122,7 +123,7 @@ export class UserController {
     })
     @UseGuards(JwtGuard)
     @Post('verify-phone-number')
-    async verifyPhoneNumber(@Request() req, @Body() dto: UserDto) {
+    async verifyPhoneNumber(@Request() req, @Body() dto: VerifyDto) {
         const data = await this.userService.verifyPhoneNumber(
             req.user,
             dto.phone
