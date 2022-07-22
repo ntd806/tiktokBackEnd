@@ -1,6 +1,4 @@
-import { Module, RequestMethod, MiddlewareConsumer } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app/controllers/app.controller';
+import { Module } from '@nestjs/common';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './components/auth/auth.module';
@@ -31,6 +29,6 @@ dotenv.config();
         SearchModule,
         MoviesModule
     ],
-    controllers: [AppController]
+    controllers: []
 })
 export class AppModule {}
