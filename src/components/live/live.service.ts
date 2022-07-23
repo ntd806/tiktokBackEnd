@@ -1,4 +1,4 @@
-import { Injectable, HttpService, Logger} from '@nestjs/common';
+import { Injectable, HttpService, Logger } from '@nestjs/common';
 import { map } from 'rxjs/operators';
 import { RequestService } from 'src/vender/core/request.service';
 

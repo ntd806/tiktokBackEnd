@@ -1,4 +1,4 @@
-import { Module, Scope } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, Scope } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { HttpExceptionFilter } from './vender/core/filter/exception.filter';
 import { LoggingInterceptor } from './vender/core/interceptors/logging.interceptor';
@@ -14,6 +14,7 @@ import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
 import { SearchModule } from './components/search/search.module';
 import { MoviesModule } from './components/movies/movies.module';
+import { LoggerMiddleware } from './logger/logger.middleware';
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -35,6 +36,7 @@ dotenv.config();
     ],
     providers: [
         RequestService,
+        LoggerMiddleware,
         {
             provide: APP_INTERCEPTOR,
             scope: Scope.REQUEST,
@@ -47,4 +49,8 @@ dotenv.config();
     ],
     controllers: []
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(LoggerMiddleware).forRoutes('*');
+    }
+}
