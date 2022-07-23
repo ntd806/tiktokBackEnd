@@ -9,14 +9,18 @@ import {
     NotFoundException,
     Delete,
     Param,
-    Query
+    Query,
+    UseGuards
 } from '@nestjs/common';
-import { ApiTags, ApiParam, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiParam, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
+import { JwtGuard } from '../auth/guard';
 
 @ApiTags('game')
+@UseGuards(JwtGuard)
+@ApiBearerAuth('Authorization')
 @Controller('/api/v1/game')
 export class GameController {
     constructor(private GameService: GameService) {}
