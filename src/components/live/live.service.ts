@@ -1,6 +1,6 @@
-import { Injectable, HttpService } from '@nestjs/common';
+import { Injectable, HttpService, HttpException, HttpStatus } from '@nestjs/common';
 import { map } from 'rxjs/operators';
-
+import { StatusCode } from 'src/vender/core/Status/status.code';
 @Injectable()
 export class LiveService {
     constructor(private readonly httpService: HttpService) {}
@@ -26,8 +26,15 @@ export class LiveService {
     private options: any = {};
 
     public async getLiveList(): Promise<any> {
-        return this.httpService
+        try {
+            return this.httpService
             .post(this.url, this.data, this.options)
             .pipe(map((resp) => resp.data.streamKey));
+        } catch (error) {
+            throw new HttpException({
+                status: StatusCode.NOT_FOUND_SERVER_LIVE_STREAM,
+                error: 'occured with server livestream',
+            }, HttpStatus.CONFLICT);
+        }
     }
 }
