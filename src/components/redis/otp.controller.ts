@@ -1,8 +1,9 @@
 import { Controller, Post, HttpCode, Body, Query, Get } from '@nestjs/common';
 import { ApiTags, ApiResponse } from '@nestjs/swagger';
 import { OtpService } from './otp.service';
-import { ApiOperation, ApiBody } from '@nestjs/swagger';
+import { ApiOperation } from '@nestjs/swagger';
 import { CreateOtpDto } from './creat.otp.dto';
+import { VerifyOtpDto } from './verify.opt.dto';
 @ApiTags('OTP')
 @Controller('/api/v1/otp')
 export class OtpController {
@@ -35,10 +36,10 @@ export class OtpController {
     })
     @HttpCode(200)
     @Post('/verify-code')
-    async verifyCode(@Body() CreateOtpDto: CreateOtpDto) {
+    async verifyCode(@Body() verifyOtpDto: VerifyOtpDto) {
         const data = await this.otpService.verifyCode(
-            CreateOtpDto.phoneNumber,
-            CreateOtpDto.smsCode
+            verifyOtpDto.phoneNumber,
+            verifyOtpDto.smsCode
         );
 
         return {
