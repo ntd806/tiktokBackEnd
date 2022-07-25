@@ -18,7 +18,8 @@ export class OtpService {
         try {
             return await this.client.messages.create({
                 body: message,
-                messagingServiceSid: process.env.TWILIO_PHONE_NUMBER,
+                from: process.env.TWILIO_PHONE_NUMBER,
+                // messagingServiceSid: process.env.TWILIO_PHONE_NUMBER,
                 to: phoneNumber
             });
         } catch (e) {
