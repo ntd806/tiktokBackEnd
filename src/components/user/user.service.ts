@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { UserDto } from './dto/user.dto';
-import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -66,14 +65,6 @@ export class UserService {
             }
         );
         await user.save();
-        return true;
-    }
-
-    async verifyPhoneNumber(user: User, phone: string) {
-        if (user.phone === phone) {
-            return false;
-        }
-
         return true;
     }
 }

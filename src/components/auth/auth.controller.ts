@@ -4,9 +4,10 @@ import { AuthDto } from './dto/auth.dto';
 import {
     ApiTags,
     ApiResponse,
-    ApiOkResponse,
     ApiOperation
 } from '@nestjs/swagger';
+import { StatusCode } from 'src/vender/core/Status/status.code';
+import { VerifyDto } from '../user/dto/verify.dto';
 
 @ApiTags('auth')
 @Controller('/api/v1/auth')
@@ -39,5 +40,21 @@ export class AuthController {
                 message: 'phone exists'
             };
         }
+    }
+
+    @ApiOperation({
+        summary: 'Verify phone number'
+    })
+    @ApiResponse({
+        status: 70001,
+        description: 'Verify phone number successfully'
+    })
+    @ApiResponse({
+        status: 70000,
+        description: 'Phone number is taken'
+    })
+    @Post('verify-phone-number')
+    async verifyPhoneNumber(@Body() verifyDto: VerifyDto) {
+        return await this.authService.verifyPhoneNumber(verifyDto);
     }
 }

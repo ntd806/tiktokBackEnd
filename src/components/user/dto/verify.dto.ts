@@ -8,4 +8,8 @@ export class VerifyDto {
     @IsNotEmpty()
     @IsString()
     phone: string;
+
+    @ApiProperty()
+    @IsString()
+    mac: string;
 }
