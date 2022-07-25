@@ -5,7 +5,4 @@ export class CreateOtpDto {
     @ApiProperty()
     @IsNotEmpty()
     phoneNumber: string;
-
-    @ApiProperty()
-    smsCode: string;
 }
