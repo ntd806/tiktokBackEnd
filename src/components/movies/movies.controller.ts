@@ -1,7 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiOkResponse, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOkResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtGuard } from '../auth/guard';
 
 @ApiTags('movies')
+@UseGuards(JwtGuard)
+@ApiBearerAuth('Authorization')
 @Controller('/api/v1/movies')
 export class MoviesController {
     constructor() {}

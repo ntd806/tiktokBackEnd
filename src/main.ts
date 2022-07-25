@@ -4,7 +4,7 @@ import { ConfigService } from './config/config.service';
 import { createDocument } from './swagger/swagger';
 import { SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
-import { HttpExceptionFilter } from './app/core/filter/exception.filter';
+import { HttpExceptionFilter } from './vender/core/filter/exception.filter';
 // import { Transport } from '@nestjs/microservices';
 
 dotenv.config();
