@@ -5,12 +5,7 @@ import { SearchController } from './search.controller';
 
 @Module({
   imports: [],
-  providers: [
-    {
-      provide: "SearchServiceInterface",
-      useClass: SearchService
-    }
-  ],
+  providers: [SearchService],
   controllers: [SearchController],
   exports: [SearchModule]
 })
