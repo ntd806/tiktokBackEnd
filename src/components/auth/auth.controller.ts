@@ -50,8 +50,12 @@ export class AuthController {
         description: 'Verify phone number successfully'
     })
     @ApiResponse({
-        status: 70000,
-        description: 'Phone number is taken'
+        status: 70003,
+        description: 'the another device'
+    })
+    @ApiResponse({
+        status: 70003,
+        description: 'The old device'
     })
     @Post('verify-phone-number')
     async verifyPhoneNumber(@Body() verifyDto: VerifyDto) {

@@ -9,6 +9,9 @@ export class VerifyDto {
     @IsString()
     phone: string;
 
+    @ApiProperty({
+        description: 'MAC address'
+    })
     @ApiProperty()
     @IsString()
     mac: string;

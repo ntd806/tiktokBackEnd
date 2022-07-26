@@ -5,8 +5,6 @@ import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { VerifyDto } from '../user/dto/verify.dto';
-import { StatusCode } from 'src/vender/core/Status/status.code';
-import { Helper } from 'src/vender/core/helpers/helper';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +12,6 @@ export class AuthService {
         private readonly jwt: JwtService,
         @InjectModel(User.name)
         private readonly authModel: Model<User>,
-        private helper: Helper,
     ) {}
 
     async signup(dto: AuthDto) {
@@ -47,8 +44,9 @@ export class AuthService {
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
             const user = await this.authModel.find({phone:verifyDto.phone}).exec();
-    
-            if (this.helper.isNullOrUndefined(user)) {
+            const count = user.length
+            
+            if (count == 0) {
                 return {
                     code: 70001,
                     data: true,
@@ -56,9 +54,25 @@ export class AuthService {
                 };
             }
 
-            if (!this.helper.isNullOrUndefined(user) && user.mac === verifyDto.mac)
+            if (count >= 1) {
+                for (let item of user) {
+                    let splitted = `${item.mac}`.split(",");
+                    if (!splitted.includes(`${verifyDto.mac}`)) {
+                        return {
+                            code: 70003,
+                            data: false,
+                            message: 'the another device'
+                        };
+                    }
+                }
+            }
 
-            return user;
+            return {
+                code: 70004,
+                data: false,
+                message: 'The old device'
+            };
+            
         } catch (error) {
             throw new NotFoundException(error);
         }
