@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
-import { VerifyDto } from './dto/verify.dto';
 import { LikeDto } from './dto/like.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
@@ -109,39 +108,5 @@ export class UserController {
                 message: 'Unlike video false'
             };
         }
-    }
-
-    @ApiOperation({
-        summary: 'Verify phone number'
-    })
-    @ApiResponse({
-        status: 200,
-        description: 'Verify phone number successfully'
-    })
-    @ApiResponse({
-        status: 400,
-        description: 'Phone number is taken'
-    })
-    @UseGuards(JwtGuard)
-    @Post('verify-phone-number')
-    async verifyPhoneNumber(@Request() req, @Body() dto: VerifyDto) {
-        const data = await this.userService.verifyPhoneNumber(
-            req.user,
-            dto.phone
-        );
-
-        if (!data) {
-            return {
-                code: 400,
-                data: false,
-                message: 'Phone number is taken'
-            };
-        }
-
-        return {
-            code: 200,
-            data: true,
-            message: 'Verify phone number successfully'
-        };
     }
 }
