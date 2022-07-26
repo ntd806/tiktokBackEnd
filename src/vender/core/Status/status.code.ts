@@ -1,12 +1,12 @@
 export declare enum StatusCode {
     /**
      * Server live streamming
-     * 
+     *
      */
     NOT_FOUND_SERVER_LIVE_STREAM = 90000, // can not connect to server live streamming
     /**
      * User
-     * 
+     *
      */
     NOT_FOUND_USER_ID = 40000,
     USER_CREATED_SUCCESSFULLY = 40001,
@@ -17,7 +17,7 @@ export declare enum StatusCode {
     USER_EDITED_FAILED = 40006,
     /**
      * Game
-     * 
+     *
      */
     NOT_FOUND_GAME_ID = 50000,
     GAME_CREATED_SUCCESSFULLY = 50001,
@@ -28,7 +28,7 @@ export declare enum StatusCode {
     GAME_EDITED_FAILED = 50006,
     /**
      * Video
-     * 
+     *
      */
     NOT_FOUND_VIDEO_ID = 60000,
     VIDEO_CREATED_SUCCESSFULLY = 60001,
@@ -44,5 +44,5 @@ export declare enum StatusCode {
     PHONE_NUMBER_VERIFIED_SUCCESSFULLY = 70001,
     PHONE_NUMBER_HAS_TAKEN = 70002,
     ANOTHER_DEVICE = 70003,
-    THE_OLD_DEVICE = 70004,
+    THE_OLD_DEVICE = 70004
 }

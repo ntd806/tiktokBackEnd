@@ -11,7 +11,12 @@ import { UserDto } from './dto/user.dto';
 import { LikeDto } from './dto/like.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
-import { ApiTags, ApiResponse, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiResponse,
+    ApiOperation,
+    ApiBearerAuth
+} from '@nestjs/swagger';
 @UseGuards(JwtStrategy)
 @ApiBearerAuth('Authorization')
 @ApiTags('user')
