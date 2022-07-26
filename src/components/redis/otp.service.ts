@@ -18,7 +18,8 @@ export class OtpService {
         try {
             return await this.client.messages.create({
                 body: message,
-                messagingServiceSid: process.env.TWILIO_PHONE_NUMBER,
+                from: process.env.TWILIO_PHONE_NUMBER,
+                // messagingServiceSid: process.env.TWILIO_PHONE_NUMBER,
                 to: phoneNumber
             });
         } catch (e) {
@@ -46,12 +47,12 @@ export class OtpService {
         await this.redisCacheService.setCode(phoneNumber, randomNumber);
 
         return {
-            code:200,
+            code: 200,
             data: {
-                message:message,
-                code:randomNumber
+                message: message,
+                code: randomNumber
             },
             message: 'Successfuly'
-        }
+        };
     }
 }

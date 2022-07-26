@@ -20,8 +20,8 @@ export class User extends Document {
     @Prop()
     phone: string;
 
-    @Prop({ type: 'object' })
-    like: any;
+    @Prop({ type: 'array' })
+    like: [{ video_id: string }];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

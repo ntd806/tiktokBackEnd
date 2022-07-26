@@ -17,4 +17,54 @@ export class UserService {
         const newUser = await this.userModel.find({ _id: user.id });
         return newUser;
     }
+
+    async likeVideo(user: User, video_id: string) {
+        let likeUpdate = [];
+        if (typeof user.like == 'undefined') {
+            likeUpdate = [{ video_id: video_id }];
+        } else {
+            likeUpdate = user.like;
+            const index = likeUpdate.find(
+                ({ video_id }) => video_id === video_id
+            );
+            if (index) {
+                return false;
+            } else {
+                likeUpdate.push({ video_id: video_id });
+            }
+        }
+        await this.userModel.findOneAndUpdate(
+            { _id: user._id },
+            {
+                like: likeUpdate
+            }
+        );
+        await user.save();
+        return true;
+    }
+
+    async unlikeVideo(user: User, video_id: string) {
+        let likeUpdate = [];
+        if (typeof user.like == 'undefined') {
+            return false;
+        } else {
+            likeUpdate = user.like;
+            const index = likeUpdate.find(
+                ({ video_id }) => video_id === video_id
+            );
+            if (index) {
+                likeUpdate = likeUpdate.splice(index, 1);
+            } else {
+                return false;
+            }
+        }
+        await this.userModel.findOneAndUpdate(
+            { _id: user._id },
+            {
+                like: likeUpdate
+            }
+        );
+        await user.save();
+        return true;
+    }
 }

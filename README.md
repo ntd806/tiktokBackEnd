@@ -5,7 +5,6 @@ MongoDB >= 5.0<br/>
 Docker<br/>
 Elasticsearch<br/>
 Redis<br/>
-Bunny (using for store video )<br/>
 # Set up 
 * git clone git@github.com:ntd806/tiktokBackEnd.git<br/>
 cd root folder<br/>
@@ -26,19 +25,24 @@ docker exec -it mycontainer sh ##for alpine<br/>
   * To create a controller using the CLI, simply execute the $ nest g controller cats command.<br/>
   * To create a service using the CLI, simply execute the $ nest g service cats command.<br/>
 # Do a Clean Restart of a Docker Instance
-Stop the container(s) using the following command:<br/>
-docker-compose down<br/>
-To delete all the images:<br/>
-docker rmi -f $(docker images -aq)<br/>
-Delete all containers using the following command:<br/>
-docker rm -f $(docker ps -a -q)<br/>
-Delete all volumes using the following command:<br/>
-docker volume rm $(docker volume ls -q)<br/>
-Restart the containers using the following command:<br/>
-docker-compose up dev<br/>
-Use this to delete everything:<br/>
-docker system prune -a --volumes<p align="center">
-How do I discard unstaged changes in Git?<br/>
+  * Stop the container(s) using the following command:<br/>
+    docker-compose down<br/>
+    
+  * To delete all the images:<br/>
+    docker rmi -f $(docker images -aq)<br/>
+
+  * Delete all containers using the following command:<br/>
+    docker rm -f $(docker ps -a -q)<br/>
+
+  * Delete all volumes using the following command:<br/>
+    docker volume rm $(docker volume ls -q)<br/>
+
+  * Use this to delete everything:<br/>
+    docker system prune -a --volumes
+
+  * Restart the containers using the following command:<br/>
+    docker-compose up dev<br/>
+#  How do I discard unstaged changes in Git?<br/>
 git stash save --keep-index --include-untracked<br/>
 # Nestjs Error: Cannot find module './app.controller'<br/>
 Run:<br/>

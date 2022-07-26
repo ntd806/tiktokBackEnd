@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app/controllers/app.controller';
 import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './components/auth/auth.module';
@@ -28,6 +27,6 @@ dotenv.config();
         UserModule,
         SearchModule
     ],
-    controllers: [AppController]
+    controllers: []
 })
 export class AppModule {}
