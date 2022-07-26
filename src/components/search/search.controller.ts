@@ -12,7 +12,7 @@ export class SearchController {
         summary: 'Insert index'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'insert index success'
     })
     public async insertIndex(@Body() body): Promise<any> {
@@ -24,7 +24,7 @@ export class SearchController {
         summary: 'Update index'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'update index success'
     })
     public async updateIndex(@Body() body): Promise<any> {
@@ -36,7 +36,7 @@ export class SearchController {
         summary: 'search index'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'search index success'
     })
     public async searchIndex(@Body() body): Promise<any> {
@@ -48,7 +48,7 @@ export class SearchController {
         summary: 'delete index'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'delete index success'
     })
     public async deleteIndex(@Body() body): Promise<any> {
@@ -60,11 +60,10 @@ export class SearchController {
         summary: 'delete document'
     })
     @ApiResponse({
-        status: 200, 
+        status: 200,
         description: 'delete document success'
     })
     public async deleteDocument(@Body() body): Promise<any> {
         return this.searchService.deleteDocument(body);
     }
-
 }

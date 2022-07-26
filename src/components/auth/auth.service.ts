@@ -11,7 +11,7 @@ export class AuthService {
     constructor(
         private readonly jwt: JwtService,
         @InjectModel(User.name)
-        private readonly authModel: Model<User>,
+        private readonly authModel: Model<User>
     ) {}
 
     async signup(dto: AuthDto) {
@@ -43,9 +43,11 @@ export class AuthService {
 
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
-            const user = await this.authModel.find({phone:verifyDto.phone}).exec();
-            const count = user.length
-            
+            const user = await this.authModel
+                .find({ phone: verifyDto.phone })
+                .exec();
+            const count = user.length;
+
             if (count == 0) {
                 return {
                     code: 70001,
@@ -56,7 +58,7 @@ export class AuthService {
 
             if (count >= 1) {
                 for (let item of user) {
-                    let splitted = `${item.mac}`.split(","); //sua lai cho nay
+                    let splitted = `${item.mac}`.split(','); //sua lai cho nay
                     if (!splitted.includes(`${verifyDto.mac}`)) {
                         return {
                             code: 70003,
@@ -72,7 +74,6 @@ export class AuthService {
                 data: false,
                 message: 'The old device'
             };
-            
         } catch (error) {
             throw new NotFoundException(error);
         }

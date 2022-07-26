@@ -1,4 +1,4 @@
 export const productIndex = {
-  _index: 'video',
-  _type: 'videos'
+    _index: 'video',
+    _type: 'videos'
 };
