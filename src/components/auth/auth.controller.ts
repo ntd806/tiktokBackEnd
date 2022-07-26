@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, VerifyDto } from './dto';
+import { AuthDto, VerifyDto, SocialDto } from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('auth')
@@ -54,5 +54,25 @@ export class AuthController {
     @Post('verify-phone-number')
     async verifyPhoneNumber(@Body() verifyDto: VerifyDto) {
         return await this.authService.verifyPhoneNumber(verifyDto);
+    }
+
+    @ApiOperation({
+        summary: 'Verify phone number'
+    })
+    @ApiResponse({
+        status: 70001,
+        description: 'Verify phone number successfully'
+    })
+    @ApiResponse({
+        status: 70003,
+        description: 'the another device'
+    })
+    @ApiResponse({
+        status: 70003,
+        description: 'The old device'
+    })
+    @Post('login-by-social')
+    async loginBySocial(@Body() socialDto: SocialDto) {
+        return await this.authService.socialNetwork(socialDto);
     }
 }
