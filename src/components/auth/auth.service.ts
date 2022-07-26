@@ -57,8 +57,8 @@ export class AuthService {
             }
 
             if (count >= 1) {
-                for (let item of user) {
-                    let splitted = `${item.mac}`.split(','); //sua lai cho nay
+                for (const item of user) {
+                    const splitted = `${item.mac}`.split(','); //sua lai cho nay
                     if (!splitted.includes(`${verifyDto.mac}`)) {
                         return {
                             code: 70003,
