@@ -1,7 +1,12 @@
 import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 import { LiveService } from './live.service';
 import { Live } from './entity/Live.entity';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth
+} from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
 
 @ApiTags('live')
@@ -18,7 +23,6 @@ export class LiveController {
         status: 200,
         description: 'Ok'
     })
-
     @Get()
     public async getLiveList(): Promise<Live> {
         return this.liveService.getLiveList();
