@@ -8,7 +8,6 @@ import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './components/redis/redis.module';
 import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
-import { SearchModule } from './components/search/search.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -25,7 +24,6 @@ dotenv.config();
         AuthModule,
         GameModule,
         UserModule,
-        SearchModule
     ],
     controllers: []
 })
