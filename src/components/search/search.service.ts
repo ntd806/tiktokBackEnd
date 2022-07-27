@@ -3,6 +3,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { SearchServiceInterface } from './interface/search.service.interface';
 import { ConfigSearch } from './config/config.search';
 import { productIndex } from './constant/product.elastic';
+import { ProductSearchObject } from './model/product.search.object';
 
 @Injectable()
 export class SearchService
@@ -30,14 +31,15 @@ export class SearchService
     }
 
     public async searchIndex(searchData: any): Promise<any> {
-        const data = this.productDocument(searchData);
-        return this.search(data)
-            .then((res) => {
-                return res;
-            })
-            .catch((err) => {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+        const data = ProductSearchObject.searchObject(searchData);
+        console.log(data)
+        // return this.search(data)
+        //     .then((res) => {
+        //         return res;
+        //     })
+        //     .catch((err) => {
+        //         throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        //     });
     }
 
     public async deleteIndex(indexData: any): Promise<any> {

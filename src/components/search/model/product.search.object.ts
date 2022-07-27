@@ -13,6 +13,16 @@ export class ElasticSearchBody {
 }
 
 export class ProductSearchObject {
+    size: number;
+    from: number;
+    query: any;
+
+    constructor(size: number, from: number, query: any) {
+        this.size = size;
+        this.from = from;
+        this.query = query;
+    }
+
     public static searchObject(q: any) {
         const body = this.elasticSearchBody(q);
         return { index: productIndex._index, body, q };
@@ -24,6 +34,6 @@ export class ProductSearchObject {
                 url: q
             }
         };
-        return new ElasticSearchBody(10, 0, query);
+        return new ProductSearchObject(10, 0, query);
     }
 }
