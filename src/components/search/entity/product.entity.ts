@@ -26,6 +26,11 @@ export class Product {
     preview: string;
 
     @Column({
+        type: 'string'
+    })
+    tag: string;
+
+    @Column({
         type: 'number'
     })
     time: number;
