@@ -28,6 +28,11 @@ export class CreateProductDto {
     preview: string;
 
     @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
+    tag: string;
+
+    @IsNotEmpty()
     @IsNumber()
     @ApiProperty()
     time: number;
