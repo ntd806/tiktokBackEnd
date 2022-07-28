@@ -1,4 +1,8 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateProductDto } from './create.product.dto';
+import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class SearchProductDto extends PartialType(CreateProductDto) {}
+export class SearchProductDto {
+    @IsNotEmpty()
+    @ApiProperty()
+    search: string;
+}

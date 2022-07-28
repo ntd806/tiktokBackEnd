@@ -3,8 +3,7 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { SearchServiceInterface } from './interface/search.service.interface';
 import { ConfigSearch } from './config/config.search';
 import { productIndex } from './constant/product.elastic';
-import { ProductSearchObject } from './model/product.search.object';
-
+// import { ProductSearchObject } from './model/product.search.object';
 @Injectable()
 export class SearchService
     extends ElasticsearchService
@@ -31,15 +30,26 @@ export class SearchService
     }
 
     public async searchIndex(searchData: any): Promise<any> {
-        const data = ProductSearchObject.searchObject(searchData);
-        console.log(data)
-        // return this.search(data)
-        //     .then((res) => {
-        //         return res;
-        //     })
-        //     .catch((err) => {
-        //         throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-        //     });
+        // const data = ProductSearchObject.searchObject(searchData);
+        return this.search({
+            index: productIndex._index,
+            body: {
+                size: 12,
+                from: 0,
+                query: {
+                    multi_match: {
+                        query: searchData,
+                        fields: ['name', 'description', 'url', 'preview']
+                    }
+                }
+            }
+        })
+        .then((res) => {
+            return res;
+        })
+        .catch((err) => {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        });
     }
 
     public async deleteIndex(indexData: any): Promise<any> {
@@ -78,5 +88,13 @@ export class SearchService
             index: productIndex._index,
             type: productIndex._type
         };
+    }
+
+    private checkfield(data: any): boolean {
+        if (!isNaN(data)) {
+            return true;
+        }
+
+        return false;
     }
 }

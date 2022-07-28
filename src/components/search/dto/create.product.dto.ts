@@ -3,9 +3,9 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
     @IsNotEmpty()
-    @IsString()
+    @IsNumber()
     @ApiProperty()
-    id: string;
+    id: number;
 
     @IsNotEmpty()
     @IsString()

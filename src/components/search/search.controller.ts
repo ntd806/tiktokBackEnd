@@ -1,4 +1,12 @@
-import { Controller, Post, Get, Put, Delete, Body, Query } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Get,
+    Put,
+    Delete,
+    Body,
+    Query
+} from '@nestjs/common';
 import { SearchService } from './search.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import {
@@ -51,7 +59,7 @@ export class SearchController {
     public async searchIndex(
         @Query() searchProductDto: SearchProductDto
     ): Promise<any> {
-        return this.searchService.searchIndex(searchProductDto);
+        return this.searchService.searchIndex(searchProductDto.search);
     }
 
     @Delete('delete-index')

@@ -18,15 +18,15 @@ export class Product {
     @Column({
         type: 'string'
     })
-    price: string;
+    url: string;
 
     @Column({
-        type: 'date'
+        type: 'string'
     })
-    createdAt: any;
+    preview: string;
 
     @Column({
-        type: 'date'
+        type: 'number'
     })
-    updatedAt: any;
+    time: number;
 }
