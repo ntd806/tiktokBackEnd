@@ -1,9 +1,14 @@
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 
-@Entity({ name: 'movies' })
-export class Movies {
+@Entity({ name: 'products' })
+export class Product {
     @ObjectIdColumn()
     id: number;
+
+    @Column({
+        type: 'string'
+    })
+    name: string;
 
     @Column({
         type: 'string'
@@ -18,10 +23,10 @@ export class Movies {
     @Column({
         type: 'string'
     })
-    name: string;
+    preview: string;
 
     @Column({
-        type: 'string'
+        type: 'number'
     })
-    time: string;
+    time: number;
 }

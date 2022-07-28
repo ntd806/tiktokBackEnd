@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-import { SearchServiceInterface } from './interface/search.interface';
+import { SearchServiceInterface } from './interface/search.service.interface';
 import { ConfigSearch } from './config/config.search';
-
+import { productIndex } from './constant/product.elastic';
+// import { ProductSearchObject } from './model/product.search.object';
 @Injectable()
 export class SearchService
     extends ElasticsearchService
@@ -13,7 +14,8 @@ export class SearchService
     }
 
     public async insertIndex(bulkData: any): Promise<any> {
-        return this.bulk(bulkData)
+        const data = this.productDocument(bulkData);
+        return this.bulk(data)
             .then((res) => res)
             .catch((err) => {
                 console.log(err);
@@ -22,21 +24,32 @@ export class SearchService
     }
 
     public async updateIndex(updateData: any): Promise<any> {
-        return this.update(updateData)
-            .then((res) => res)
-            .catch((err) => {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+        const data = this.productDocument(updateData);
+        await this.productDocument(updateData.id);
+        return this.insertIndex(data);
     }
 
     public async searchIndex(searchData: any): Promise<any> {
-        return this.search(searchData)
-            .then((res) => {
-                return res;
-            })
-            .catch((err) => {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+        // const data = ProductSearchObject.searchObject(searchData);
+        return this.search({
+            index: productIndex._index,
+            body: {
+                size: 12,
+                from: 0,
+                query: {
+                    multi_match: {
+                        query: searchData,
+                        fields: ['name', 'description', 'url', 'preview']
+                    }
+                }
+            }
+        })
+        .then((res) => {
+            return res;
+        })
+        .catch((err) => {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        });
     }
 
     public async deleteIndex(indexData: any): Promise<any> {
@@ -54,5 +67,34 @@ export class SearchService
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
+    }
+
+    private bulkIndex(productId: number): any {
+        return {
+            _index: productIndex._index,
+            _type: productIndex._type,
+            _id: productId
+        };
+    }
+
+    private productDocument(product: any): any {
+        const bulk = [];
+        bulk.push({
+            index: this.bulkIndex(product.id)
+        });
+        bulk.push(product);
+        return {
+            body: bulk,
+            index: productIndex._index,
+            type: productIndex._type
+        };
+    }
+
+    private checkfield(data: any): boolean {
+        if (!isNaN(data)) {
+            return true;
+        }
+
+        return false;
     }
 }

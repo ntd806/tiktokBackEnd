@@ -12,7 +12,13 @@ import {
     Query,
     UseGuards
 } from '@nestjs/common';
-import { ApiTags, ApiParam, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+    ApiTags,
+    ApiParam,
+    ApiOperation,
+    ApiResponse,
+    ApiBearerAuth
+} from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
