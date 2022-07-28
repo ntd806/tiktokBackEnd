@@ -39,7 +39,7 @@ export class SearchService
                 query: {
                     multi_match: {
                         query: searchData,
-                        fields: ['name', 'description', 'url', 'preview']
+                        fields: ['name', 'description', 'url', 'preview', "tag"]
                     }
                 }
             }
