@@ -1,6 +1,19 @@
-import { Controller, Post, Get, Put, Delete, Body } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Get,
+    Put,
+    Delete,
+    Body,
+    Query
+} from '@nestjs/common';
 import { SearchService } from './search.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+    CreateProductDto,
+    UpdateProductDto,
+    SearchProductDto
+} from './dto/index';
 
 @Controller('/api/v1/search')
 @ApiTags('search')
@@ -15,8 +28,10 @@ export class SearchController {
         status: 200,
         description: 'insert index success'
     })
-    public async insertIndex(@Body() body): Promise<any> {
-        return this.searchService.insertIndex(body);
+    public async insertIndex(
+        @Body() createProductDto: CreateProductDto
+    ): Promise<any> {
+        return this.searchService.insertIndex(createProductDto);
     }
 
     @Put('update-index')
@@ -27,8 +42,10 @@ export class SearchController {
         status: 200,
         description: 'update index success'
     })
-    public async updateIndex(@Body() body): Promise<any> {
-        return this.searchService.updateIndex(body);
+    public async updateIndex(
+        @Body() updateGameDto: UpdateProductDto
+    ): Promise<any> {
+        return this.searchService.updateIndex(updateGameDto);
     }
 
     @Get('search-index')
@@ -39,8 +56,10 @@ export class SearchController {
         status: 200,
         description: 'search index success'
     })
-    public async searchIndex(@Body() body): Promise<any> {
-        return this.searchService.searchIndex(body);
+    public async searchIndex(
+        @Query() searchProductDto: SearchProductDto
+    ): Promise<any> {
+        return this.searchService.searchIndex(searchProductDto.search);
     }
 
     @Delete('delete-index')
