@@ -15,13 +15,13 @@ export class User extends Document {
     ip: object;
 
     @Prop({ type: 'object' })
-    mac: object;
+    mac: [{ mac: string }];
 
     @Prop()
     phone: string;
 
     @Prop({ type: 'object' })
-    like: object;
+    like: [{ video_id: string }];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

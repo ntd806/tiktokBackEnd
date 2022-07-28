@@ -23,19 +23,7 @@ export class AuthController {
     })
     @Post('register')
     async signup(@Body() dto: AuthDto) {
-        const data = await this.authService.signup(dto);
-        if (data) {
-            return {
-                code: 201,
-                data: data,
-                message: 'ok'
-            };
-        } else {
-            return {
-                code: 400,
-                message: 'phone exists'
-            };
-        }
+        return await this.authService.signup(dto);
     }
 
     @ApiOperation({

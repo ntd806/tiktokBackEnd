@@ -74,12 +74,14 @@ export class GameController {
     @Get('/:id')
     public async getGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
-            throw new NotFoundException('Game ID does not exist');
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                code: 50007,
+                data: false,
+                message: 'Game does not exist!'
+            });
         }
 
-        const Game = await this.GameService.findOne(gameId);
-
-        return res.status(HttpStatus.OK).json(Game);
+        return await this.GameService.findOne(gameId);
     }
 
     @ApiOperation({
@@ -98,13 +100,15 @@ export class GameController {
         try {
             const Game = await this.GameService.create(CreateGameDto);
             return res.status(HttpStatus.OK).json({
+                code: 50001,
                 message: 'Game has been created successfully',
                 Game
             });
         } catch (err) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                message: 'Error: Game not created!',
-                status: 400
+                code: 50004,
+                data: false,
+                message: 'Error: Game not created!'
             });
         }
     }
@@ -133,16 +137,21 @@ export class GameController {
         try {
             const Game = await this.GameService.update(gameId, UpdateGameDto);
             if (!Game) {
-                throw new NotFoundException('Game does not exist!');
+                return res.status(HttpStatus.BAD_REQUEST).json({
+                    code: 50007,
+                    data: false,
+                    message: 'Game does not exist!'
+                });
             }
             return res.status(HttpStatus.OK).json({
+                code: 50002,
                 message: 'Game has been successfully updated',
                 Game
             });
         } catch (err) {
             return res.status(HttpStatus.BAD_REQUEST).json({
                 message: 'Error: Game not updated!',
-                status: 400
+                code: 50005
             });
         }
     }
@@ -161,12 +170,17 @@ export class GameController {
     @Delete('/:id')
     public async deleteGame(@Res() res, @Param('id') gameId: string) {
         if (!gameId) {
-            throw new NotFoundException('Game ID does not exist');
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                code: 50007,
+                data: false,
+                message: 'Game does not exist!'
+            });
         }
 
         const Game = await this.GameService.remove(gameId);
 
         return res.status(HttpStatus.OK).json({
+            code: 50008,
             message: 'Game has been deleted',
             Game
         });

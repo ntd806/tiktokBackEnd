@@ -15,7 +15,11 @@ export class UserService {
         await user.update(dto);
         await user.save();
         const newUser = await this.userModel.find({ _id: user.id });
-        return newUser;
+        return {
+            code: 40002,
+            data: newUser,
+            message: 'Update successfully'
+        };
     }
 
     async likeVideo(user: User, video_id: string) {
@@ -28,7 +32,11 @@ export class UserService {
                 ({ video_id }) => video_id === video_id
             );
             if (index) {
-                return false;
+                return {
+                    code: 70003,
+                    data: true,
+                    message: 'Like video false'
+                };
             } else {
                 likeUpdate.push({ video_id: video_id });
             }
@@ -40,13 +48,21 @@ export class UserService {
             }
         );
         await user.save();
-        return true;
+        return {
+            code: 70001,
+            data: true,
+            message: 'Like video successfully'
+        };
     }
 
     async unlikeVideo(user: User, video_id: string) {
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
-            return false;
+            return {
+                code: 70004,
+                data: true,
+                message: 'Unlike video false'
+            };
         } else {
             likeUpdate = user.like;
             const index = likeUpdate.find(
@@ -55,7 +71,11 @@ export class UserService {
             if (index) {
                 likeUpdate = likeUpdate.splice(index, 1);
             } else {
-                return false;
+                return {
+                    code: 70004,
+                    data: true,
+                    message: 'Unlike video false'
+                };
             }
         }
         await this.userModel.findOneAndUpdate(
@@ -65,6 +85,10 @@ export class UserService {
             }
         );
         await user.save();
-        return true;
+        return {
+            code: 70002,
+            data: true,
+            message: 'Unlike video successfully'
+        };
     }
 }

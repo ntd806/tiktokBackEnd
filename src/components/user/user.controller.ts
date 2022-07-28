@@ -35,7 +35,7 @@ export class UserController {
     @Get('info')
     async info(@Request() req) {
         return {
-            code: 200,
+            code: 40007,
             data: req.user,
             message: 'Get successfully'
         };
@@ -51,12 +51,7 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Post('update')
     async updateUser(@Request() req, @Body() dto: UserDto) {
-        const data = await this.userService.updateUser(req.user, dto);
-        return {
-            code: 200,
-            data: data,
-            message: 'Update successfully'
-        };
+        return await this.userService.updateUser(req.user, dto);
     }
 
     @ApiOperation({
@@ -73,18 +68,7 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Post('like-video')
     async likeVideo(@Request() req, @Body() dto: LikeDto) {
-        const data = await this.userService.likeVideo(req.user, dto.video_id);
-        if (data) {
-            return {
-                code: 200,
-                message: 'Like video successfully'
-            };
-        } else {
-            return {
-                code: 400,
-                message: 'Like video false'
-            };
-        }
+        return await this.userService.likeVideo(req.user, dto.video_id);
     }
 
     @ApiOperation({
@@ -101,17 +85,6 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Post('unlike-video')
     async unlikeVideo(@Request() req, @Body() dto: LikeDto) {
-        const data = await this.userService.unlikeVideo(req.user, dto.video_id);
-        if (data) {
-            return {
-                code: 200,
-                message: 'Unlike video successfully'
-            };
-        } else {
-            return {
-                code: 400,
-                message: 'Unlike video false'
-            };
-        }
+        return await this.userService.unlikeVideo(req.user, dto.video_id);
     }
 }

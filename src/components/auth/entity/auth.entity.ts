@@ -18,7 +18,7 @@ export class Auth {
     ip: string;
 
     @Column()
-    mac: string;
+    mac: object;
 
     @Column({ unique: true })
     phone: string;
