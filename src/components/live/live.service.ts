@@ -33,16 +33,14 @@ export class LiveService {
     public async getLiveList(): Promise<any> {
         try {
             return this.httpService
-                .post(this.url, this.data, this.options)
-                .pipe(map((resp) => resp.data.streamKey));
+            .post(this.url, this.data, this.options)
+            .pipe(map((resp) => resp.data.streamKey));
         } catch (error) {
-            throw new HttpException(
-                {
-                    status: StatusCode.NOT_FOUND_SERVER_LIVE_STREAM,
-                    error: 'occured with server livestream'
-                },
-                HttpStatus.CONFLICT
-            );
+            return {
+                code: 80002,
+                data: false,
+                message: 'Get list live failed'
+            };
         }
     }
 }
