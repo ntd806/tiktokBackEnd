@@ -72,15 +72,7 @@ export class GameController {
         description: 'Game ID does not exist'
     })
     @Get('/:id')
-    public async getGame(@Res() res, @Param('id') gameId: string) {
-        if (!gameId) {
-            return res.status(HttpStatus.BAD_REQUEST).json({
-                code: 50007,
-                data: false,
-                message: 'Game does not exist!'
-            });
-        }
-
+    public async getGame(@Param('id') gameId: string) {
         return await this.GameService.findOne(gameId);
     }
 
