@@ -17,11 +17,47 @@ export class AuthService {
     async signup(dto: AuthDto) {
         const user = await this.authModel.findOne({ phone: dto.phone });
         if (user) {
-            return false;
+            if(user.mac.find(({mac}) => mac == dto.mac)){
+                return {
+                    status: 40004,
+                    data: true,
+                    message: 'Register failed'
+                }
+            } else {
+                let mac = user.mac;
+                mac.push({mac: dto.mac});
+                await this.authModel.findOneAndUpdate(
+                    { _id: user._id },
+                    {
+                        mac: mac
+                    }
+                );
+                let access_token = await this.signToken(user.phone);
+                return {
+                    status: 40001,
+                    data: access_token,
+                    message: 'Register success'
+                };
+            }
         } else {
-            const newAuth = await this.authModel.create(dto);
+            let dataInsert = {
+                ip: dto.ip,
+                mac: [{
+                    mac: dto.mac,
+                }],
+                phone: dto.phone,
+                birthdate: dto.birthdate,
+                sex: dto.sex,
+                fullname: dto.fullname
+            };
+            const newAuth = await this.authModel.create(dataInsert);
             newAuth.save();
-            return this.signToken(newAuth.phone);
+            let access_token = await this.signToken(newAuth.phone);
+            return {
+                status: 40001,
+                data: access_token,
+                message: 'Register success'
+            };
         }
     }
 
@@ -44,11 +80,9 @@ export class AuthService {
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
             const user = await this.authModel
-                .find({ phone: verifyDto.phone })
-                .exec();
-            const count = user.length;
+                .findOne({ phone: verifyDto.phone });
 
-            if (count == 0) {
+            if (!user) {
                 return {
                     code: 70001,
                     data: true,
@@ -56,23 +90,18 @@ export class AuthService {
                 };
             }
 
-            if (count >= 1) {
-                for (const item of user) {
-                    const splitted = `${item.mac}`.split(','); //sua lai cho nay
-                    if (!splitted.includes(`${verifyDto.mac}`)) {
-                        return {
-                            code: 70003,
-                            data: false,
-                            message: 'the another device'
-                        };
-                    }
-                }
+            if(user.mac.find(({mac}) => mac == verifyDto.mac)){
+                return {
+                    code: 70004,
+                    data: false,
+                    message: 'The old device'
+                };
             }
 
             return {
-                code: 70004,
+                code: 70003,
                 data: false,
-                message: 'The old device'
+                message: 'the another device'
             };
         } catch (error) {
             throw new NotFoundException(error);

@@ -15,7 +15,7 @@ export class User extends Document {
     ip: any;
 
     @Prop({ type: 'object' })
-    mac: any;
+    mac: [{ mac: string }];
 
     @Prop()
     phone: string;

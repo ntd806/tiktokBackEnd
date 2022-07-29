@@ -24,17 +24,25 @@ export class GameService {
             .exec();
     }
 
-    public async findOne(gameId: string): Promise<Game> {
+    public async findOne(gameId: string): Promise<any> {
         const Game = await this.gameModel
             .findById({ _id: gameId })
             // .populate('organization')
             .exec();
 
         if (!Game) {
-            throw new NotFoundException(`Game #${gameId} not found`);
+            return {
+                code: 50007,
+                data: false,
+                message: `Game #${gameId} not found`
+            };
         }
 
-        return Game;
+        return {
+            code: 50008,
+            data: Game,
+            message: 'OK'
+        };
     }
 
     public async create(CreateGameDto: CreateGameDto): Promise<IGame> {
