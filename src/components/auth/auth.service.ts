@@ -1,11 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, SocialDto, VerifyDto} from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { VerifyDto } from '../user/dto/verify.dto';
-
 @Injectable()
 export class AuthService {
     constructor(
@@ -106,5 +104,9 @@ export class AuthService {
         } catch (error) {
             throw new NotFoundException(error);
         }
+    }
+
+    async socialNetwork(verifyDto: VerifyDto) {
+
     }
 }
