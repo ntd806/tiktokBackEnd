@@ -106,7 +106,7 @@ export class AuthService {
         }
     }
 
-    async socialNetwork(verifyDto: VerifyDto) {
+    async socialNetwork(socialDto: SocialDto) {
 
     }
 }

@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, VerifyDto } from './dto';
+import { AuthDto, VerifyDto, SocialDto } from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 @ApiTags('auth')
 @Controller('/api/v1/auth')
@@ -59,7 +59,7 @@ export class AuthController {
         description: 'The old device'
     })
     @Post('verify-social-network')
-    async socialNetwork(@Body() verifyDto: VerifyDto) {
-        return await this.authService.socialNetwork(verifyDto);
+    async socialNetwork(@Body() socialDto: SocialDto) {
+        return await this.authService.socialNetwork(socialDto);
     }
 }
