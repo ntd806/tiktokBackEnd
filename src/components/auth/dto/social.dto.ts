@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, isNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SocialDto {
@@ -47,6 +47,6 @@ export class SocialDto {
     })
     @ApiProperty()
     @IsNotEmpty()
-    @isNumber()
+    @IsNumber()
     isGoogle: number;
 }
