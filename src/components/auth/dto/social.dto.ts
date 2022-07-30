@@ -11,7 +11,7 @@ export class SocialDto {
     email: string;
 
     @ApiProperty({
-    description: 'MAC address'
+        description: 'MAC address'
     })
     @ApiProperty()
     @IsNotEmpty()
@@ -19,7 +19,7 @@ export class SocialDto {
     mac: string;
 
     @ApiProperty({
-    description: 'token of Google or Facebook'
+        description: 'token of Google or Facebook'
     })
     @ApiProperty()
     @IsNotEmpty()
@@ -27,7 +27,7 @@ export class SocialDto {
     token: string;
 
     @ApiProperty({
-    description: 'Id of Google or Facebook'
+        description: 'Id of Google or Facebook'
     })
     @ApiProperty()
     @IsString()
@@ -35,7 +35,7 @@ export class SocialDto {
     id: string;
 
     @ApiProperty({
-    description: 'fullname of user'
+        description: 'fullname of user'
     })
     @ApiProperty()
     @IsNotEmpty()
@@ -43,7 +43,7 @@ export class SocialDto {
     fullname: string;
 
     @ApiProperty({
-    description: 'Phone of user'
+        description: 'Phone of user'
     })
     @ApiProperty()
     @IsNotEmpty()
@@ -51,7 +51,7 @@ export class SocialDto {
     phone: string;
 
     @ApiProperty({
-    description: 'Ip of user'
+        description: 'Ip of user'
     })
     @ApiProperty()
     @IsNotEmpty()
@@ -59,7 +59,7 @@ export class SocialDto {
     ip: string;
 
     @ApiProperty({
-    description: 'url of user'
+        description: 'url of user'
     })
     @ApiProperty()
     @IsNotEmpty()
@@ -67,7 +67,7 @@ export class SocialDto {
     url: string;
 
     @ApiProperty({
-    description: 'Is Google or not Google'
+        description: 'Is Google or not Google'
     })
     @ApiProperty()
     @IsNotEmpty()

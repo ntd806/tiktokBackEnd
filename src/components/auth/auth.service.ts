@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto, SocialDto, VerifyDto} from './dto';
+import { AuthDto, SocialDto, VerifyDto } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -15,22 +15,22 @@ export class AuthService {
     async signup(dto: AuthDto) {
         const user = await this.authModel.findOne({ phone: dto.phone });
         if (user) {
-            if(user.mac.find(({mac}) => mac == dto.mac)){
+            if (user.mac.find(({ mac }) => mac == dto.mac)) {
                 return {
                     status: 40004,
                     data: true,
                     message: 'Register failed'
-                }
+                };
             } else {
-                let mac = user.mac;
-                mac.push({mac: dto.mac});
+                const mac = user.mac;
+                mac.push({ mac: dto.mac });
                 await this.authModel.findOneAndUpdate(
                     { _id: user._id },
                     {
                         mac: mac
                     }
                 );
-                let access_token = await this.signToken(user.phone);
+                const access_token = await this.signToken(user.phone);
                 return {
                     status: 40001,
                     data: access_token,
@@ -38,11 +38,13 @@ export class AuthService {
                 };
             }
         } else {
-            let dataInsert = {
+            const dataInsert = {
                 ip: dto.ip,
-                mac: [{
-                    mac: dto.mac,
-                }],
+                mac: [
+                    {
+                        mac: dto.mac
+                    }
+                ],
                 phone: dto.phone,
                 birthdate: dto.birthdate,
                 sex: dto.sex,
@@ -50,7 +52,7 @@ export class AuthService {
             };
             const newAuth = await this.authModel.create(dataInsert);
             newAuth.save();
-            let access_token = await this.signToken(newAuth.phone);
+            const access_token = await this.signToken(newAuth.phone);
             return {
                 status: 40001,
                 data: access_token,
@@ -77,8 +79,9 @@ export class AuthService {
 
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
-            const user = await this.authModel
-                .findOne({ phone: verifyDto.phone });
+            const user = await this.authModel.findOne({
+                phone: verifyDto.phone
+            });
 
             if (!user) {
                 return {
@@ -88,7 +91,7 @@ export class AuthService {
                 };
             }
 
-            if(user.mac.find(({mac}) => mac == verifyDto.mac)){
+            if (user.mac.find(({ mac }) => mac == verifyDto.mac)) {
                 return {
                     code: 80004,
                     data: false,
@@ -107,35 +110,32 @@ export class AuthService {
     }
 
     async socialNetwork(socialDto: SocialDto) {
-        const user = await this.authModel.findOne({ phone: socialDto.phone });
+        try {
+        let user = await this.authModel.findOne({ phone: socialDto.phone });
+        const access_token = await this.signToken(socialDto.phone);
 
         if (!user) {
-            let data = {
+            const data = {
                 ip: socialDto.ip,
-                mac: [{
-                    mac: socialDto.mac,
-                }],
+                mac: [
+                    {
+                        mac: socialDto.mac
+                    }
+                ],
                 phone: socialDto.phone,
-                fullname: socialDto.fullname,
-                social: [{
-                    email: socialDto.email,
-                    token: socialDto.token,
-                    id: socialDto.id,
-                    url: socialDto.url,
-                    isGoogle: socialDto.isGoogle
-                }]
-            }
+                fullname: socialDto.fullname
+            };
             const newAuth = await this.authModel.create(data);
             newAuth.save();
-            let access_token = await this.signToken(newAuth.phone);
 
             return {
-                status: 80005,
+                code: 80005,
                 data: access_token,
                 message: 'Registered by social successfully'
             };
         }
-
-
+        } catch (error) {
+            
+        }
     }
 }
