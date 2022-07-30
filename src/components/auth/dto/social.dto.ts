@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class SocialDto {
     @ApiProperty({
-        description: 'Phone number of user'
+        description: 'email of user'
     })
     @IsNotEmpty()
     @IsNotEmpty()
@@ -41,6 +41,30 @@ export class SocialDto {
     @IsNotEmpty()
     @IsString()
     fullname: string;
+
+    @ApiProperty({
+    description: 'Phone of user'
+    })
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    phone: string;
+
+    @ApiProperty({
+    description: 'Ip of user'
+    })
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    ip: string;
+
+    @ApiProperty({
+    description: 'url of user'
+    })
+    @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
+    url: string;
 
     @ApiProperty({
     description: 'Is Google or not Google'

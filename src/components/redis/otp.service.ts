@@ -40,19 +40,4 @@ export class OtpService {
 
         return false;
     }
-
-    public async getCode(phoneNumber) {
-        const randomNumber = generateRandomSixDigitsNumber();
-        const message = `Hello from TopTop! Your verification code is: ${randomNumber}`;
-        await this.redisCacheService.setCode(phoneNumber, randomNumber);
-
-        return {
-            code: 200,
-            data: {
-                message: message,
-                code: randomNumber
-            },
-            message: 'Successfuly'
-        };
-    }
 }

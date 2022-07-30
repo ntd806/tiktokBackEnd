@@ -66,7 +66,7 @@ export class AuthService {
         const secret = process.env.SECRET;
 
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '120m',
+            expiresIn: '365d',
             secret: secret
         });
 
@@ -82,7 +82,7 @@ export class AuthService {
 
             if (!user) {
                 return {
-                    code: 70001,
+                    code: 80001,
                     data: true,
                     message: 'Phone number verified successfully'
                 };
@@ -90,14 +90,14 @@ export class AuthService {
 
             if(user.mac.find(({mac}) => mac == verifyDto.mac)){
                 return {
-                    code: 70004,
+                    code: 80004,
                     data: false,
                     message: 'The old device'
                 };
             }
 
             return {
-                code: 70003,
+                code: 80003,
                 data: false,
                 message: 'the another device'
             };
@@ -107,6 +107,35 @@ export class AuthService {
     }
 
     async socialNetwork(socialDto: SocialDto) {
+        const user = await this.authModel.findOne({ phone: socialDto.phone });
+
+        if (!user) {
+            let data = {
+                ip: socialDto.ip,
+                mac: [{
+                    mac: socialDto.mac,
+                }],
+                phone: socialDto.phone,
+                fullname: socialDto.fullname,
+                social: [{
+                    email: socialDto.email,
+                    token: socialDto.token,
+                    id: socialDto.id,
+                    url: socialDto.url,
+                    isGoogle: socialDto.isGoogle
+                }]
+            }
+            const newAuth = await this.authModel.create(data);
+            newAuth.save();
+            let access_token = await this.signToken(newAuth.phone);
+
+            return {
+                status: 80005,
+                data: access_token,
+                message: 'Registered by social successfully'
+            };
+        }
+
 
     }
 }
