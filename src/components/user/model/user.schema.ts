@@ -24,6 +24,15 @@ export class User extends Document {
 
     @Prop({ type: 'array' })
     like: [{ video_id: string }];
+
+    @Prop({ type: 'object' })
+    social: { 
+        token: string,
+        isGoogle: boolean,
+        email: string,
+        id: string,
+        url: string
+    };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

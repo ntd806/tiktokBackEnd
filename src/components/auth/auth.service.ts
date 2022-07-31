@@ -110,6 +110,44 @@ export class AuthService {
     }
 
     async socialNetwork(socialDto: SocialDto) {
+        try {
+            console.log(socialDto);
+            const user = await this.authModel.findOne({
+                phone: socialDto.phone
+            });
+            
+            if (!user) {
+                const dataInsert = {
+                    ip: socialDto.ip,
+                    mac: [
+                        {
+                            mac: socialDto.mac
+                        }
+                    ],
+                    phone: socialDto.phone,
+                    fullname: socialDto.fullname,
+                    social: { 
+                        token: socialDto.url,
+                        isGoogle: socialDto.isGoogle,
+                        email: socialDto.email,
+                        id: socialDto.id,
+                        url: socialDto.url
+                    }
+                };
+                const newAuth = await this.authModel.create(dataInsert);
+                newAuth.save();
+
+                const access_token = await this.signToken(socialDto.phone);
+
+                return {
+                    code: 80001,
+                    data: access_token,
+                    message: 'Registered by social successfully'
+                };
+            }
+        } catch (error) {
+            throw new NotFoundException(error);
+        }
     }
 
     private async isNotNullUser(socialDto: SocialDto) {
@@ -119,26 +157,32 @@ export class AuthService {
             });
             const access_token = await this.signToken(socialDto.phone);
 
-            if (!user) {
-                const data = {
-                    ip: socialDto.ip,
-                    mac: [
-                        {
-                            mac: socialDto.mac
-                        }
-                    ],
-                    phone: socialDto.phone,
-                    fullname: socialDto.fullname
-                };
-                const newAuth = await this.authModel.create(data);
-                newAuth.save();
-
+            if(user) {
                 return {
-                    code: 80005,
-                    data: access_token,
-                    message: 'Registered by social successfully'
+                    code: 80003,
+                    data: false,
+                    message: 'the another device'
                 };
             }
+
+            const data = {
+                ip: socialDto.ip,
+                mac: [
+                    {
+                        mac: socialDto.mac
+                    }
+                ],
+                phone: socialDto.phone,
+                fullname: socialDto.fullname
+            };
+            const newAuth = await this.authModel.create(data);
+            newAuth.save();
+
+            return {
+                code: 80005,
+                data: access_token,
+                message: 'Registered by social successfully'
+            };
         } catch (error) {
             throw new NotFoundException(error);
         }
