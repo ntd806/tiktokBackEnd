@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class LikeDto {
@@ -7,4 +7,10 @@ export class LikeDto {
     })
     @IsString()
     video_id: string;
+
+    @ApiProperty({
+        description: 'type of video'
+    })
+    @IsNumber()
+    isLive: number;
 }

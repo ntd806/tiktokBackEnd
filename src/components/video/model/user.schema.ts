@@ -12,7 +12,7 @@ export class User extends Document {
     birthdate: Date;
 
     @Prop({ type: 'object' })
-    ip: object;
+    ip: any;
 
     @Prop({ type: 'object' })
     mac: [{ mac: string }];
