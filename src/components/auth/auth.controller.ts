@@ -1,10 +1,7 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto } from './dto/auth.dto';
+import { AuthDto, VerifyDto, SocialDto } from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { StatusCode } from 'src/vender/core/Status/status.code';
-import { VerifyDto } from '../user/dto/verify.dto';
-
 @ApiTags('auth')
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -44,5 +41,21 @@ export class AuthController {
     @Post('verify-phone-number')
     async verifyPhoneNumber(@Body() verifyDto: VerifyDto) {
         return await this.authService.verifyPhoneNumber(verifyDto);
+    }
+
+    @ApiOperation({
+        summary: 'Register social network'
+    })
+    @ApiResponse({
+        status: 80005,
+        description: 'Registered by social successfully'
+    })
+    @ApiResponse({
+        status: 80003,
+        description: 'the another device'
+    })
+    @Post('social-network')
+    async socialNetwork(@Body() socialDto: SocialDto) {
+        return await this.authService.socialNetwork(socialDto);
     }
 }

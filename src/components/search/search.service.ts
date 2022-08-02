@@ -39,17 +39,17 @@ export class SearchService
                 query: {
                     multi_match: {
                         query: searchData,
-                        fields: ['name', 'description', 'url', 'preview', "tag"]
+                        fields: ['name', 'description', 'url', 'preview', 'tag']
                     }
                 }
             }
         })
-        .then((res) => {
-            return res;
-        })
-        .catch((err) => {
-            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-        });
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
     }
 
     public async deleteIndex(indexData: any): Promise<any> {

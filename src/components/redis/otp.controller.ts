@@ -48,16 +48,4 @@ export class OtpController {
             message: 'Successfully'
         };
     }
-
-    // @ApiOperation({
-    //     summary: 'Get otp'
-    // })
-    // @ApiResponse({
-    //     status: 200,
-    //     description: 'Successfully'
-    // })
-    // @Get('')
-    // public async getCode(@Query('phoneNumber') phoneNumber: string) {
-    //     return this.otpService.getCode(phoneNumber);
-    // }
 }
