@@ -110,8 +110,8 @@ export class AuthService {
     }
 
     async socialNetwork(socialDto: SocialDto) {
+        const access_token = await this.signToken(socialDto.phone);
         try {
-            console.log(socialDto);
             const user = await this.authModel.findOne({
                 phone: socialDto.phone
             });
@@ -137,52 +137,61 @@ export class AuthService {
                 const newAuth = await this.authModel.create(dataInsert);
                 newAuth.save();
 
-                const access_token = await this.signToken(socialDto.phone);
-
                 return {
                     code: 80001,
                     data: access_token,
                     message: 'Registered by social successfully'
                 };
             }
-        } catch (error) {
-            throw new NotFoundException(error);
-        }
-    }
 
-    private async isNotNullUser(socialDto: SocialDto) {
-        try {
-            const user = await this.authModel.findOne({
-                phone: socialDto.phone
-            });
-            const access_token = await this.signToken(socialDto.phone);
+            // case 2 The old device
+            if (user.social.find(({ mac }) => mac == socialDto.mac)) {
 
-            if(user) {
-                return {
-                    code: 80003,
-                    data: false,
-                    message: 'the another device'
-                };
+                if (user.social.find(({ email }) => email == socialDto.email)) {
+                    return {
+                        code: 80004,
+                        data: access_token,
+                        message: 'The old device'
+                    };
+                }
+
+                // Add new a social object to user.model
+                /**
+                 * 
+                 *  Do sonething here
+                 * 
+                 */
+                // return {
+                //     code: 80005,
+                //     data: access_token,
+                //     message: 'the new social network acount'
+                // };
             }
 
-            const data = {
-                ip: socialDto.ip,
-                mac: [
-                    {
-                        mac: socialDto.mac
-                    }
-                ],
-                phone: socialDto.phone,
-                fullname: socialDto.fullname
-            };
-            const newAuth = await this.authModel.create(data);
-            newAuth.save();
+            // case 3 a new device
+            if (user.social.find(({ mac }) => mac != socialDto.mac)) {
 
-            return {
-                code: 80005,
-                data: access_token,
-                message: 'Registered by social successfully'
-            };
+                if (user.social.find(({ email }) => email == socialDto.email)) {
+                    // Update a new mac address to db
+                    // return {
+                    //     code: 80007,
+                    //     data: access_token,
+                    //     message: 'The old email'
+                    // };
+                }
+
+                // Add new a social object to user.model
+                /**
+                 * 
+                 *  Do sonething here
+                 * 
+                 */
+                // return {
+                //     code: 80006,
+                //     data: access_token,
+                //     message: 'the new device'
+                // };
+            }
         } catch (error) {
             throw new NotFoundException(error);
         }
