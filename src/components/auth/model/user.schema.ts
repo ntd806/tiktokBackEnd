@@ -25,6 +25,15 @@ export class User extends Document {
         video_id: string,
         isLive: number
     }];
+
+    @Prop({ type: 'object' })
+    social: { 
+        token: string,
+        isGoogle: boolean,
+        email: string,
+        id: string,
+        url: string
+    };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

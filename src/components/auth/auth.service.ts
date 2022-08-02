@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto, SocialDto, VerifyDto} from './dto';
+import { AuthDto, SocialDto, VerifyDto } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -15,22 +15,22 @@ export class AuthService {
     async signup(dto: AuthDto) {
         const user = await this.authModel.findOne({ phone: dto.phone });
         if (user) {
-            if(user.mac.find(({mac}) => mac == dto.mac)){
+            if (user.mac.find(({ mac }) => mac == dto.mac)) {
                 return {
                     status: 40004,
                     data: true,
                     message: 'Register failed'
-                }
+                };
             } else {
-                let mac = user.mac;
-                mac.push({mac: dto.mac});
+                const mac = user.mac;
+                mac.push({ mac: dto.mac });
                 await this.authModel.findOneAndUpdate(
                     { _id: user._id },
                     {
                         mac: mac
                     }
                 );
-                let access_token = await this.signToken(user.phone);
+                const access_token = await this.signToken(user.phone);
                 return {
                     status: 40001,
                     data: access_token,
@@ -38,11 +38,13 @@ export class AuthService {
                 };
             }
         } else {
-            let dataInsert = {
+            const dataInsert = {
                 ip: dto.ip,
-                mac: [{
-                    mac: dto.mac,
-                }],
+                mac: [
+                    {
+                        mac: dto.mac
+                    }
+                ],
                 phone: dto.phone,
                 birthdate: dto.birthdate,
                 sex: dto.sex,
@@ -50,7 +52,7 @@ export class AuthService {
             };
             const newAuth = await this.authModel.create(dataInsert);
             newAuth.save();
-            let access_token = await this.signToken(newAuth.phone);
+            const access_token = await this.signToken(newAuth.phone);
             return {
                 status: 40001,
                 data: access_token,
@@ -66,7 +68,7 @@ export class AuthService {
         const secret = process.env.SECRET;
 
         const token = await this.jwt.signAsync(payload, {
-            expiresIn: '120m',
+            expiresIn: '365d',
             secret: secret
         });
 
@@ -77,27 +79,28 @@ export class AuthService {
 
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
-            const user = await this.authModel
-                .findOne({ phone: verifyDto.phone });
+            const user = await this.authModel.findOne({
+                phone: verifyDto.phone
+            });
 
             if (!user) {
                 return {
-                    code: 70001,
+                    code: 80001,
                     data: true,
                     message: 'Phone number verified successfully'
                 };
             }
 
-            if(user.mac.find(({mac}) => mac == verifyDto.mac)){
+            if (user.mac.find(({ mac }) => mac == verifyDto.mac)) {
                 return {
-                    code: 70004,
+                    code: 80004,
                     data: false,
                     message: 'The old device'
                 };
             }
 
             return {
-                code: 70003,
+                code: 80003,
                 data: false,
                 message: 'the another device'
             };
@@ -107,6 +110,81 @@ export class AuthService {
     }
 
     async socialNetwork(socialDto: SocialDto) {
+        try {
+            console.log(socialDto);
+            const user = await this.authModel.findOne({
+                phone: socialDto.phone
+            });
+            
+            if (!user) {
+                const dataInsert = {
+                    ip: socialDto.ip,
+                    mac: [
+                        {
+                            mac: socialDto.mac
+                        }
+                    ],
+                    phone: socialDto.phone,
+                    fullname: socialDto.fullname,
+                    social: { 
+                        token: socialDto.url,
+                        isGoogle: socialDto.isGoogle,
+                        email: socialDto.email,
+                        id: socialDto.id,
+                        url: socialDto.url
+                    }
+                };
+                const newAuth = await this.authModel.create(dataInsert);
+                newAuth.save();
 
+                const access_token = await this.signToken(socialDto.phone);
+
+                return {
+                    code: 80001,
+                    data: access_token,
+                    message: 'Registered by social successfully'
+                };
+            }
+        } catch (error) {
+            throw new NotFoundException(error);
+        }
+    }
+
+    private async isNotNullUser(socialDto: SocialDto) {
+        try {
+            const user = await this.authModel.findOne({
+                phone: socialDto.phone
+            });
+            const access_token = await this.signToken(socialDto.phone);
+
+            if(user) {
+                return {
+                    code: 80003,
+                    data: false,
+                    message: 'the another device'
+                };
+            }
+
+            const data = {
+                ip: socialDto.ip,
+                mac: [
+                    {
+                        mac: socialDto.mac
+                    }
+                ],
+                phone: socialDto.phone,
+                fullname: socialDto.fullname
+            };
+            const newAuth = await this.authModel.create(data);
+            newAuth.save();
+
+            return {
+                code: 80005,
+                data: access_token,
+                message: 'Registered by social successfully'
+            };
+        } catch (error) {
+            throw new NotFoundException(error);
+        }
     }
 }

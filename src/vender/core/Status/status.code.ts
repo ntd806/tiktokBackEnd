@@ -61,6 +61,6 @@ export declare enum StatusCode {
     /***
      * Live
      */
-     GET_LIVE_SUCCESS = 80001,
-     GET_LIVE_FAILED = 80002,
+    GET_LIVE_SUCCESS = 80001,
+    GET_LIVE_FAILED = 80002
 }
