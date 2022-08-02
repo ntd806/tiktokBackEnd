@@ -44,21 +44,17 @@ export class AuthController {
     }
 
     @ApiOperation({
-        summary: 'Verify phone number'
+        summary: 'Register social network'
     })
     @ApiResponse({
-        status: 70001,
-        description: 'Verify phone number successfully'
+        status: 80005,
+        description: 'Registered by social successfully'
     })
     @ApiResponse({
-        status: 70003,
+        status: 80003,
         description: 'the another device'
     })
-    @ApiResponse({
-        status: 70003,
-        description: 'The old device'
-    })
-    @Post('verify-social-network')
+    @Post('social-network')
     async socialNetwork(@Body() socialDto: SocialDto) {
         return await this.authService.socialNetwork(socialDto);
     }

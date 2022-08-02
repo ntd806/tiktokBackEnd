@@ -33,8 +33,8 @@ export class LiveService {
     public async getLiveList(): Promise<any> {
         try {
             return this.httpService
-            .post(this.url, this.data, this.options)
-            .pipe(map((resp) => resp.data.streamKey));
+                .post(this.url, this.data, this.options)
+                .pipe(map((resp) => resp.data.streamKey));
         } catch (error) {
             return {
                 code: 80002,
