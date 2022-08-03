@@ -54,6 +54,14 @@ export class AuthController {
         status: 80003,
         description: 'the another device'
     })
+    @ApiResponse({
+        status: 80006,
+        description: 'The old device'
+    })
+    @ApiResponse({
+        status: 80007,
+        description: 'The new device'
+    })
     @Post('social-network')
     async socialNetwork(@Body() socialDto: SocialDto) {
         return await this.authService.socialNetwork(socialDto);

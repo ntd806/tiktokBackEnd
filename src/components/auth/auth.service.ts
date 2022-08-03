@@ -111,11 +111,10 @@ export class AuthService {
 
     async socialNetwork(socialDto: SocialDto) {
         try {
-            console.log(socialDto);
             const user = await this.authModel.findOne({
                 phone: socialDto.phone
             });
-            
+            const access_token = await this.signToken(socialDto.phone);
             if (!user) {
                 const dataInsert = {
                     ip: socialDto.ip,
@@ -137,14 +136,43 @@ export class AuthService {
                 const newAuth = await this.authModel.create(dataInsert);
                 newAuth.save();
 
-                const access_token = await this.signToken(socialDto.phone);
-
                 return {
                     code: 80001,
                     data: access_token,
                     message: 'Registered by social successfully'
                 };
             }
+
+            if (user.mac.find(({ mac }) => mac == socialDto.mac)) {
+                return {
+                    code: 80006,
+                    data: access_token,
+                    message: 'The old device'
+                };
+            }
+            const mac = user.mac;
+            mac.push({ mac: socialDto.mac });
+            const dataUpdate = {
+                ip: socialDto.ip,
+                mac: mac,
+                phone: socialDto.phone,
+                fullname: socialDto.fullname,
+                social: { 
+                    token: socialDto.url,
+                    isGoogle: socialDto.isGoogle,
+                    email: socialDto.email,
+                    id: socialDto.id,
+                    url: socialDto.url
+                }
+            };
+            await user.update(dataUpdate);
+            await user.save();
+            return {
+                code: 80007,
+                data: access_token,
+                message: 'The new device'
+            };
+
         } catch (error) {
             throw new NotFoundException(error);
         }

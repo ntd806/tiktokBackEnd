@@ -12,7 +12,7 @@ export class User extends Document {
     birthdate: Date;
 
     @Prop({ type: 'object' })
-    ip: object;
+    ip: any;
 
     @Prop({ type: 'object' })
     mac: [{ mac: string }];
@@ -25,15 +25,6 @@ export class User extends Document {
         video_id: string,
         isLive: number
     }];
-
-    @Prop({ type: 'object' })
-    social: { 
-        token: string,
-        isGoogle: boolean,
-        email: string,
-        id: string,
-        url: string
-    };
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
