@@ -3,13 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
     @ApiProperty({
-        description: 'Phone number of user'
-    })
-    @IsNotEmpty()
-    @IsString()
-    phone: string;
-
-    @ApiProperty({
         description: 'Birthday of user'
     })
     @IsDateString()
