@@ -69,4 +69,20 @@ export class VideoController {
     async getListVideo(@Request() req) {
         return await this.videoService.getListVideoLiked(req.user, req.query);
     }
+
+    @ApiOperation({
+        summary: 'Get list video liked'
+    })
+    @ApiResponse({
+        status: 90005,
+        description: 'Get list video liked successfully'
+    })
+    @ApiResponse({
+        status: 90006,
+        description: 'Get list video liked failed'
+    })
+    @Get('get-relative-video')
+    async getRelativeVideo(@Request() req) {
+        return await this.videoService.getRelativeVideo(req.query);
+    }
 }

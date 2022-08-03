@@ -1,15 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-
+import { ConfigSearch } from '../search/config/config.search';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { productIndex } from '../search/constant/product.elastic';
 @Injectable()
-export class VideoService {
+export class VideoService  extends ElasticsearchService{
     constructor(
         @InjectModel(User.name)
-        private readonly userModel: Model<User>
-    ) {}
+        private readonly userModel: Model<User>,
+    ) {
+        super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
+    }
 
     async likeVideo(user: User, likeDto: LikeDto) {
         console.log(likeDto);
@@ -99,5 +103,28 @@ export class VideoService {
             };
         }
         
+    }
+
+    public async getRelativeVideo(url: string) : Promise<any> {
+
+        return this.search({
+            index: productIndex._index,
+            body: {
+                size: 1,
+                from: 0,
+                query: {
+                    multi_match: {
+                        query: url,
+                        fields: ['url']
+                    }
+                }
+            }
+        })
+            .then((res) => {
+                return res;
+            })
+            .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
     }
 }
