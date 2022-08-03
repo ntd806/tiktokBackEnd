@@ -14,7 +14,6 @@ import {
     UpdateProductDto,
     SearchProductDto
 } from './dto/index';
-
 @Controller('/api/v1/search')
 @ApiTags('search')
 export class SearchController {
@@ -59,7 +58,7 @@ export class SearchController {
     public async searchIndex(
         @Query() searchProductDto: SearchProductDto
     ): Promise<any> {
-        return this.searchService.searchIndex(searchProductDto.search);
+        return this.searchService.searchIndex(searchProductDto);
     }
 
     @Delete('delete-index')
