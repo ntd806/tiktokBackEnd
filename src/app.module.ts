@@ -3,6 +3,7 @@ import { ConfigModule } from './config/config.module';
 import { LoggerModule } from './logger/logger.module';
 import { AuthModule } from './components/auth/auth.module';
 import { UserModule } from './components/user/user.module';
+import { VideoModule } from './components/video/video.module';
 import { DatabaseModule } from './database/database.module';
 import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './components/redis/redis.module';
@@ -25,7 +26,8 @@ dotenv.config();
         AuthModule,
         GameModule,
         UserModule,
-        SearchModule
+        SearchModule,
+        VideoModule
     ],
     controllers: []
 })

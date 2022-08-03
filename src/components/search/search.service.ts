@@ -4,6 +4,7 @@ import { SearchServiceInterface } from './interface/search.service.interface';
 import { ConfigSearch } from './config/config.search';
 import { productIndex } from './constant/product.elastic';
 // import { ProductSearchObject } from './model/product.search.object';
+import { PaginationQueryDto } from '../game/dto/pagination.query.dto';
 @Injectable()
 export class SearchService
     extends ElasticsearchService
@@ -34,8 +35,8 @@ export class SearchService
         return this.search({
             index: productIndex._index,
             body: {
-                size: 12,
-                from: 0,
+                size: searchData.limit,
+                from: searchData.offset,
                 query: {
                     multi_match: {
                         query: searchData,
