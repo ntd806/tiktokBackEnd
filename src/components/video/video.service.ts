@@ -107,7 +107,7 @@ export class VideoService  extends ElasticsearchService{
 
     public async getRelativeVideo(url: string) : Promise<any> {
 
-        return this.search({
+        const video = await this.search({
             index: productIndex._index,
             body: {
                 size: 1,
@@ -121,10 +121,12 @@ export class VideoService  extends ElasticsearchService{
             }
         })
             .then((res) => {
-                return res;
+                return res.hits.hits;
             })
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
+
+        console.log(video)
     }
 }

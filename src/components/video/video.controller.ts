@@ -4,7 +4,8 @@ import {
     Post,
     Get,
     Request,
-    UseGuards
+    UseGuards,
+    Query
 } from '@nestjs/common';
 import { VideoService } from './video.service';
 import { LikeDto } from './dto/like.dto';
@@ -15,6 +16,7 @@ import {
     ApiOperation,
     ApiBearerAuth
 } from '@nestjs/swagger';
+import { SearchDto } from './dto';
 @ApiBearerAuth('Authorization')
 @ApiTags('video')
 @UseGuards(JwtGuard)
@@ -82,7 +84,7 @@ export class VideoController {
         description: 'Get list video liked failed'
     })
     @Get('get-relative-video')
-    async getRelativeVideo(@Request() req) {
-        return await this.videoService.getRelativeVideo(req.query);
+    async getRelativeVideo(@Query() searchDto: SearchDto) {
+        return await this.videoService.getRelativeVideo(searchDto.search);
     }
 }
