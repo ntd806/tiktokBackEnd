@@ -23,7 +23,15 @@ export class User extends Document {
     phone: string;
 
     @Prop({ type: 'array' })
-    like: [{ video_id: string }];
+    like: [{ 
+        url: string,
+        isLive: number
+    }];
+
+    @Prop({ type: 'array' })
+    tag: [{ 
+        name: string
+    }];
 
     @Prop({ type: 'object' })
     social: { 

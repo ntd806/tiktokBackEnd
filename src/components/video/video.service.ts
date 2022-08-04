@@ -3,6 +3,7 @@ import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PaginationQueryDto } from './dto/pagination.query.dto';
 
 @Injectable()
 export class VideoService {
@@ -12,14 +13,13 @@ export class VideoService {
     ) {}
 
     async likeVideo(user: User, likeDto: LikeDto) {
-        console.log(likeDto);
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
-            likeUpdate = [{ video_id: likeDto.video_id, isLive: likeDto.isLive }];
+            likeUpdate = [{ url: likeDto.url, isLive: likeDto.isLive }];
         } else {
             likeUpdate = user.like;
             const index = likeUpdate.find(
-                ({ video_id }) => video_id === likeDto.video_id
+                ({ url }) => url === likeDto.url
             );
             if (index) {
                 return {
@@ -28,16 +28,16 @@ export class VideoService {
                     message: 'Like video false'
                 };
             } else {
-                likeUpdate.push({ video_id: likeDto.video_id, isLive: likeDto.isLive });
+                likeUpdate.push({ url: likeDto.url, isLive: likeDto.isLive });
             }
         }
+        console.log(likeUpdate);
         await this.userModel.findOneAndUpdate(
             { _id: user._id },
             {
                 like: likeUpdate
             }
         );
-        await user.save();
         return {
             code: 90001,
             data: true,
@@ -56,7 +56,7 @@ export class VideoService {
         } else {
             likeUpdate = user.like;
             const index = likeUpdate.find(
-                ({ video_id }) => video_id === likeDto.video_id
+                ({ url }) => url === likeDto.url
             );
             if (index) {
                 likeUpdate = likeUpdate.splice(index, 1);
@@ -82,13 +82,13 @@ export class VideoService {
         };
     }
 
-    async getListVideoLiked(user: User, param) {
+    async getListVideoLiked(user: User, paginationQuery: PaginationQueryDto) {
         try {
-            let page = param.page ? param.page : 1;
-            let limit = param.limit ? param.limit : 5;
+            const { limit, offset } = paginationQuery;
+            console.log(paginationQuery);
             return {
                 code: 90005,
-                data: user.like.slice((page-1)*limit, page*limit),
+                data: user.like.slice((offset-1)*limit, offset*limit),
                 message: 'Get list video successfully'
             };
         } catch(err) {
