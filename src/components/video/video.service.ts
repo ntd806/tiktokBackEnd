@@ -6,6 +6,8 @@ import { Model } from 'mongoose';
 import { ConfigSearch } from '../search/config/config.search';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { productIndex } from '../search/constant/product.elastic';
+import { SearchProductDto } from '../search/dto';
+import { Video } from './model/video.schema';
 @Injectable()
 export class VideoService  extends ElasticsearchService{
     constructor(
@@ -105,7 +107,7 @@ export class VideoService  extends ElasticsearchService{
         
     }
 
-    public async getRelativeVideo(url: string) : Promise<any> {
+    public async getRelativeVideo(searchProductDto: SearchProductDto): Promise<any> {
 
         const video = await this.search({
             index: productIndex._index,
@@ -114,19 +116,51 @@ export class VideoService  extends ElasticsearchService{
                 from: 0,
                 query: {
                     multi_match: {
-                        query: url,
+                        query: searchProductDto.search,
                         fields: ['url']
                     }
                 }
             }
         })
             .then((res) => {
-                return res.hits.hits;
+                const video = res.hits.hits;
+                if (video.length < 1) {
+                    return {
+                        code: 90007,
+                        data: [],
+                        message: 'There is no relative video'
+                    };
+                }
+                return res.hits.hits[0]._source;
             })
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
+        
+        // const list = await this.search({
+        //     index: productIndex._index,
+        //     body: {
+        //         size: searchProductDto.limit,
+        //         from: searchProductDto.offset,
+        //         query: {
+        //             multi_match: {
+        //                 query: video._source.tag,
+        //                 fields: ['tag', 'name', 'description']
+        //             }
+        //         }
+        //     }
+        // })
+        //     .then((res) => {
+        //         return res.hits;
+        //     })
+        //     .catch((err) => {
+        //         throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        //     });
 
-        console.log(video)
+        // return {
+        //     code: 90008,
+        //     data: list,
+        //     message: 'Get relative videos successfully'
+        // };
     }
 }

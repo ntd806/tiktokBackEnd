@@ -16,7 +16,7 @@ import {
     ApiOperation,
     ApiBearerAuth
 } from '@nestjs/swagger';
-import { SearchDto } from './dto';
+import { SearchProductDto } from '../search/dto';
 @ApiBearerAuth('Authorization')
 @ApiTags('video')
 @UseGuards(JwtGuard)
@@ -84,7 +84,7 @@ export class VideoController {
         description: 'Get list video liked failed'
     })
     @Get('get-relative-video')
-    async getRelativeVideo(@Query() searchDto: SearchDto) {
-        return await this.videoService.getRelativeVideo(searchDto.search);
+    async getRelativeVideo(@Query() searchProductDto: SearchProductDto) {
+        return await this.videoService.getRelativeVideo(searchProductDto);
     }
 }
