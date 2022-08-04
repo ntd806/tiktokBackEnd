@@ -109,7 +109,7 @@ export class VideoService  extends ElasticsearchService{
 
     public async getRelativeVideo(searchProductDto: SearchProductDto): Promise<any> {
 
-        const video = await this.search({
+        return await this.search({
             index: productIndex._index,
             body: {
                 size: 1,
@@ -136,31 +136,5 @@ export class VideoService  extends ElasticsearchService{
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
-        
-        // const list = await this.search({
-        //     index: productIndex._index,
-        //     body: {
-        //         size: searchProductDto.limit,
-        //         from: searchProductDto.offset,
-        //         query: {
-        //             multi_match: {
-        //                 query: video._source.tag,
-        //                 fields: ['tag', 'name', 'description']
-        //             }
-        //         }
-        //     }
-        // })
-        //     .then((res) => {
-        //         return res.hits;
-        //     })
-        //     .catch((err) => {
-        //         throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-        //     });
-
-        // return {
-        //     code: 90008,
-        //     data: list,
-        //     message: 'Get relative videos successfully'
-        // };
     }
 }
