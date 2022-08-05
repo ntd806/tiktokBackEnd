@@ -109,6 +109,24 @@ export class VideoService  extends ElasticsearchService{
 
     public async getRelativeVideo(searchProductDto: SearchProductDto): Promise<any> {
 
+        const video = await this.getVideoByUrl(searchProductDto);
+        let tag = '';
+        for (var v in video) {
+            if (v === 'tag') {
+                tag = video[v];
+            }
+            break;
+        }
+        let list = await this.getTag(searchProductDto, tag);
+
+        return {
+            code: 90007,
+            data: list,
+            message: 'Get relative video successfully'
+        };
+    }
+
+    private async getVideoByUrl(searchProductDto: SearchProductDto): Promise<any> {
         return await this.search({
             index: productIndex._index,
             body: {
@@ -122,17 +140,27 @@ export class VideoService  extends ElasticsearchService{
                 }
             }
         })
-            .then((res) => {
-                const video = res.hits.hits;
-                if (video.length < 1) {
-                    return {
-                        code: 90007,
-                        data: [],
-                        message: 'There is no relative video'
-                    };
+            .then((res) => res.hits.hits[0]._source )
+            .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+    }
+
+    private async getTag(searchProductDto: SearchProductDto, tag: string): Promise<any> {
+        return await this.search({
+            index: productIndex._index,
+            body: {
+                size: searchProductDto.limit,
+                from: searchProductDto.offset,
+                query: {
+                    multi_match: {
+                        query: tag,
+                        fields: ['tag']
+                    }
                 }
-                return res.hits.hits[0]._source;
-            })
+            }
+        })
+            .then((res) => res.hits.hits )
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
