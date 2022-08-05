@@ -113,8 +113,8 @@ export class VideoService  extends ElasticsearchService{
         for (var v in video) {
             if (v === 'tag') {
                 tag = video[v];
+                break;
             }
-            break;
         }
         let list = await this.getTag(searchProductDto, tag);
 
