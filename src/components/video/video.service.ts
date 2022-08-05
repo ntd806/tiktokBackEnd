@@ -25,7 +25,7 @@ export class VideoService {
                 return {
                     code: 90002,
                     data: true,
-                    message: 'Like video false'
+                    message: 'You have liked this video already'
                 };
             } else {
                 likeUpdate.push({ url: likeDto.url, isLive: likeDto.isLive });
@@ -49,9 +49,9 @@ export class VideoService {
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
             return {
-                code: 90004,
+                code: 90007,
                 data: true,
-                message: 'Unlike video false'
+                message: 'Does not exist video to unlike'
             };
         } else {
             likeUpdate = user.like;
@@ -64,7 +64,7 @@ export class VideoService {
                 return {
                     code: 90004,
                     data: true,
-                    message: 'Unlike video false'
+                    message: 'You have unliked this video already'
                 };
             }
         }
