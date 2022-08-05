@@ -1,15 +1,21 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-
+import { ConfigSearch } from '../search/config/config.search';
+import { ElasticsearchService } from '@nestjs/elasticsearch';
+import { productIndex } from '../search/constant/product.elastic';
+import { SearchProductDto } from '../search/dto';
+import { Video } from './model/video.schema';
 @Injectable()
-export class VideoService {
+export class VideoService  extends ElasticsearchService{
     constructor(
         @InjectModel(User.name)
-        private readonly userModel: Model<User>
-    ) {}
+        private readonly userModel: Model<User>,
+    ) {
+        super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
+    }
 
     async likeVideo(user: User, likeDto: LikeDto) {
         console.log(likeDto);
@@ -99,5 +105,64 @@ export class VideoService {
             };
         }
         
+    }
+
+    public async getRelativeVideo(searchProductDto: SearchProductDto): Promise<any> {
+
+        const video = await this.getVideoByUrl(searchProductDto);
+        let tag = '';
+        for (var v in video) {
+            if (v === 'tag') {
+                tag = video[v];
+            }
+            break;
+        }
+        let list = await this.getTag(searchProductDto, tag);
+
+        return {
+            code: 90007,
+            data: list,
+            message: 'Get relative video successfully'
+        };
+    }
+
+    private async getVideoByUrl(searchProductDto: SearchProductDto): Promise<any> {
+        return await this.search({
+            index: productIndex._index,
+            body: {
+                size: 1,
+                from: 0,
+                query: {
+                    multi_match: {
+                        query: searchProductDto.search,
+                        fields: ['url']
+                    }
+                }
+            }
+        })
+            .then((res) => res.hits.hits[0]._source )
+            .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+    }
+
+    private async getTag(searchProductDto: SearchProductDto, tag: string): Promise<any> {
+        return await this.search({
+            index: productIndex._index,
+            body: {
+                size: searchProductDto.limit,
+                from: searchProductDto.offset,
+                query: {
+                    multi_match: {
+                        query: tag,
+                        fields: ['tag']
+                    }
+                }
+            }
+        })
+            .then((res) => res.hits.hits )
+            .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
     }
 }
