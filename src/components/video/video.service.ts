@@ -7,7 +7,6 @@ import { ConfigSearch } from '../search/config/config.search';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { productIndex } from '../search/constant/product.elastic';
 import { SearchProductDto } from '../search/dto';
-import { Video } from './model/video.schema';
 @Injectable()
 export class VideoService  extends ElasticsearchService{
     constructor(
