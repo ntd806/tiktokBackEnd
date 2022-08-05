@@ -120,7 +120,7 @@ export class VideoService  extends ElasticsearchService{
         let list = await this.getTag(searchProductDto, tag);
 
         return {
-            code: 90007,
+            code: 90008,
             data: list,
             message: 'Get relative video successfully'
         };
