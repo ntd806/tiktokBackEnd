@@ -38,8 +38,8 @@ export class SearchService
                 from: searchData.offset,
                 query: {
                     multi_match: {
-                        query: searchData,
-                        fields: ['name', 'description', 'url', 'preview', 'tag', 'type']
+                        query: searchData.search,
+                        fields: ['name', 'description', 'url', 'preview', 'tag']
                     }
                 }
             }
