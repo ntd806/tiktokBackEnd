@@ -18,6 +18,7 @@ import {
     ApiBearerAuth,
     ApiQuery
 } from '@nestjs/swagger';
+import { SearchProductDto } from '../search/dto';
 @ApiBearerAuth('Authorization')
 @ApiTags('video')
 @UseGuards(JwtGuard)
@@ -83,5 +84,37 @@ export class VideoController {
     @Get('video-liked')
     async getListVideo(@Request() req, @Query() paginationQuery: PaginationQueryDto) {
         return await this.videoService.getListVideoLiked(req.user, paginationQuery);
+    }
+
+    @ApiOperation({
+        summary: 'Get list video liked'
+    })
+    @ApiResponse({
+        status: 90005,
+        description: 'Get list video liked successfully'
+    })
+    @ApiResponse({
+        status: 90006,
+        description: 'Get list video liked failed'
+    })
+    @Get('get-relative-video')
+    async getRelativeVideo(@Query() searchProductDto: SearchProductDto) {
+        return await this.videoService.getRelativeVideo(searchProductDto);
+    }
+
+    @ApiOperation({
+        summary: 'Get list video liked'
+    })
+    @ApiResponse({
+        status: 90007,
+        description: 'Get list video liked by tag successfully'
+    })
+    @ApiResponse({
+        status: 90008,
+        description: 'Get list video liked by tag failed'
+    })
+    @Get('get-relative-video-by-tag')
+    async getRelativeVideoByTag(@Query() searchProductDto: SearchProductDto) {
+        return await this.videoService.getRelativeVideoByTag(searchProductDto);
     }
 }

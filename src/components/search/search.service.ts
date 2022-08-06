@@ -4,7 +4,6 @@ import { SearchServiceInterface } from './interface/search.service.interface';
 import { ConfigSearch } from './config/config.search';
 import { productIndex } from './constant/product.elastic';
 // import { ProductSearchObject } from './model/product.search.object';
-import { PaginationQueryDto } from '../game/dto/pagination.query.dto';
 @Injectable()
 export class SearchService
     extends ElasticsearchService
@@ -49,6 +48,7 @@ export class SearchService
                 return res;
             })
             .catch((err) => {
+                console.log(err);
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
     }
