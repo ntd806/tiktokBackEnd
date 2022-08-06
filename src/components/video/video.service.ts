@@ -8,10 +8,10 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { productIndex } from '../search/constant/product.elastic';
 import { SearchProductDto } from '../search/dto';
 @Injectable()
-export class VideoService  extends ElasticsearchService{
+export class VideoService extends ElasticsearchService {
     constructor(
         @InjectModel(User.name)
-        private readonly userModel: Model<User>,
+        private readonly userModel: Model<User>
     ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
@@ -20,7 +20,9 @@ export class VideoService  extends ElasticsearchService{
         console.log(likeDto);
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
-            likeUpdate = [{ video_id: likeDto.video_id, isLive: likeDto.isLive }];
+            likeUpdate = [
+                { video_id: likeDto.video_id, isLive: likeDto.isLive }
+            ];
         } else {
             likeUpdate = user.like;
             const index = likeUpdate.find(
@@ -33,7 +35,10 @@ export class VideoService  extends ElasticsearchService{
                     message: 'Like video false'
                 };
             } else {
-                likeUpdate.push({ video_id: likeDto.video_id, isLive: likeDto.isLive });
+                likeUpdate.push({
+                    video_id: likeDto.video_id,
+                    isLive: likeDto.isLive
+                });
             }
         }
         await this.userModel.findOneAndUpdate(
@@ -89,34 +94,34 @@ export class VideoService  extends ElasticsearchService{
 
     async getListVideoLiked(user: User, param) {
         try {
-            let page = param.page ? param.page : 1;
-            let limit = param.limit ? param.limit : 5;
+            const page = param.page ? param.page : 1;
+            const limit = param.limit ? param.limit : 5;
             return {
                 code: 90005,
-                data: user.like.slice((page-1)*limit, page*limit),
+                data: user.like.slice((page - 1) * limit, page * limit),
                 message: 'Get list video successfully'
             };
-        } catch(err) {
+        } catch (err) {
             return {
                 code: 90006,
                 data: false,
                 message: 'Get list video failed'
             };
         }
-        
     }
 
-    public async getRelativeVideo(searchProductDto: SearchProductDto): Promise<any> {
-
+    public async getRelativeVideo(
+        searchProductDto: SearchProductDto
+    ): Promise<any> {
         const video = await this.getVideoByUrl(searchProductDto);
         let tag = '';
-        for (var v in video) {
+        for (const v in video) {
             if (v === 'tag') {
                 tag = video[v];
                 break;
             }
         }
-        let list = await this.getTag(searchProductDto, tag);
+        const list = await this.getTag(searchProductDto, tag);
 
         return {
             code: 90008,
@@ -125,7 +130,9 @@ export class VideoService  extends ElasticsearchService{
         };
     }
 
-    private async getVideoByUrl(searchProductDto: SearchProductDto): Promise<any> {
+    private async getVideoByUrl(
+        searchProductDto: SearchProductDto
+    ): Promise<any> {
         return await this.search({
             index: productIndex._index,
             body: {
@@ -139,13 +146,16 @@ export class VideoService  extends ElasticsearchService{
                 }
             }
         })
-            .then((res) => res.hits.hits[0]._source )
+            .then((res) => res.hits.hits[0]._source)
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
     }
 
-    private async getTag(searchProductDto: SearchProductDto, tag: string): Promise<any> {
+    private async getTag(
+        searchProductDto: SearchProductDto,
+        tag: string
+    ): Promise<any> {
         return await this.search({
             index: productIndex._index,
             body: {
@@ -154,12 +164,12 @@ export class VideoService  extends ElasticsearchService{
                 query: {
                     multi_match: {
                         query: tag,
-                        fields: ['tag']
+                        fields: ['name', 'description', 'preview', 'tag']
                     }
                 }
             }
         })
-            .then((res) => res.hits.hits )
+            .then((res) => res.hits.hits)
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });

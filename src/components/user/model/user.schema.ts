@@ -18,7 +18,7 @@ export class User extends Document {
 
     @Prop({ type: 'object' })
     mac: [{ mac: string }];
-    
+
     @Prop()
     phone: string;
 
@@ -26,12 +26,12 @@ export class User extends Document {
     like: [{ video_id: string }];
 
     @Prop({ type: 'object' })
-    social: { 
-        token: string,
-        isGoogle: boolean,
-        email: string,
-        id: string,
-        url: string
+    social: {
+        token: string;
+        isGoogle: boolean;
+        email: string;
+        id: string;
+        url: string;
     };
 }
 

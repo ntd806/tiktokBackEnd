@@ -9,10 +9,10 @@ export class SearchProductDto {
     @IsOptional()
     @IsPositive()
     @ApiProperty()
-    limit: number = 10;
+    limit = 10;
 
     @IsOptional()
     @IsPositive()
     @ApiProperty()
-    offset: number = 0;
+    offset = 0;
 }
