@@ -48,7 +48,7 @@ export class SearchService
                 return res;
             })
             .catch((err) => {
-                console.log(err)
+                console.log(err);
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
     }

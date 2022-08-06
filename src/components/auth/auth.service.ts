@@ -125,7 +125,7 @@ export class AuthService {
                     ],
                     phone: socialDto.phone,
                     fullname: socialDto.fullname,
-                    social: { 
+                    social: {
                         token: socialDto.url,
                         isGoogle: socialDto.isGoogle,
                         email: socialDto.email,
@@ -157,7 +157,7 @@ export class AuthService {
                 mac: mac,
                 phone: socialDto.phone,
                 fullname: socialDto.fullname,
-                social: { 
+                social: {
                     token: socialDto.url,
                     isGoogle: socialDto.isGoogle,
                     email: socialDto.email,
@@ -172,7 +172,6 @@ export class AuthService {
                 data: access_token,
                 message: 'The new device'
             };
-
         } catch (error) {
             throw new NotFoundException(error);
         }
@@ -185,7 +184,7 @@ export class AuthService {
             });
             const access_token = await this.signToken(socialDto.phone);
 
-            if(user) {
+            if (user) {
                 return {
                     code: 80003,
                     data: false,

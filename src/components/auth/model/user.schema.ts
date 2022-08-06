@@ -21,18 +21,20 @@ export class User extends Document {
     phone: string;
 
     @Prop({ type: 'array' })
-    like: [{ 
-        video_id: string,
-        isLive: number
-    }];
+    like: [
+        {
+            video_id: string;
+            isLive: number;
+        }
+    ];
 
     @Prop({ type: 'object' })
-    social: { 
-        token: string,
-        isGoogle: boolean,
-        email: string,
-        id: string,
-        url: string
+    social: {
+        token: string;
+        isGoogle: boolean;
+        email: string;
+        id: string;
+        url: string;
     };
 }
 
