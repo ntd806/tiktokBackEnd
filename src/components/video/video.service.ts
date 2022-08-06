@@ -114,6 +114,15 @@ export class VideoService extends ElasticsearchService {
         searchProductDto: SearchProductDto
     ): Promise<any> {
         const video = await this.getVideoByUrl(searchProductDto);
+
+        if (video.lenght) {
+            return {
+                code: 90008,
+                data: [],
+                message: 'Not found data'
+            }
+        }
+
         let tag = '';
         for (const v in video) {
             if (v === 'tag') {
@@ -146,7 +155,10 @@ export class VideoService extends ElasticsearchService {
                 }
             }
         })
-            .then((res) => res.hits.hits[0]._source)
+            .then((res) => {
+                console.log(res)
+                return res;
+            })
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
