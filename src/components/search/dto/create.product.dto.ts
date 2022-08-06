@@ -35,5 +35,10 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsNumber()
     @ApiProperty()
+    type: number;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @ApiProperty()
     time: number;
 }

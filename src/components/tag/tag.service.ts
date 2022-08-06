@@ -68,7 +68,7 @@ export class TagService {
     ) {
         if (typeof user.tag == 'undefined') {
             return { 
-                code: 10005,
+                code: 10004,
                 data: false,
                 message: "Update tag failed"
             }
@@ -79,13 +79,13 @@ export class TagService {
                 user.tag.push({ name: TagUpdateDto.nameUpdate });
                 await user.save();
                 return { 
-                    code: 10004,
+                    code: 10003,
                     data: false,
                     message: "Update tag successfully"
                 }
             } else {
                 return {
-                    code: 10005,
+                    code: 10004,
                     data: false,
                     message: 'Update tag false'
                 };
