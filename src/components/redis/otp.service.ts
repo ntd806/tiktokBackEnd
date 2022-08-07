@@ -13,7 +13,7 @@ export class OtpService {
     async sendSMS(phoneNumber: string) {
         const randomNumber = generateRandomSixDigitsNumber();
         // const message = `Hello from TopTop! Your verification code is: ${randomNumber}`;
-        const message = `TopTop xin chào! Đây là mã xác nhận của bạn. Xin vui lòng không chia sẻ mã này với bất kỳ ai: ${randomNumber}`;
+        const message = `Xin chao! Tin nhan den tu TOPTOP day la ma xac nhan cua ban. Vui long! Khong chia se voi bat ky ai: ${randomNumber}`;
         await this.redisCacheService.setCode(phoneNumber, randomNumber);
 
         try {
