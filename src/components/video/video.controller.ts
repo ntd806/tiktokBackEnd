@@ -113,6 +113,18 @@ export class VideoController {
         status: 90008,
         description: 'Get list video liked by tag failed'
     })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
     @Get('get-relative-video-by-tag')
     async getRelativeVideoByTag(@Query() searchProductDto: SearchProductDto) {
         return await this.videoService.getRelativeVideoByTag(searchProductDto);

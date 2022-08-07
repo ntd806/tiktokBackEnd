@@ -170,7 +170,7 @@ export class VideoService extends ElasticsearchService {
                 query: {
                     multi_match: {
                         query: searchProductDto.search,
-                        fields: ['name', 'description', 'preview', 'tag', 'type', 'url']
+                        fields: ['tag']
                     }
                 }
             }
