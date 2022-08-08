@@ -1,7 +1,5 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-
-export type UserDocument = User & Document;
 @Schema()
 export class User extends Document {
     @Prop()
@@ -14,7 +12,7 @@ export class User extends Document {
     birthdate: Date;
 
     @Prop({ type: 'object' })
-    ip: any;
+    ip: object;
 
     @Prop({ type: 'object' })
     mac: [{ mac: string }];
@@ -34,12 +32,12 @@ export class User extends Document {
     }];
 
     @Prop({ type: 'object' })
-    social: {
-        token: string;
-        isGoogle: boolean;
-        email: string;
-        id: string;
-        url: string;
+    social: { 
+        token: string,
+        isGoogle: boolean,
+        email: string,
+        id: string,
+        url: string
     };
 }
 

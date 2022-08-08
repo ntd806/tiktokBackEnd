@@ -34,4 +34,9 @@ export class Product {
         type: 'number'
     })
     time: number;
+
+    @Column({
+        type: 'number'
+    })
+    type: number;
 }
