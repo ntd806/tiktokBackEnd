@@ -12,21 +12,24 @@ export class ChatService {
         private readonly chatModel: Model<Chat>
     ) {}
 
-    public async findAllByUser(user_id: string,paginationQuery: PaginationQueryDto): Promise<Chat[]> {
+    public async findAllByUser(user_id: string,paginationQuery: PaginationQueryDto): Promise<any> {
         const { limit, offset } = paginationQuery;
 
-        return await this.chatModel
+        const chat = await this.chatModel
             .find({'user_id': user_id})
             .skip(offset)
             .limit(limit)
-            // .populate('organization')
             .exec();
+        return {
+            code: 110003,
+            data: chat,
+            message: `Get chat by user successfully`
+        };
     }
 
     public async findOne(chatId: string): Promise<any> {
         const Chat = await this.chatModel
             .findById({ _id: chatId })
-            // .populate('organization')
             .exec();
 
         if (!Chat) {

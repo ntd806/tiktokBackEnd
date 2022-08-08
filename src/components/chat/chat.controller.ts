@@ -54,12 +54,10 @@ export class ChatController {
         description: 'Get all chat success'
     })
     public async getAllChatByUser(
-        @Res() res,
         @Req() req,
         @Query() paginationQuery: PaginationQueryDto
     ) {
-        const chats = await this.ChatService.findAllByUser(req.user._id,paginationQuery);
-        return res.status(HttpStatus.OK).json(chats);
+        return await this.ChatService.findAllByUser(req.user._id,paginationQuery);
     }
 
     @ApiOperation({
@@ -70,7 +68,7 @@ export class ChatController {
         description: 'Get chat by id success'
     })
     @ApiResponse({
-        status: 110007,
+        status: 404,
         description: 'Chat ID does not exist'
     })
     @Get('/:id')
