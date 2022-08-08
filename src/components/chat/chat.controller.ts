@@ -130,7 +130,7 @@ export class ChatController {
             const Chat = await this.ChatService.update(chatId, UpdateChatDto);
             if (!Chat) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
-                    code: 110007,
+                    code: 110006,
                     data: false,
                     message: 'Chat does not exist!'
                 });
@@ -163,7 +163,7 @@ export class ChatController {
     public async deleteChat(@Res() res, @Param('id') chatId: string) {
         if (!chatId) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                code: 110007,
+                code: 110006,
                 data: false,
                 message: 'Chat does not exist!'
             });
@@ -172,7 +172,7 @@ export class ChatController {
         const Chat = await this.ChatService.remove(chatId);
 
         return res.status(HttpStatus.OK).json({
-            code: 110008,
+            code: 110007,
             message: 'Chat has been deleted',
             Chat
         });
