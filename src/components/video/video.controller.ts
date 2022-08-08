@@ -10,11 +10,13 @@ import {
 import { VideoService } from './video.service';
 import { LikeDto } from './dto/like.dto';
 import { JwtGuard } from '../auth/guard';
+import { PaginationQueryDto } from './dto/pagination.query.dto';
 import {
     ApiTags,
     ApiResponse,
     ApiOperation,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiQuery
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
 @ApiBearerAuth('Authorization')
@@ -67,9 +69,21 @@ export class VideoController {
         status: 90006,
         description: 'Get list video liked failed'
     })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
     @Get('video-liked')
-    async getListVideo(@Request() req) {
-        return await this.videoService.getListVideoLiked(req.user, req.query);
+    async getListVideo(@Request() req, @Query() paginationQuery: PaginationQueryDto) {
+        return await this.videoService.getListVideoLiked(req.user, paginationQuery);
     }
 
     @ApiOperation({
@@ -86,5 +100,33 @@ export class VideoController {
     @Get('get-relative-video')
     async getRelativeVideo(@Query() searchProductDto: SearchProductDto) {
         return await this.videoService.getRelativeVideo(searchProductDto);
+    }
+
+    @ApiOperation({
+        summary: 'Get list video liked'
+    })
+    @ApiResponse({
+        status: 90007,
+        description: 'Get list video liked by tag successfully'
+    })
+    @ApiResponse({
+        status: 90008,
+        description: 'Get list video liked by tag failed'
+    })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    @Get('get-relative-video-by-tag')
+    async getRelativeVideoByTag(@Query() searchProductDto: SearchProductDto) {
+        return await this.videoService.getRelativeVideoByTag(searchProductDto);
     }
 }

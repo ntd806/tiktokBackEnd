@@ -14,11 +14,12 @@ export class AuthService {
 
     async signup(dto: AuthDto) {
         const user = await this.authModel.findOne({ phone: dto.phone });
+        const access_token = await this.signToken(dto.phone);
         if (user) {
             if (user.mac.find(({ mac }) => mac == dto.mac)) {
                 return {
-                    status: 40004,
-                    data: true,
+                    code: 40004,
+                    data: access_token,
                     message: 'Register failed'
                 };
             } else {
@@ -30,9 +31,8 @@ export class AuthService {
                         mac: mac
                     }
                 );
-                const access_token = await this.signToken(user.phone);
                 return {
-                    status: 40001,
+                    code: 40001,
                     data: access_token,
                     message: 'Register success'
                 };
@@ -54,7 +54,7 @@ export class AuthService {
             newAuth.save();
             const access_token = await this.signToken(newAuth.phone);
             return {
-                status: 40001,
+                code: 40001,
                 data: access_token,
                 message: 'Register success'
             };

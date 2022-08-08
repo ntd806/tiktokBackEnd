@@ -3,11 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
     @IsNotEmpty()
-    @IsNumber()
-    @ApiProperty()
-    id: number;
-
-    @IsNotEmpty()
     @IsString()
     @ApiProperty()
     name: string;
@@ -31,6 +26,11 @@ export class CreateProductDto {
     @IsString()
     @ApiProperty()
     tag: string;
+
+    @IsNotEmpty()
+    @IsNumber()
+    @ApiProperty()
+    type: number;
 
     @IsNotEmpty()
     @IsNumber()
