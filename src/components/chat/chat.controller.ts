@@ -70,7 +70,7 @@ export class ChatController {
         description: 'Get chat by id success'
     })
     @ApiResponse({
-        status: 11007,
+        status: 110007,
         description: 'Chat ID does not exist'
     })
     @Get('/:id')
@@ -94,13 +94,13 @@ export class ChatController {
         try {
             const Chat = await this.ChatService.create(req.user._id, CreateChatDto);
             return res.status(HttpStatus.OK).json({
-                code: 11001,
+                code: 110001,
                 message: 'Chat has been created successfully',
                 Chat
             });
         } catch (err) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                code: 11004,
+                code: 110004,
                 data: false,
                 message: 'Error: Chat not created!'
             });
@@ -132,20 +132,20 @@ export class ChatController {
             const Chat = await this.ChatService.update(chatId, UpdateChatDto);
             if (!Chat) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
-                    code: 11007,
+                    code: 110007,
                     data: false,
                     message: 'Chat does not exist!'
                 });
             }
             return res.status(HttpStatus.OK).json({
-                code: 11002,
+                code: 110002,
                 message: 'Chat has been successfully updated',
                 Chat
             });
         } catch (err) {
             return res.status(HttpStatus.BAD_REQUEST).json({
                 message: 'Error: Chat not updated!',
-                code: 11005
+                code: 110005
             });
         }
     }
@@ -165,7 +165,7 @@ export class ChatController {
     public async deleteChat(@Res() res, @Param('id') chatId: string) {
         if (!chatId) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                code: 11007,
+                code: 110007,
                 data: false,
                 message: 'Chat does not exist!'
             });
@@ -174,7 +174,7 @@ export class ChatController {
         const Chat = await this.ChatService.remove(chatId);
 
         return res.status(HttpStatus.OK).json({
-            code: 11008,
+            code: 110008,
             message: 'Chat has been deleted',
             Chat
         });

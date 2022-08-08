@@ -31,14 +31,14 @@ export class ChatService {
 
         if (!Chat) {
             return {
-                code: 11007,
+                code: 110007,
                 data: false,
                 message: `Chat #${chatId} not found`
             };
         }
 
         return {
-            code: 11008,
+            code: 110008,
             data: Chat,
             message: 'OK'
         };
