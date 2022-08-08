@@ -6,7 +6,7 @@ export class LikeDto {
         description: 'ID of video'
     })
     @IsString()
-    video_id: string;
+    url: string;
 
     @ApiProperty({
         description: 'type of video'

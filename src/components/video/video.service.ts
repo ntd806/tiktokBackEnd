@@ -3,6 +3,7 @@ import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { PaginationQueryDto } from './dto/pagination.query.dto';
 import { ConfigSearch } from '../search/config/config.search';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { productIndex } from '../search/constant/product.elastic';
@@ -17,37 +18,31 @@ export class VideoService extends ElasticsearchService {
     }
 
     async likeVideo(user: User, likeDto: LikeDto) {
-        console.log(likeDto);
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
-            likeUpdate = [
-                { video_id: likeDto.video_id, isLive: likeDto.isLive }
-            ];
+            likeUpdate = [{ url: likeDto.url, isLive: likeDto.isLive }];
         } else {
             likeUpdate = user.like;
             const index = likeUpdate.find(
-                ({ video_id }) => video_id === likeDto.video_id
+                ({ url }) => url === likeDto.url
             );
             if (index) {
                 return {
                     code: 90002,
                     data: true,
-                    message: 'Like video false'
+                    message: 'You have liked this video already'
                 };
             } else {
-                likeUpdate.push({
-                    video_id: likeDto.video_id,
-                    isLive: likeDto.isLive
-                });
+                likeUpdate.push({ url: likeDto.url, isLive: likeDto.isLive });
             }
         }
+        console.log(likeUpdate);
         await this.userModel.findOneAndUpdate(
             { _id: user._id },
             {
                 like: likeUpdate
             }
         );
-        await user.save();
         return {
             code: 90001,
             data: true,
@@ -59,14 +54,14 @@ export class VideoService extends ElasticsearchService {
         let likeUpdate = [];
         if (typeof user.like == 'undefined') {
             return {
-                code: 90004,
+                code: 90007,
                 data: true,
-                message: 'Unlike video false'
+                message: 'Does not exist video to unlike'
             };
         } else {
             likeUpdate = user.like;
             const index = likeUpdate.find(
-                ({ video_id }) => video_id === likeDto.video_id
+                ({ url }) => url === likeDto.url
             );
             if (index) {
                 likeUpdate = likeUpdate.splice(index, 1);
@@ -74,7 +69,7 @@ export class VideoService extends ElasticsearchService {
                 return {
                     code: 90004,
                     data: true,
-                    message: 'Unlike video false'
+                    message: 'You have unliked this video already'
                 };
             }
         }
@@ -92,13 +87,13 @@ export class VideoService extends ElasticsearchService {
         };
     }
 
-    async getListVideoLiked(user: User, param) {
+    async getListVideoLiked(user: User, paginationQuery: PaginationQueryDto) {
         try {
-            const page = param.page ? param.page : 1;
-            const limit = param.limit ? param.limit : 5;
+            const { limit, offset } = paginationQuery;
+            console.log(paginationQuery);
             return {
                 code: 90005,
-                data: user.like.slice((page - 1) * limit, page * limit),
+                data: user.like.slice((offset-1)*limit, offset*limit),
                 message: 'Get list video successfully'
             };
         } catch (err) {
@@ -139,6 +134,18 @@ export class VideoService extends ElasticsearchService {
         };
     }
 
+    public async getRelativeVideoByTag(
+        searchProductDto: SearchProductDto
+    ): Promise<any> {
+        const video = await this.getVideoByTag(searchProductDto);
+
+        return {
+            code: 90009,
+            data: video,
+            message: 'Get relative video by tag successfully'
+        };
+    }
+
     private async getVideoByUrl(
         searchProductDto: SearchProductDto
     ): Promise<any> {
@@ -151,6 +158,28 @@ export class VideoService extends ElasticsearchService {
                     multi_match: {
                         query: searchProductDto.search,
                         fields: ['url']
+                    }
+                }
+            }
+        })
+            .then((res) => res.hits.hits)
+            .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+    }
+
+    private async getVideoByTag(
+        searchProductDto: SearchProductDto
+    ): Promise<any> {
+        return await this.search({
+            index: productIndex._index,
+            body: {
+                size: searchProductDto.limit,
+                from: searchProductDto.offset,
+                query: {
+                    multi_match: {
+                        query: searchProductDto.search,
+                        fields: ['tag']
                     }
                 }
             }

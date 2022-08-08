@@ -21,12 +21,15 @@ export class User extends Document {
     phone: string;
 
     @Prop({ type: 'array' })
-    like: [
-        {
-            video_id: string;
-            isLive: number;
-        }
-    ];
+    tag: [{ 
+        name: string
+    }];
+
+    @Prop({ type: 'array' })
+    like: [{ 
+        url: string,
+        isLive: number
+    }];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
