@@ -9,6 +9,7 @@ import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './components/redis/redis.module';
 import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
+import { ChatModule } from './components/chat/chat.module';
 import { SearchModule } from './components/search/search.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -25,6 +26,7 @@ dotenv.config();
         LiveModule,
         AuthModule,
         GameModule,
+        ChatModule,
         UserModule,
         SearchModule,
         VideoModule
