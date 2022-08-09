@@ -57,7 +57,10 @@ export class ChatController {
         @Req() req,
         @Query() paginationQuery: PaginationQueryDto
     ) {
-        return await this.ChatService.findAllByUser(req.user._id,paginationQuery);
+        return await this.ChatService.findAllByUser(
+            req.user._id,
+            paginationQuery
+        );
     }
 
     @ApiOperation({
@@ -88,9 +91,16 @@ export class ChatController {
         description: 'Error: Chat not created!'
     })
     @Post()
-    public async addChat(@Res() res, @Req() req, @Body() CreateChatDto: CreateChatDto) {
+    public async addChat(
+        @Res() res,
+        @Req() req,
+        @Body() CreateChatDto: CreateChatDto
+    ) {
         try {
-            const Chat = await this.ChatService.create(req.user._id, CreateChatDto);
+            const Chat = await this.ChatService.create(
+                req.user._id,
+                CreateChatDto
+            );
             return res.status(HttpStatus.OK).json({
                 code: 110001,
                 message: 'Chat has been created successfully',

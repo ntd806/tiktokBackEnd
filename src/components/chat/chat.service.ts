@@ -12,11 +12,14 @@ export class ChatService {
         private readonly chatModel: Model<Chat>
     ) {}
 
-    public async findAllByUser(user_id: string,paginationQuery: PaginationQueryDto): Promise<any> {
+    public async findAllByUser(
+        user_id: string,
+        paginationQuery: PaginationQueryDto
+    ): Promise<any> {
         const { limit, offset } = paginationQuery;
 
         const chat = await this.chatModel
-            .find({'user_id': user_id})
+            .find({ user_id: user_id })
             .skip(offset)
             .limit(limit)
             .exec();
@@ -28,9 +31,7 @@ export class ChatService {
     }
 
     public async findOne(chatId: string): Promise<any> {
-        const Chat = await this.chatModel
-            .findById({ _id: chatId })
-            .exec();
+        const Chat = await this.chatModel.findById({ _id: chatId }).exec();
 
         if (!Chat) {
             return {
@@ -47,14 +48,17 @@ export class ChatService {
         };
     }
 
-    public async create(user_id: string,CreateChatDto: CreateChatDto): Promise<any> {
+    public async create(
+        user_id: string,
+        CreateChatDto: CreateChatDto
+    ): Promise<any> {
         const dataInsert = {
             data: CreateChatDto.data,
             key: CreateChatDto.key,
             user_id: user_id,
             field1: CreateChatDto.field1,
-            field2: CreateChatDto.field2,
-        }
+            field2: CreateChatDto.field2
+        };
         const newCustomer = await this.chatModel.create(dataInsert);
         return newCustomer;
     }
