@@ -105,6 +105,7 @@ export class AuthService {
                 message: 'the another device'
             };
         } catch (error) {
+            console.log(error);
             throw new NotFoundException(error);
         }
     }
