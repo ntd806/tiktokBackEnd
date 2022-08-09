@@ -23,9 +23,7 @@ export class VideoService extends ElasticsearchService {
             likeUpdate = [{ url: likeDto.url, isLive: likeDto.isLive }];
         } else {
             likeUpdate = user.like;
-            const index = likeUpdate.find(
-                ({ url }) => url === likeDto.url
-            );
+            const index = likeUpdate.find(({ url }) => url === likeDto.url);
             if (index) {
                 return {
                     code: 90002,
@@ -60,9 +58,7 @@ export class VideoService extends ElasticsearchService {
             };
         } else {
             likeUpdate = user.like;
-            const index = likeUpdate.find(
-                ({ url }) => url === likeDto.url
-            );
+            const index = likeUpdate.find(({ url }) => url === likeDto.url);
             if (index) {
                 likeUpdate = likeUpdate.splice(index, 1);
             } else {
@@ -93,7 +89,7 @@ export class VideoService extends ElasticsearchService {
             console.log(paginationQuery);
             return {
                 code: 90005,
-                data: user.like.slice((offset-1)*limit, offset*limit),
+                data: user.like.slice((offset - 1) * limit, offset * limit),
                 message: 'Get list video successfully'
             };
         } catch (err) {
@@ -115,7 +111,7 @@ export class VideoService extends ElasticsearchService {
                 code: 90008,
                 data: [],
                 message: 'Not found data'
-            }
+            };
         }
 
         let tag = '';

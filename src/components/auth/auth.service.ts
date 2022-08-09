@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto, SocialDto, VerifyDto, Reinstall} from './dto';
+import { AuthDto, SocialDto, VerifyDto, Reinstall } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,7 +16,7 @@ export class AuthService {
         const user = await this.authModel.findOne({ phone: dto.phone });
         const access_token = await this.signToken(dto.phone);
         if (user) {
-            if (user.mac.find(m => m.mac == dto.mac)) {
+            if (user.mac.find((m) => m.mac == dto.mac)) {
                 return {
                     code: 40004,
                     data: access_token,
@@ -91,7 +91,7 @@ export class AuthService {
                 };
             }
             console.log(user.mac);
-            if (user.mac.find(m => m.mac == verifyDto.mac)) {
+            if (user.mac.find((m) => m.mac == verifyDto.mac)) {
                 return {
                     code: 80004,
                     data: false,
@@ -142,8 +142,8 @@ export class AuthService {
                     message: 'Registered by social successfully'
                 };
             }
-            
-            if (user.mac.find(m => m.mac == socialDto.mac)) {
+
+            if (user.mac.find((m) => m.mac == socialDto.mac)) {
                 return {
                     code: 80006,
                     data: access_token,
@@ -215,20 +215,19 @@ export class AuthService {
         }
     }
 
-    public async reinstall (reinstall: Reinstall) {
+    public async reinstall(reinstall: Reinstall) {
         try {
-            let user = await this.authModel.find({
+            const user = await this.authModel.find({
                 phone: reinstall.phone,
-                mac: [{mac: reinstall.mac}]
+                mac: [{ mac: reinstall.mac }]
             });
-            console.log(user)
+
             if (user.length < 1) {
                 return {
                     code: 80010,
                     data: false,
                     message: 'Not found phone number or MAC address of device'
                 };
-
             }
             const access_token = await this.signToken(reinstall.phone);
 
@@ -237,7 +236,6 @@ export class AuthService {
                 data: access_token,
                 message: 'Reinstall successfully'
             };
-
         } catch (error) {
             throw new NotFoundException(error);
         }
