@@ -221,7 +221,7 @@ export class AuthService {
                 phone: reinstall.phone,
                 mac: [{mac: reinstall.mac}]
             });
-            console.log(user)
+            
             if (user.length < 1) {
                 return {
                     code: 80010,
