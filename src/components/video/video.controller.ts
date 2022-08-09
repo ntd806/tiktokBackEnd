@@ -82,8 +82,14 @@ export class VideoController {
         required: true
     })
     @Get('video-liked')
-    async getListVideo(@Request() req, @Query() paginationQuery: PaginationQueryDto) {
-        return await this.videoService.getListVideoLiked(req.user, paginationQuery);
+    async getListVideo(
+        @Request() req,
+        @Query() paginationQuery: PaginationQueryDto
+    ) {
+        return await this.videoService.getListVideoLiked(
+            req.user,
+            paginationQuery
+        );
     }
 
     @ApiOperation({
