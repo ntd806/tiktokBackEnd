@@ -18,10 +18,10 @@ export class TagService {
             console.log(paginationQuery);
             return {
                 code: 10005,
-                data: user.tag.slice((offset-1)*limit, offset*limit),
+                data: user.tag.slice((offset - 1) * limit, offset * limit),
                 message: 'Get list tag successfully'
             };
-        } catch(err) {
+        } catch (err) {
             return {
                 code: 10006,
                 data: false,
@@ -36,9 +36,7 @@ export class TagService {
             tagCreate = [{ name: TagDto.name }];
         } else {
             tagCreate = user.tag;
-            const index = tagCreate.find(
-                ({ name }) => name === TagDto.name
-            );
+            const index = tagCreate.find(({ name }) => name === TagDto.name);
             if (index) {
                 return {
                     code: 10002,
@@ -62,27 +60,28 @@ export class TagService {
         };
     }
 
-    public async update(
-        user: User,
-        TagUpdateDto: TagUpdateDto
-    ) {
+    public async update(user: User, TagUpdateDto: TagUpdateDto) {
         if (typeof user.tag == 'undefined') {
-            return { 
+            return {
                 code: 10004,
                 data: false,
-                message: "Update tag failed"
-            }
+                message: 'Update tag failed'
+            };
         } else {
-            const index = user.tag.map(function(e) { return e.name; }).indexOf(TagUpdateDto.name);
+            const index = user.tag
+                .map(function (e) {
+                    return e.name;
+                })
+                .indexOf(TagUpdateDto.name);
             if (index > -1) {
                 user.tag.splice(index, 1);
                 user.tag.push({ name: TagUpdateDto.nameUpdate });
                 await user.save();
-                return { 
+                return {
                     code: 10003,
                     data: false,
-                    message: "Update tag successfully"
-                }
+                    message: 'Update tag successfully'
+                };
             } else {
                 return {
                     code: 10004,
@@ -95,21 +94,25 @@ export class TagService {
 
     public async remove(user: User, TagDto: TagDto) {
         if (typeof user.tag == 'undefined') {
-            return { 
+            return {
                 code: 10007,
                 data: false,
-                message: "Delete tag failed"
-            }
+                message: 'Delete tag failed'
+            };
         } else {
-            const index = user.tag.map(function(e) { return e.name; }).indexOf(TagDto.name);
+            const index = user.tag
+                .map(function (e) {
+                    return e.name;
+                })
+                .indexOf(TagDto.name);
             if (index > -1) {
                 user.tag.splice(index, 1);
                 await user.save();
-                return { 
+                return {
                     code: 10008,
                     data: false,
-                    message: "Delete tag successfully"
-                }
+                    message: 'Delete tag successfully'
+                };
             } else {
                 return {
                     code: 10008,
