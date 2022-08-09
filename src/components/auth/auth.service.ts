@@ -177,44 +177,6 @@ export class AuthService {
         }
     }
 
-    private async isNotNullUser(socialDto: SocialDto) {
-        try {
-            const user = await this.authModel.findOne({
-                phone: socialDto.phone
-            });
-            const access_token = await this.signToken(socialDto.phone);
-
-            if (user) {
-                return {
-                    code: 80003,
-                    data: false,
-                    message: 'the another device'
-                };
-            }
-
-            const data = {
-                ip: socialDto.ip,
-                mac: [
-                    {
-                        mac: socialDto.mac
-                    }
-                ],
-                phone: socialDto.phone,
-                fullname: socialDto.fullname
-            };
-            const newAuth = await this.authModel.create(data);
-            newAuth.save();
-
-            return {
-                code: 80005,
-                data: access_token,
-                message: 'Registered by social successfully'
-            };
-        } catch (error) {
-            throw new NotFoundException(error);
-        }
-    }
-
     public async reinstall(reinstall: Reinstall) {
         try {
             const user = await this.authModel.find({
