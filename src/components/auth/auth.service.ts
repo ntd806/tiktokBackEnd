@@ -18,7 +18,7 @@ export class AuthService {
         if (user) {
             if (user.mac.find((m) => m.mac == dto.mac)) {
                 return {
-                    code: 40004,
+                    code: 80002,
                     data: access_token,
                     message: 'Register failed'
                 };
@@ -32,7 +32,7 @@ export class AuthService {
                     }
                 );
                 return {
-                    code: 40001,
+                    code: 80006,
                     data: access_token,
                     message: 'Register success'
                 };
@@ -137,7 +137,7 @@ export class AuthService {
                 newAuth.save();
 
                 return {
-                    code: 80001,
+                    code: 80005,
                     data: access_token,
                     message: 'Registered by social successfully'
                 };
@@ -145,7 +145,7 @@ export class AuthService {
 
             if (user.mac.find((m) => m.mac == socialDto.mac)) {
                 return {
-                    code: 80006,
+                    code: 80004,
                     data: access_token,
                     message: 'The old device'
                 };
