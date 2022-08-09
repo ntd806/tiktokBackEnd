@@ -16,7 +16,7 @@ export class AuthService {
         const user = await this.authModel.findOne({ phone: dto.phone });
         const access_token = await this.signToken(dto.phone);
         if (user) {
-            if (user.mac.find(({ mac }) => mac == dto.mac)) {
+            if (user.mac.find(m => m.mac == dto.mac)) {
                 return {
                     code: 40004,
                     data: access_token,
@@ -90,8 +90,8 @@ export class AuthService {
                     message: 'Phone number verified successfully'
                 };
             }
-
-            if (user.mac.find(({ mac }) => mac == verifyDto.mac)) {
+            console.log(user.mac);
+            if (user.mac.find(m => m.mac == verifyDto.mac)) {
                 return {
                     code: 80004,
                     data: false,
@@ -105,7 +105,6 @@ export class AuthService {
                 message: 'the another device'
             };
         } catch (error) {
-            console.log(error);
             throw new NotFoundException(error);
         }
     }
@@ -143,8 +142,8 @@ export class AuthService {
                     message: 'Registered by social successfully'
                 };
             }
-
-            if (user.mac.find(({ mac }) => mac == socialDto.mac)) {
+            
+            if (user.mac.find(m => m.mac == socialDto.mac)) {
                 return {
                     code: 80006,
                     data: access_token,
