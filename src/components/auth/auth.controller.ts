@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, VerifyDto, SocialDto } from './dto';
+import { AuthDto, VerifyDto, SocialDto, Reinstall } from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 @ApiTags('auth')
 @Controller('/api/v1/auth')
@@ -65,5 +65,21 @@ export class AuthController {
     @Post('social-network')
     async socialNetwork(@Body() socialDto: SocialDto) {
         return await this.authService.socialNetwork(socialDto);
+    }
+
+    @ApiOperation({
+        summary: 'Reinstall application'
+    })
+    @ApiResponse({
+        status: 80010,
+        description: 'Not found phone number or MAC address of device'
+    })
+    @ApiResponse({
+        status: 80011,
+        description: 'Reinstall successfully'
+    })
+    @Post('reinstall')
+    async reinstall(@Body() reinstall: Reinstall) {
+        return await this.authService.reinstall(reinstall);
     }
 }

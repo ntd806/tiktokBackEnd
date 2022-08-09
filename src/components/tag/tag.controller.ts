@@ -92,10 +92,7 @@ export class TagController {
         description: 'Tag ID does not exist'
     })
     @Put('/update')
-    public async updateTag(
-        @Request() req,
-        @Body() TagUpdateDto: TagUpdateDto
-    ) {
+    public async updateTag(@Request() req, @Body() TagUpdateDto: TagUpdateDto) {
         return await this.TagService.update(req.user, TagUpdateDto);
     }
 
@@ -112,6 +109,6 @@ export class TagController {
     })
     @Delete('/delete')
     public async deleteTag(@Request() req, @Body() tagDto: TagDto) {
-        return await this.TagService.remove(req.user,tagDto);
+        return await this.TagService.remove(req.user, tagDto);
     }
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto, SocialDto, VerifyDto } from './dto';
+import { AuthDto, SocialDto, VerifyDto, Reinstall } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,9 +16,9 @@ export class AuthService {
         const user = await this.authModel.findOne({ phone: dto.phone });
         const access_token = await this.signToken(dto.phone);
         if (user) {
-            if (user.mac.find(({ mac }) => mac == dto.mac)) {
+            if (user.mac.find((m) => m.mac == dto.mac)) {
                 return {
-                    code: 40004,
+                    code: 80002,
                     data: access_token,
                     message: 'Register failed'
                 };
@@ -32,7 +32,7 @@ export class AuthService {
                     }
                 );
                 return {
-                    code: 40001,
+                    code: 80006,
                     data: access_token,
                     message: 'Register success'
                 };
@@ -90,8 +90,8 @@ export class AuthService {
                     message: 'Phone number verified successfully'
                 };
             }
-
-            if (user.mac.find(({ mac }) => mac == verifyDto.mac)) {
+            console.log(user.mac);
+            if (user.mac.find((m) => m.mac == verifyDto.mac)) {
                 return {
                     code: 80004,
                     data: false,
@@ -137,15 +137,15 @@ export class AuthService {
                 newAuth.save();
 
                 return {
-                    code: 80001,
+                    code: 80005,
                     data: access_token,
                     message: 'Registered by social successfully'
                 };
             }
 
-            if (user.mac.find(({ mac }) => mac == socialDto.mac)) {
+            if (user.mac.find((m) => m.mac == socialDto.mac)) {
                 return {
-                    code: 80006,
+                    code: 80004,
                     data: access_token,
                     message: 'The old device'
                 };
@@ -177,38 +177,26 @@ export class AuthService {
         }
     }
 
-    private async isNotNullUser(socialDto: SocialDto) {
+    public async reinstall(reinstall: Reinstall) {
         try {
-            const user = await this.authModel.findOne({
-                phone: socialDto.phone
+            const user = await this.authModel.find({
+                phone: reinstall.phone,
+                mac: [{ mac: reinstall.mac }]
             });
-            const access_token = await this.signToken(socialDto.phone);
 
-            if (user) {
+            if (user.length < 1) {
                 return {
-                    code: 80003,
+                    code: 80010,
                     data: false,
-                    message: 'the another device'
+                    message: 'Not found phone number or MAC address of device'
                 };
             }
-
-            const data = {
-                ip: socialDto.ip,
-                mac: [
-                    {
-                        mac: socialDto.mac
-                    }
-                ],
-                phone: socialDto.phone,
-                fullname: socialDto.fullname
-            };
-            const newAuth = await this.authModel.create(data);
-            newAuth.save();
+            const access_token = await this.signToken(reinstall.phone);
 
             return {
-                code: 80005,
+                code: 80011,
                 data: access_token,
-                message: 'Registered by social successfully'
+                message: 'Reinstall successfully'
             };
         } catch (error) {
             throw new NotFoundException(error);
