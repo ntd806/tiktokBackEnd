@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthDto, SocialDto, VerifyDto } from './dto';
+import { AuthDto, SocialDto, VerifyDto, Reinstall} from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -210,6 +210,34 @@ export class AuthService {
                 data: access_token,
                 message: 'Registered by social successfully'
             };
+        } catch (error) {
+            throw new NotFoundException(error);
+        }
+    }
+
+    public async reinstall (reinstall: Reinstall) {
+        try {
+            let user = await this.authModel.find({
+                phone: reinstall.phone,
+                mac: [{mac: reinstall.mac}]
+            });
+            console.log(user)
+            if (user.length < 1) {
+                return {
+                    code: 80010,
+                    data: false,
+                    message: 'Not found phone number or MAC address of device'
+                };
+
+            }
+            const access_token = await this.signToken(reinstall.phone);
+
+            return {
+                code: 80011,
+                data: access_token,
+                message: 'Reinstall successfully'
+            };
+
         } catch (error) {
             throw new NotFoundException(error);
         }

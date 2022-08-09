@@ -1,6 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, VerifyDto, SocialDto } from './dto';
+import { AuthDto, VerifyDto, SocialDto, Reinstall} from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 @ApiTags('auth')
 @Controller('/api/v1/auth')
@@ -65,5 +65,29 @@ export class AuthController {
     @Post('social-network')
     async socialNetwork(@Body() socialDto: SocialDto) {
         return await this.authService.socialNetwork(socialDto);
+    }
+
+    @ApiOperation({
+        summary: 'Reinstall application'
+    })
+    @ApiResponse({
+        status: 80005,
+        description: 'Registered by social successfully'
+    })
+    @ApiResponse({
+        status: 80003,
+        description: 'the another device'
+    })
+    @ApiResponse({
+        status: 80006,
+        description: 'The old device'
+    })
+    @ApiResponse({
+        status: 80007,
+        description: 'The new device'
+    })
+    @Post('reinstall')
+    async reinstall(@Body() reinstall: Reinstall) {
+        return await this.authService.reinstall(reinstall);
     }
 }
