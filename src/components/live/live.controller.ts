@@ -20,8 +20,8 @@ export class LiveController {
         summary: 'Get list live'
     })
     @ApiResponse({
-        status: 200,
-        description: 'Ok'
+        status: 80002,
+        description: 'Get list live failed'
     })
     @Get()
     public async getLiveList(): Promise<Live> {

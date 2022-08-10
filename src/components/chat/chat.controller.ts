@@ -50,8 +50,8 @@ export class ChatController {
         required: true
     })
     @ApiResponse({
-        status: 200,
-        description: 'Get all chat success'
+        status: 110003,
+        description: 'Get chat by user successfully'
     })
     public async getAllChatByUser(
         @Req() req,
@@ -67,11 +67,11 @@ export class ChatController {
         summary: 'Get chat by id'
     })
     @ApiResponse({
-        status: 200,
+        status: 110007,
         description: 'Get chat by id success'
     })
     @ApiResponse({
-        status: 404,
+        status: 110006,
         description: 'Chat ID does not exist'
     })
     @Get('/:id')
@@ -83,11 +83,11 @@ export class ChatController {
         summary: 'Add new chat'
     })
     @ApiResponse({
-        status: 200,
+        status: 110001,
         description: 'Chat has been created successfully'
     })
     @ApiResponse({
-        status: 400,
+        status: 110004,
         description: 'Error: Chat not created!'
     })
     @Post()
@@ -119,15 +119,15 @@ export class ChatController {
         summary: 'Update chat by id'
     })
     @ApiResponse({
-        status: 200,
+        status: 110002,
         description: 'Chat has been successfully updated'
     })
     @ApiResponse({
-        status: 400,
+        status: 110005,
         description: 'Error: Chat not updated!'
     })
     @ApiResponse({
-        status: 404,
+        status: 110006,
         description: 'Chat ID does not exist'
     })
     @Put('/:id')
@@ -162,11 +162,11 @@ export class ChatController {
         summary: 'Delete chat by id'
     })
     @ApiResponse({
-        status: 200,
+        status: 110007,
         description: 'Chat has been deleted'
     })
     @ApiResponse({
-        status: 404,
+        status: 110006,
         description: 'Chat ID does not exist'
     })
     @Delete('/:id')

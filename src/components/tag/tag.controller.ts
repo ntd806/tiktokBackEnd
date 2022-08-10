@@ -50,8 +50,12 @@ export class TagController {
         required: true
     })
     @ApiResponse({
-        status: 200,
+        status: 10005,
         description: 'Get all tag success'
+    })
+    @ApiResponse({
+        status: 10006,
+        description: 'Get list tag failed'
     })
     public async getAllTag(
         @Request() req,
@@ -64,11 +68,11 @@ export class TagController {
         summary: 'Add new tag'
     })
     @ApiResponse({
-        status: 200,
+        status: 10001,
         description: 'Tag has been created successfully'
     })
     @ApiResponse({
-        status: 400,
+        status: 10002,
         description: 'Error: Tag not created!'
     })
     @Post()
@@ -80,16 +84,12 @@ export class TagController {
         summary: 'Update tag by id'
     })
     @ApiResponse({
-        status: 200,
+        status: 10003,
         description: 'Tag has been successfully updated'
     })
     @ApiResponse({
-        status: 400,
+        status: 10004,
         description: 'Error: Tag not updated!'
-    })
-    @ApiResponse({
-        status: 404,
-        description: 'Tag ID does not exist'
     })
     @Put('/update')
     public async updateTag(@Request() req, @Body() TagUpdateDto: TagUpdateDto) {
@@ -100,12 +100,12 @@ export class TagController {
         summary: 'Delete tag by id'
     })
     @ApiResponse({
-        status: 200,
+        status: 10008,
         description: 'Tag has been deleted'
     })
     @ApiResponse({
-        status: 404,
-        description: 'Tag ID does not exist'
+        status: 10007,
+        description: 'Delete tag failed'
     })
     @Delete('/delete')
     public async deleteTag(@Request() req, @Body() tagDto: TagDto) {
