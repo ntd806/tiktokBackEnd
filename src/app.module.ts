@@ -9,6 +9,7 @@ import { TwilioModule } from 'nestjs-twilio';
 import { RedisCacheModule } from './components/redis/redis.module';
 import { LiveModule } from './components/live/live.module';
 import { GameModule } from './components/game/game.module';
+import { SupportModule } from './components/support/support.module';
 import { ChatModule } from './components/chat/chat.module';
 import { SearchModule } from './components/search/search.module';
 import { TagModule } from './components/tag/tag.module';
@@ -30,6 +31,7 @@ dotenv.config();
         ChatModule,
         UserModule,
         SearchModule,
+        SupportModule,
         VideoModule,
         TagModule
     ],
