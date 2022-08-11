@@ -4,7 +4,8 @@ import {
     Post,
     Get,
     Request,
-    UseGuards
+    UseGuards,
+    Delete
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
@@ -51,5 +52,14 @@ export class UserController {
     @Post('update')
     async updateUser(@Request() req, @Body() dto: UserDto) {
         return await this.userService.updateUser(req.user, dto);
+    }
+
+    @ApiOperation({
+        summary: 'Delete all user'
+    })
+    @UseGuards(JwtGuard)
+    @Delete('delete')
+    public async deleteUser() {
+        return this.userService.deleteUser();
     }
 }
