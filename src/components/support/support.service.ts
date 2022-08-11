@@ -12,11 +12,14 @@ export class SupportService {
         private readonly supportModel: Model<Support>
     ) {}
 
-    public async findAllByUser(user_id: string,paginationQuery: PaginationQueryDto): Promise<any> {
+    public async findAllByUser(
+        user_id: string,
+        paginationQuery: PaginationQueryDto
+    ): Promise<any> {
         const { limit, offset } = paginationQuery;
 
         const support = await this.supportModel
-            .find({'user_id': user_id})
+            .find({ user_id: user_id })
             .skip(offset)
             .limit(limit)
             .exec();
@@ -29,28 +32,30 @@ export class SupportService {
 
     public async findOne(supportId: string): Promise<any> {
         try {
-            const Support = await this.supportModel
-            .findOne({ _id: supportId });
+            const Support = await this.supportModel.findOne({ _id: supportId });
             return {
                 code: 120007,
                 data: Support,
                 message: 'OK'
             };
-        } catch(error) {
+        } catch (error) {
             return {
                 code: 120006,
                 data: false,
                 message: `Support #${supportId} not found`
             };
-        }     
+        }
     }
 
-    public async create(user_id: string,CreateSupportDto: CreateSupportDto): Promise<any> {
+    public async create(
+        user_id: string,
+        CreateSupportDto: CreateSupportDto
+    ): Promise<any> {
         const dataInsert = {
             title: CreateSupportDto.title,
             body: CreateSupportDto.body,
             user_id: user_id
-        }
+        };
         const newCustomer = await this.supportModel.create(dataInsert);
         return newCustomer;
     }
@@ -65,13 +70,15 @@ export class SupportService {
                 UpdateSupportDto
             );
             return existingCustomer;
-        } catch(error) {
+        } catch (error) {
             throw new NotFoundException(`Support #${supportId} not found`);
-        }     
+        }
     }
 
     public async remove(supportId: string): Promise<any> {
-        const deletedCustomer = await this.supportModel.findByIdAndRemove(supportId);
+        const deletedCustomer = await this.supportModel.findByIdAndRemove(
+            supportId
+        );
         return deletedCustomer;
     }
 }

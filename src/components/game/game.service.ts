@@ -16,10 +16,7 @@ export class GameService {
     public async findAll(paginationQuery: PaginationQueryDto): Promise<any> {
         const { limit, offset } = paginationQuery;
 
-        const games = await this.gameModel
-            .find()
-            .skip(offset)
-            .limit(limit);
+        const games = await this.gameModel.find().skip(offset).limit(limit);
         return {
             code: 50009,
             data: games,
