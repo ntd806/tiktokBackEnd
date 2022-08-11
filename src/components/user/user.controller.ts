@@ -54,12 +54,12 @@ export class UserController {
         return await this.userService.updateUser(req.user, dto);
     }
 
-    @ApiOperation({
-        summary: 'Delete all user'
-    })
-    @UseGuards(JwtGuard)
-    @Delete('delete')
-    public async deleteUser() {
-        return this.userService.deleteUser();
-    }
+    // @ApiOperation({
+    //     summary: 'Delete all user'
+    // })
+    // @UseGuards(JwtGuard)
+    // @Delete('delete')
+    // public async deleteUser() {
+    //     return this.userService.deleteUser();
+    // }
 }
