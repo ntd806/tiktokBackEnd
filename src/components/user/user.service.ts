@@ -21,8 +21,4 @@ export class UserService {
             message: 'Update successfully'
         };
     }
-
-    public async deleteUser(): Promise <any> {
-        return this.userModel.deleteMany({});
-    }
 }
