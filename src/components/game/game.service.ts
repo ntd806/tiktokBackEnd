@@ -13,15 +13,18 @@ export class GameService {
         private readonly gameModel: Model<Game>
     ) {}
 
-    public async findAll(paginationQuery: PaginationQueryDto): Promise<Game[]> {
+    public async findAll(paginationQuery: PaginationQueryDto): Promise<any> {
         const { limit, offset } = paginationQuery;
 
-        return await this.gameModel
+        const games = await this.gameModel
             .find()
             .skip(offset)
-            .limit(limit)
-            // .populate('organization')
-            .exec();
+            .limit(limit);
+        return {
+            code: 50009,
+            data: games,
+            message: `Get list game successfully`
+        };
     }
 
     public async findOne(gameId: string): Promise<any> {
@@ -39,9 +42,9 @@ export class GameService {
         }
 
         return {
-            code: 50008,
+            code: 50009,
             data: Game,
-            message: 'OK'
+            message: 'Get game success'
         };
     }
 

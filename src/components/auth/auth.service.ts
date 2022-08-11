@@ -56,7 +56,7 @@ export class AuthService {
             return {
                 code: 40001,
                 data: access_token,
-                message: 'Register success'
+                message: 'Create a user successfully'
             };
         }
     }

@@ -28,7 +28,7 @@ export class UserController {
         summary: 'Get info user'
     })
     @ApiResponse({
-        status: 200,
+        status: 40007,
         description: 'Get successfully'
     })
     @UseGuards(JwtGuard)
@@ -45,7 +45,7 @@ export class UserController {
         summary: 'Update user'
     })
     @ApiResponse({
-        status: 200,
+        status: 40002,
         description: 'Update successfully'
     })
     @UseGuards(JwtGuard)
