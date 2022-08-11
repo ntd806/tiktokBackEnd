@@ -25,6 +25,11 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty()
+    previewImage: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
     tag: string;
 
     @IsNotEmpty()

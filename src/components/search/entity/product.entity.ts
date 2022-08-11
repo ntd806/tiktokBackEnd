@@ -28,6 +28,11 @@ export class Product {
     @Column({
         type: 'string'
     })
+    previewImage: string;
+
+    @Column({
+        type: 'string'
+    })
     tag: string;
 
     @Column({

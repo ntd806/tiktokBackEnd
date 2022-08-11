@@ -7,9 +7,10 @@ import {
     UseGuards,
     Query,
     UseInterceptors,
-    FileInterceptor,
+    
     UploadedFile
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express'
 import { VideoService } from './video.service';
 import { LikeDto } from './dto/like.dto';
 import { JwtGuard } from '../auth/guard';
@@ -19,7 +20,9 @@ import {
     ApiResponse,
     ApiOperation,
     ApiBearerAuth,
-    ApiQuery
+    ApiQuery,
+    ApiBody,
+    ApiConsumes
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
 import { multerOptions } from 'src/vender/helper/Helper';
