@@ -22,7 +22,7 @@ export class UserService {
         };
     }
 
-    // public async deleteUser() {
-    //     return this.userModel.deleteMany({});
-    // }
+    public async deleteUser(): Promise <any> {
+        return this.userModel.deleteMany({});
+    }
 }
