@@ -15,7 +15,6 @@ export class TagService {
     public async findAll(user: User, paginationQuery: PaginationQueryDto) {
         try {
             const { limit, offset } = paginationQuery;
-            console.log(paginationQuery);
             return {
                 code: 10005,
                 data: user.tag.slice((offset - 1) * limit, offset * limit),
@@ -41,7 +40,7 @@ export class TagService {
                 return {
                     code: 10002,
                     data: true,
-                    message: 'Create tag false'
+                    message: 'Error: Tag not created!'
                 };
             } else {
                 tagCreate.push({ name: TagDto.name });
@@ -86,7 +85,7 @@ export class TagService {
                 return {
                     code: 10004,
                     data: false,
-                    message: 'Update tag false'
+                    message: 'Error: Tag not updated!'
                 };
             }
         }
@@ -115,7 +114,7 @@ export class TagService {
                 };
             } else {
                 return {
-                    code: 10008,
+                    code: 10007,
                     data: false,
                     message: 'Delete tag false'
                 };

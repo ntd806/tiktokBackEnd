@@ -11,12 +11,16 @@ export class AuthController {
         summary: 'Register user'
     })
     @ApiResponse({
-        status: 201,
-        description: `ok`
+        status: 40001,
+        description: `Create a user successfully`
     })
     @ApiResponse({
-        status: 400,
-        description: `phone exists`
+        status: 80006,
+        description: `Register success`
+    })
+    @ApiResponse({
+        status: 80002,
+        description: `Register failed`
     })
     @Post('register')
     async signup(@Body() dto: AuthDto) {
@@ -27,15 +31,15 @@ export class AuthController {
         summary: 'Verify phone number'
     })
     @ApiResponse({
-        status: 70001,
+        status: 80001,
         description: 'Verify phone number successfully'
     })
     @ApiResponse({
-        status: 70003,
+        status: 80003,
         description: 'the another device'
     })
     @ApiResponse({
-        status: 70003,
+        status: 80004,
         description: 'The old device'
     })
     @Post('verify-phone-number')
