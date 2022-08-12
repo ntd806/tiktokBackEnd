@@ -6,7 +6,9 @@ import { SupportSchema, Support } from './model/support.schema';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: Support.name, schema: SupportSchema }])
+        MongooseModule.forFeature([
+            { name: Support.name, schema: SupportSchema }
+        ])
     ],
     controllers: [SupportController],
     providers: [SupportService]

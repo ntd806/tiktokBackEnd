@@ -57,7 +57,10 @@ export class SupportController {
         @Req() req,
         @Query() paginationQuery: PaginationQueryDto
     ) {
-        return await this.SupportService.findAllByUser(req.user._id,paginationQuery);
+        return await this.SupportService.findAllByUser(
+            req.user._id,
+            paginationQuery
+        );
     }
 
     @ApiOperation({
@@ -88,9 +91,16 @@ export class SupportController {
         description: 'Error: Support not created!'
     })
     @Post()
-    public async addSupport(@Res() res, @Req() req, @Body() CreateSupportDto: CreateSupportDto) {
+    public async addSupport(
+        @Res() res,
+        @Req() req,
+        @Body() CreateSupportDto: CreateSupportDto
+    ) {
         try {
-            const Support = await this.SupportService.create(req.user._id, CreateSupportDto);
+            const Support = await this.SupportService.create(
+                req.user._id,
+                CreateSupportDto
+            );
             return res.status(HttpStatus.OK).json({
                 code: 120001,
                 message: 'Support has been created successfully',
@@ -123,7 +133,10 @@ export class SupportController {
         @Body() UpdateSupportDto: UpdateSupportDto
     ) {
         try {
-            const Support = await this.SupportService.update(supportId, UpdateSupportDto);
+            const Support = await this.SupportService.update(
+                supportId,
+                UpdateSupportDto
+            );
             if (!Support) {
                 return res.status(HttpStatus.BAD_REQUEST).json({
                     code: 120006,

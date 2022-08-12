@@ -48,9 +48,7 @@ export class GameController {
         description: 'enter offset of record',
         required: true
     })
-    public async getAllGame(
-        @Query() paginationQuery: PaginationQueryDto
-    ) {
+    public async getAllGame(@Query() paginationQuery: PaginationQueryDto) {
         return await this.GameService.findAll(paginationQuery);
     }
 
