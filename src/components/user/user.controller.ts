@@ -5,17 +5,19 @@ import {
     Get,
     Request,
     UseGuards,
-    Delete
+    Query
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
+import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import {
     ApiTags,
     ApiResponse,
     ApiOperation,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiParam
 } from '@nestjs/swagger';
 @UseGuards(JwtStrategy)
 @ApiBearerAuth('Authorization')
@@ -52,5 +54,26 @@ export class UserController {
     @Post('update')
     async updateUser(@Request() req, @Body() dto: UserDto) {
         return await this.userService.updateUser(req.user, dto);
+    }
+
+
+    @Get()
+    @ApiOperation({
+        summary: 'Get all users'
+    })
+    @ApiParam({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiParam({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    public async getAllGame(@Query() paginationQuery: PaginationQueryDto) {
+        return await this.userService.findAll(paginationQuery);
     }
 }
