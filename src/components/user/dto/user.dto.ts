@@ -19,4 +19,10 @@ export class UserDto {
     })
     @IsString()
     fullname: string;
+
+    @ApiProperty({
+        description: 'avatar of user'
+    })
+    @IsString()
+    avatar: string;
 }

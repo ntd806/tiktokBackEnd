@@ -1,5 +1,5 @@
 export interface SearchServiceInterface<T> {
-    insertIndex(bulkData: T, path: string): Promise<T>;
+    insertIndex(bulkData: T): Promise<T>;
 
     updateIndex(updateData: T): Promise<T>;
 

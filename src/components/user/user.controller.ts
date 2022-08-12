@@ -4,14 +4,20 @@ import {
     Post,
     Get,
     Request,
-    UseGuards
+    UseGuards,
+    UploadedFile,
+    UseInterceptors
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
+import { FileInterceptor } from '@nestjs/platform-express'
+import { multerOptions } from '../../vender/helper/Helper'
 import {
     ApiTags,
+    ApiBody,
+    ApiConsumes,
     ApiResponse,
     ApiOperation,
     ApiBearerAuth
@@ -49,7 +55,31 @@ export class UserController {
     })
     @UseGuards(JwtGuard)
     @Post('update')
-    async updateUser(@Request() req, @Body() dto: UserDto) {
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                birthdate: {
+                    type: 'datetime',
+                },
+                sex: {
+                    type: 'number'
+                },
+                fullname: {
+                    type: 'string'
+                }
+            },
+        },
+    })
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    async updateUser(@Request() req, @Body() dto: UserDto, @UploadedFile('file') file) {
+        dto.avatar = process.env.URL_IMAGE + file.filename;
+        console.log(dto);
         return await this.userService.updateUser(req.user, dto);
     }
 }

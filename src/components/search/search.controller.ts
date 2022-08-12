@@ -6,6 +6,8 @@ import {
     Delete,
     Body,
     Query,
+    Param,
+    Res,
     UploadedFile,
     UseInterceptors
 } from '@nestjs/common';
@@ -24,6 +26,8 @@ import {
     SearchProductDto
 } from './dto/index';
 import { multerOptions } from '../../vender/helper/Helper'
+import { Observable, of } from 'rxjs';
+import { join } from 'path';
 @Controller('/api/v1/search')
 @ApiTags('search')
 export class SearchController {
@@ -75,7 +79,8 @@ export class SearchController {
         @Body() createProductDto: CreateProductDto,
         @UploadedFile('file') file
     ): Promise<any> {
-        return this.searchService.insertIndex(createProductDto, file.path);
+        createProductDto.previewImage = process.env.URL_IMAGE+file.filename;
+        return this.searchService.insertIndex(createProductDto);
     }
 
     @Put('update-index')
@@ -128,5 +133,13 @@ export class SearchController {
     })
     public async deleteDocument(@Body() body): Promise<any> {
         return this.searchService.deleteDocument(body);
+    }
+
+    @Get('image/:imagename')
+    @ApiOperation({
+        summary: 'get image'
+    })
+    findProfileImage(@Param('imagename') imagename: string, @Res() res): Observable<Object> {
+        return of(res.sendFile(join(process.cwd(), 'public/image/' + imagename)));
     }
 }
