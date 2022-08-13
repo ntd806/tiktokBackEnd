@@ -27,7 +27,7 @@ export class SearchService
     public async updateIndex(updateData: any): Promise<any> {
         const data = this.productDocument(updateData);
         await this.productDocument(updateData.id);
-        return this.insertIndex(data);
+        // return this.insertIndex(data);
     }
 
     public async searchIndex(searchData: any): Promise<any> {
