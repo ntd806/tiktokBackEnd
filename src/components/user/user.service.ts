@@ -4,10 +4,12 @@ import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
     constructor(
+        private readonly jwt: JwtService,
         @InjectModel(User.name)
         private readonly userModel: Model<User>
     ) {}
@@ -48,9 +50,13 @@ export class UserService {
             await user.update(dto);
             await user.save();
             const newUser = await this.userModel.find({ _id: user.id });
+            const access_token = await this.signToken(dto.phone);
             return {
                 code: 40011,
-                data: newUser,
+                data: {
+                    newUser,
+                    access_token
+                },
                 message: 'Update phone number successfully'
             };
             
@@ -58,5 +64,21 @@ export class UserService {
             console.log(error);
             throw new NotFoundException(error);
         }
+    }
+
+    async signToken(phone: string): Promise<{ access_token: string }> {
+        const payload = {
+            sub: phone
+        };
+        const secret = process.env.SECRET;
+
+        const token = await this.jwt.signAsync(payload, {
+            expiresIn: '365d',
+            secret: secret
+        });
+
+        return {
+            access_token: token
+        };
     }
 }
