@@ -5,12 +5,13 @@ import {
     Get,
     Request,
     UseGuards,
+    Put,
     UploadedFile,
     UseInterceptors,
     Query
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UpdateUserDto } from './dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -104,5 +105,25 @@ export class UserController {
     })
     public async getAllGame(@Query() paginationQuery: PaginationQueryDto) {
         return await this.userService.findAll(paginationQuery);
+    }
+
+    @ApiOperation({
+        summary: 'Update phone number'
+    })
+    @ApiResponse({
+        status: 40011,
+        description: 'Update phone number successfully'
+    })
+    @ApiResponse({
+        status: 40012,
+        description: 'Not found user'
+    })
+    @UseGuards(JwtGuard)
+    @Put('update-phone')
+    public async updateGame(
+        @Request() req,
+        @Body() UpdateGameDto: UpdateUserDto
+    ) {
+        return await this.userService.updatePhoneNumber(req.user, UpdateGameDto);
     }
 }

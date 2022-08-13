@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { UserDto } from './dto/user.dto';
+import { Injectable, NotFoundException} from '@nestjs/common';
+import { UserDto, UpdateUserDto } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -32,5 +32,31 @@ export class UserService {
             data: users,
             message: `Get list user successfully`
         };
+    }
+
+    public async updatePhoneNumber(user: User, dto: UpdateUserDto) {
+        try {
+            const checkUser = await this.userModel.find({ _id: user.id });
+            if (checkUser.length < 1) {
+                return {
+                    code: 40012,
+                    data: newUser,
+                    message: 'Not found user'
+                };
+            }
+
+            await user.update(dto);
+            await user.save();
+            const newUser = await this.userModel.find({ _id: user.id });
+            return {
+                code: 40011,
+                data: newUser,
+                message: 'Update phone number successfully'
+            };
+            
+        } catch (error) {
+            console.log(error);
+            throw new NotFoundException(error);
+        }
     }
 }
