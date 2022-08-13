@@ -40,7 +40,7 @@ export class UserService {
             if (checkUser.length < 1) {
                 return {
                     code: 40012,
-                    data: newUser,
+                    data: [],
                     message: 'Not found user'
                 };
             }
