@@ -6,7 +6,8 @@ import {
     Request,
     UseGuards,
     UploadedFile,
-    UseInterceptors
+    UseInterceptors,
+    Query
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto } from './dto/user.dto';
@@ -14,13 +15,15 @@ import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express'
 import { multerOptions } from '../../vender/helper/Helper'
+import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import {
     ApiTags,
     ApiBody,
     ApiConsumes,
     ApiResponse,
     ApiOperation,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiParam
 } from '@nestjs/swagger';
 @UseGuards(JwtStrategy)
 @ApiBearerAuth('Authorization')
@@ -33,7 +36,7 @@ export class UserController {
         summary: 'Get info user'
     })
     @ApiResponse({
-        status: 200,
+        status: 40007,
         description: 'Get successfully'
     })
     @UseGuards(JwtGuard)
@@ -50,7 +53,7 @@ export class UserController {
         summary: 'Update user'
     })
     @ApiResponse({
-        status: 200,
+        status: 40002,
         description: 'Update successfully'
     })
     @UseGuards(JwtGuard)
@@ -80,5 +83,26 @@ export class UserController {
     async updateUser(@Request() req, @Body() dto: UserDto, @UploadedFile('file') file) {
         dto.avatar = process.env.URL_IMAGE + file.filename;
         return await this.userService.updateUser(req.user, dto);
+    }
+
+
+    @Get()
+    @ApiOperation({
+        summary: 'Get all users'
+    })
+    @ApiParam({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiParam({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    public async getAllGame(@Query() paginationQuery: PaginationQueryDto) {
+        return await this.userService.findAll(paginationQuery);
     }
 }
