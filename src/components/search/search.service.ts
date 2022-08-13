@@ -15,6 +15,7 @@ export class SearchService
 
     public async insertIndex(bulkData: any, path: any): Promise<any> {
         bulkData.previewImage = path;
+        console.log(bulkData);
         const data = this.productDocument(bulkData);
         return this.bulk(data)
             .then((res) => res)
