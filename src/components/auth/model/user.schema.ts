@@ -35,6 +35,9 @@ export class User extends Document {
         }
     ];
 
+    @Prop()
+    avatar: string;
+
     @Prop({ type: 'object' })
     social: {
         token: string;
