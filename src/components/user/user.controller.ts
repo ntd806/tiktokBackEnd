@@ -5,10 +5,12 @@ import {
     Get,
     Request,
     UseGuards,
-    Query
+    Query,
+    Put,
+    Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto } from './dto/user.dto';
+import { UserDto, UpdateUserDto } from './dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
@@ -75,5 +77,21 @@ export class UserController {
     })
     public async getAllGame(@Query() paginationQuery: PaginationQueryDto) {
         return await this.userService.findAll(paginationQuery);
+    }
+
+    @ApiOperation({
+        summary: 'Update phone number'
+    })
+    @ApiResponse({
+        status: 40011,
+        description: 'Update phone number successfully'
+    })
+    @UseGuards(JwtGuard)
+    @Put('update-phone')
+    public async updateGame(
+        @Request() req,
+        @Body() UpdateGameDto: UpdateUserDto
+    ) {
+        return await this.userService.updatePhoneNumber(req.user, UpdateGameDto);
     }
 }
