@@ -22,6 +22,9 @@ export class User extends Document {
     @Prop()
     phone: string;
 
+    @Prop()
+    avatar: string;
+
     @Prop({ type: 'array' })
     like: [
         {
