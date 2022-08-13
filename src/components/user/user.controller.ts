@@ -79,7 +79,6 @@ export class UserController {
     @UseInterceptors(FileInterceptor('file', multerOptions))
     async updateUser(@Request() req, @Body() dto: UserDto, @UploadedFile('file') file) {
         dto.avatar = process.env.URL_IMAGE + file.filename;
-        console.log(dto);
         return await this.userService.updateUser(req.user, dto);
     }
 }

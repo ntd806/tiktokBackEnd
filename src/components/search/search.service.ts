@@ -14,9 +14,7 @@ export class SearchService
     }
 
     public async insertIndex(bulkData: any): Promise<any> {
-        console.log(bulkData);
         const data = this.productDocument(bulkData);
-        
         return this.bulk(data)
             .then((res) => res)
             .catch((err) => {
