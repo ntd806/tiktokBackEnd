@@ -13,7 +13,8 @@ export class SearchService
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
 
-    public async insertIndex(bulkData: any): Promise<any> {
+    public async insertIndex(bulkData: any, path: any): Promise<any> {
+        bulkData.previewImage = path;
         const data = this.productDocument(bulkData);
         return this.bulk(data)
             .then((res) => res)

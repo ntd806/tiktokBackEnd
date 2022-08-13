@@ -5,15 +5,25 @@ import {
     Put,
     Delete,
     Body,
-    Query
+    Query,
+    UploadedFile,
+    UseInterceptors
 } from '@nestjs/common';
 import { SearchService } from './search.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { 
+    ApiTags, 
+    ApiOperation, 
+    ApiResponse, 
+    ApiBody, 
+    ApiConsumes 
+} from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express'
 import {
     CreateProductDto,
     UpdateProductDto,
     SearchProductDto
 } from './dto/index';
+import { multerOptions } from '../../vender/helper/Helper'
 @Controller('/api/v1/search')
 @ApiTags('search')
 export class SearchController {
@@ -23,14 +33,49 @@ export class SearchController {
     @ApiOperation({
         summary: 'Insert index'
     })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                name: {
+                    type: 'string',
+                },
+                description: {
+                    type: 'string'
+                },
+                url: {
+                    type: 'string'
+                },
+                preview: {
+                    type: 'string'
+                },
+                tag: {
+                    type: 'string'
+                },
+                type: {
+                    type: 'number'
+                },
+                time: {
+                    type: 'number'
+                }
+            },
+        },
+    })
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     @ApiResponse({
         status: 200,
         description: 'insert index success'
     })
     public async insertIndex(
-        @Body() createProductDto: CreateProductDto
+        @Body() createProductDto: CreateProductDto,
+        @UploadedFile('file') file
     ): Promise<any> {
-        return this.searchService.insertIndex(createProductDto);
+        return this.searchService.insertIndex(createProductDto, file.path);
     }
 
     @Put('update-index')
