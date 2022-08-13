@@ -36,9 +36,17 @@ export class UserService {
 
     public async updatePhoneNumber(user: User, dto: UpdateUserDto) {
         try {
+            const newUser = await this.userModel.find({ _id: user.id });
+            if (newUser.length < 1) {
+                return {
+                    code: 40012,
+                    data: newUser,
+                    message: 'Not found user'
+                };
+            }
+
             await user.update(dto);
             await user.save();
-            const newUser = await this.userModel.find({ _id: user.id });
             return {
                 code: 40011,
                 data: newUser,
