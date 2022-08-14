@@ -77,7 +77,7 @@ export class UserController {
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('file', multerOptions))
     async updateAvata(@Request() req, @Body() dto: AvataDto, @UploadedFile('file') file) {
-        dto.avatar = process.env.URL_IMAGE + file.filename;
+        dto.avatar = file.filename;
         return await this.userService.updateAvata(req.user, dto);
     }
 
