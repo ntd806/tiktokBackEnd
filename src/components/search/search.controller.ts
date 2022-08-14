@@ -79,7 +79,7 @@ export class SearchController {
         @Body() createProductDto: CreateProductDto,
         @UploadedFile('file') file
     ): Promise<any> {
-        createProductDto.previewImage = process.env.URL_IMAGE+file.filename;
+        createProductDto.previewImage = file.filename;
         return this.searchService.insertIndex(createProductDto);
     }
 
