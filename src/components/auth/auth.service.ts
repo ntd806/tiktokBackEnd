@@ -183,15 +183,16 @@ export class AuthService {
                 phone: reinstall.phone,
                 mac: [{ mac: reinstall.mac }]
             });
+            const access_token = await this.signToken(reinstall.phone);
 
             if (user.length < 1) {
                 return {
                     code: 80010,
-                    data: false,
+                    data: access_token,
                     message: 'Not found phone number or MAC address of device'
                 };
             }
-            const access_token = await this.signToken(reinstall.phone);
+            
 
             return {
                 code: 80011,
