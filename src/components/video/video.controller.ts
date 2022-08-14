@@ -19,9 +19,7 @@ import {
     ApiResponse,
     ApiOperation,
     ApiBearerAuth,
-    ApiQuery,
-    ApiBody,
-    ApiConsumes
+    ApiQuery
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
 import { multerOptions } from 'src/vender/helper/Helper';
