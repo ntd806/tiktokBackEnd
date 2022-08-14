@@ -11,7 +11,7 @@ import {
     Query
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UserDto, UpdateUserDto } from './dto';
+import { UserDto, UpdateUserDto, AvataDto } from './dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express'
@@ -51,6 +51,37 @@ export class UserController {
     }
 
     @ApiOperation({
+        summary: 'Update avata of user'
+    })
+    @ApiResponse({
+        status: 40013,
+        description: 'Update avata number successfully'
+    })
+    @ApiResponse({
+        status: 40012,
+        description: 'Not found user'
+    })
+    @UseGuards(JwtGuard)
+    @Post('update-avata')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                }
+            },
+        },
+    })
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    async updateAvata(@Request() req, @Body() dto: AvataDto, @UploadedFile('file') file) {
+        dto.avatar = process.env.URL_IMAGE + file.filename;
+        return await this.userService.updateAvata(req.user, dto);
+    }
+
+    @ApiOperation({
         summary: 'Update user'
     })
     @ApiResponse({
@@ -59,33 +90,9 @@ export class UserController {
     })
     @UseGuards(JwtGuard)
     @Post('update')
-    @ApiBody({
-        schema: {
-            type: 'object',
-            properties: {
-                file: {
-                    type: 'string',
-                    format: 'binary',
-                },
-                birthdate: {
-                    type: 'datetime',
-                },
-                sex: {
-                    type: 'number'
-                },
-                fullname: {
-                    type: 'string'
-                }
-            },
-        },
-    })
-    @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileInterceptor('file', multerOptions))
-    async updateUser(@Request() req, @Body() dto: UserDto, @UploadedFile('file') file) {
-        dto.avatar = process.env.URL_IMAGE + file.filename;
+    async updateUser(@Request() req, @Body() dto: UserDto) {
         return await this.userService.updateUser(req.user, dto);
     }
-
 
     @Get()
     @ApiOperation({

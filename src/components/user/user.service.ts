@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException} from '@nestjs/common';
-import { UserDto, UpdateUserDto } from './dto';
+import { UserDto, UpdateUserDto, AvataDto } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -58,6 +58,32 @@ export class UserService {
                     access_token
                 },
                 message: 'Update phone number successfully'
+            };
+            
+        } catch (error) {
+            console.log(error);
+            throw new NotFoundException(error);
+        }
+    }
+
+    public async updateAvata (user: User, dto: AvataDto) {
+        try {
+            const checkUser = await this.userModel.find({ _id: user.id });
+            if (checkUser.length < 1) {
+                return {
+                    code: 40012,
+                    data: [],
+                    message: 'Not found user'
+                };
+            }
+
+            await user.update(dto);
+            await user.save();
+            const newUser = await this.userModel.find({ _id: user.id });
+            return {
+                code: 40013,
+                data: newUser,
+                message: 'Update avata number successfully'
             };
             
         } catch (error) {
