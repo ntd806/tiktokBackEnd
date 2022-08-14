@@ -6,7 +6,6 @@ import {
     Post,
     Body,
     Put,
-    NotFoundException,
     Delete,
     Param,
     Query,
