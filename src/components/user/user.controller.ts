@@ -14,8 +14,8 @@ import { UserService } from './user.service';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
 import { JwtStrategy } from '../auth/strategy';
 import { JwtGuard } from '../auth/guard';
-import { FileInterceptor } from '@nestjs/platform-express'
-import { multerOptions } from '../../vender/helper/Helper'
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from '../../vender/helper/Helper';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import {
     ApiTags,
@@ -69,14 +69,18 @@ export class UserController {
             properties: {
                 file: {
                     type: 'string',
-                    format: 'binary',
+                    format: 'binary'
                 }
-            },
-        },
+            }
+        }
     })
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('file', multerOptions))
-    async updateAvata(@Request() req, @Body() dto: AvataDto, @UploadedFile('file') file) {
+    async updateAvata(
+        @Request() req,
+        @Body() dto: AvataDto,
+        @UploadedFile('file') file
+    ) {
         dto.avatar = file.filename;
         return await this.userService.updateAvata(req.user, dto);
     }
@@ -131,6 +135,9 @@ export class UserController {
         @Request() req,
         @Body() UpdateGameDto: UpdateUserDto
     ) {
-        return await this.userService.updatePhoneNumber(req.user, UpdateGameDto);
+        return await this.userService.updatePhoneNumber(
+            req.user,
+            UpdateGameDto
+        );
     }
 }
