@@ -4,18 +4,16 @@ import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '../../common';
 import { STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
-import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
     constructor(
         private readonly jwt: JwtService,
         @InjectModel(User.name)
-        private readonly userModel: Model<User>,
-        private authService: AuthService,
+        private readonly userModel: Model<User>
     ) { }
 
     async findUserById(id: string) {
@@ -99,7 +97,7 @@ export class UserService {
                     'User not found');
             }
             const newUser = await this.updateSomeField(user, dto);
-            const access_token = await this.authService.signToken(dto.phone, newUser.fullname);
+            const access_token = await this.jwt.signToken(dto.phone, newUser.fullname);
             return new BaseResponse(
                 STATUSCODE.PHONE_UPDATE_SUCCESS_4011,
                 {

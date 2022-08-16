@@ -1,10 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService } from '../../common';
 import { AuthDto, SocialDto, VerifyDto, Reinstall } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { JwtPayload } from 'src/interfaces/jwt.interface';
 @Injectable()
 export class AuthService {
     constructor(
@@ -62,23 +61,6 @@ export class AuthService {
         // }
     }
 
-    async signToken(phone: string, fullname: string): Promise<{ access_token: string }> {
-        const payload: JwtPayload = {
-            sub: phone,
-            fullname,
-        };
-        const secret = process.env.SECRET;
-
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '365d',
-            secret: secret
-        });
-
-        return {
-            access_token: token
-        };
-    }
-
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
             const user = await this.authModel.findOne({
@@ -116,7 +98,7 @@ export class AuthService {
             const user = await this.authModel.findOne({
                 phone: socialDto.phone
             });
-            const access_token = await this.signToken(socialDto.phone, socialDto.fullname);
+            const access_token = await this.jwt.signToken(socialDto.phone, socialDto.fullname);
             if (!user) {
                 const dataInsert = {
                     ip: socialDto.ip,
