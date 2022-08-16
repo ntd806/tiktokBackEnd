@@ -7,10 +7,9 @@ import {
     UseGuards,
     Query,
     UseInterceptors,
-    
     UploadedFile
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express'
+import { FileInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
 import { LikeDto } from './dto/like.dto';
 import { JwtGuard } from '../auth/guard';
@@ -20,9 +19,7 @@ import {
     ApiResponse,
     ApiOperation,
     ApiBearerAuth,
-    ApiQuery,
-    ApiBody,
-    ApiConsumes
+    ApiQuery
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
 import { multerOptions } from 'src/vender/helper/Helper';
@@ -140,7 +137,10 @@ export class VideoController {
     })
     @Get('get-relative-video-by-tag')
     @UseInterceptors(FileInterceptor('file', multerOptions))
-    async getRelativeVideoByTag(@Query() searchProductDto: SearchProductDto, @UploadedFile() file) {
+    async getRelativeVideoByTag(
+        @Query() searchProductDto: SearchProductDto,
+        @UploadedFile() file
+    ) {
         console.log(file);
         return await this.videoService.getRelativeVideoByTag(searchProductDto);
     }

@@ -12,20 +12,20 @@ import {
     UseInterceptors
 } from '@nestjs/common';
 import { SearchService } from './search.service';
-import { 
-    ApiTags, 
-    ApiOperation, 
-    ApiResponse, 
-    ApiBody, 
-    ApiConsumes 
+import {
+    ApiTags,
+    ApiOperation,
+    ApiResponse,
+    ApiBody,
+    ApiConsumes
 } from '@nestjs/swagger';
-import { FileInterceptor } from '@nestjs/platform-express'
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
     CreateProductDto,
     UpdateProductDto,
     SearchProductDto
 } from './dto/index';
-import { multerOptions } from '../../vender/helper/Helper'
+import { multerOptions } from '../../vender/helper/Helper';
 import { Observable, of } from 'rxjs';
 import { join } from 'path';
 @Controller('/api/v1/search')
@@ -43,10 +43,10 @@ export class SearchController {
             properties: {
                 file: {
                     type: 'string',
-                    format: 'binary',
+                    format: 'binary'
                 },
                 name: {
-                    type: 'string',
+                    type: 'string'
                 },
                 description: {
                     type: 'string'
@@ -66,8 +66,8 @@ export class SearchController {
                 time: {
                     type: 'number'
                 }
-            },
-        },
+            }
+        }
     })
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('file', multerOptions))
@@ -139,7 +139,12 @@ export class SearchController {
     @ApiOperation({
         summary: 'get image'
     })
-    findProfileImage(@Param('imagename') imagename: string, @Res() res): Observable<Object> {
-        return of(res.sendFile(join(process.cwd(), 'public/image/' + imagename)));
+    findProfileImage(
+        @Param('imagename') imagename: string,
+        @Res() res
+    ): Observable<Object> {
+        return of(
+            res.sendFile(join(process.cwd(), 'public/image/' + imagename))
+        );
     }
 }

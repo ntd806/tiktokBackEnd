@@ -6,7 +6,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 
 // Multer configuration
 export const multerConfig = {
-    dest: process.env.UPLOAD_LOCATION,
+    dest: process.env.UPLOAD_LOCATION
 };
 
 // Multer upload options
@@ -22,7 +22,15 @@ export const multerOptions = {
             cb(null, true);
         } else {
             // Reject file
-            cb(new HttpException(`Unsupported file type ${path.parse(file.originalname).ext}`, HttpStatus.BAD_REQUEST), false);
+            cb(
+                new HttpException(
+                    `Unsupported file type ${
+                        path.parse(file.originalname).ext
+                    }`,
+                    HttpStatus.BAD_REQUEST
+                ),
+                false
+            );
         }
     },
     // Storage properties
@@ -32,10 +40,11 @@ export const multerOptions = {
         // File modification details
         filename: (req: any, file: any, cb: any) => {
             // Calling the callback passing the random name generated with the original extension name
-            const filename: string = path.parse(file.originalname).name.replace(/\s/g, '') + uuid();
+            const filename: string =
+                path.parse(file.originalname).name.replace(/\s/g, '') + uuid();
             const extension: string = path.parse(file.originalname).ext;
 
             cb(null, `${filename}${extension}`);
-        },
-    }),
+        }
+    })
 };

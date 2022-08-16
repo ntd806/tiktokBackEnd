@@ -192,7 +192,6 @@ export class AuthService {
                     message: 'Not found phone number or MAC address of device'
                 };
             }
-            
 
             return {
                 code: 80011,
