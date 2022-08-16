@@ -4,6 +4,7 @@ import { AuthDto, SocialDto, VerifyDto, Reinstall } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { JwtPayload } from 'src/interfaces/jwt.interface';
 @Injectable()
 export class AuthService {
     constructor(
@@ -13,57 +14,58 @@ export class AuthService {
     ) {}
 
     async signup(dto: AuthDto) {
-        const user = await this.authModel.findOne({ phone: dto.phone });
-        const access_token = await this.signToken(dto.phone);
-        if (user) {
-            if (user.mac.find((m) => m.mac == dto.mac)) {
-                return {
-                    code: 80002,
-                    data: access_token,
-                    message: 'Register failed'
-                };
-            } else {
-                const mac = user.mac;
-                mac.push({ mac: dto.mac });
-                await this.authModel.findOneAndUpdate(
-                    { _id: user._id },
-                    {
-                        mac: mac
-                    }
-                );
-                return {
-                    code: 80006,
-                    data: access_token,
-                    message: 'Register success'
-                };
-            }
-        } else {
-            const dataInsert = {
-                ip: dto.ip,
-                mac: [
-                    {
-                        mac: dto.mac
-                    }
-                ],
-                phone: dto.phone,
-                birthdate: dto.birthdate,
-                sex: dto.sex,
-                fullname: dto.fullname
-            };
-            const newAuth = await this.authModel.create(dataInsert);
-            newAuth.save();
-            const access_token = await this.signToken(newAuth.phone);
-            return {
-                code: 40001,
-                data: access_token,
-                message: 'Create a user successfully'
-            };
-        }
+        // const user = await this.authModel.findOne({ phone: dto.phone });
+        // const access_token = await this.signToken(dto.phone);
+        // if (user) {
+        //     if (user.mac.find((m) => m.mac == dto.mac)) {
+        //         return {
+        //             code: 80002,
+        //             data: access_token,
+        //             message: 'Register failed'
+        //         };
+        //     } else {
+        //         const mac = user.mac;
+        //         mac.push({ mac: dto.mac });
+        //         await this.authModel.findOneAndUpdate(
+        //             { _id: user._id },
+        //             {
+        //                 mac: mac
+        //             }
+        //         );
+        //         return {
+        //             code: 80006,
+        //             data: access_token,
+        //             message: 'Register success'
+        //         };
+        //     }
+        // } else {
+        //     const dataInsert = {
+        //         ip: dto.ip,
+        //         mac: [
+        //             {
+        //                 mac: dto.mac
+        //             }
+        //         ],
+        //         phone: dto.phone,
+        //         birthdate: dto.birthdate,
+        //         sex: dto.sex,
+        //         fullname: dto.fullname
+        //     };
+        //     const newAuth = await this.authModel.create(dataInsert);
+        //     newAuth.save();
+        //     const access_token = await this.signToken(newAuth.phone, newAuth.fullname);
+        //     return {
+        //         code: 40001,
+        //         data: access_token,
+        //         message: 'Create a user successfully'
+        //     };
+        // }
     }
 
-    async signToken(phone: string): Promise<{ access_token: string }> {
-        const payload = {
-            sub: phone
+    async signToken(phone: string, fullname: string): Promise<{ access_token: string }> {
+        const payload: JwtPayload = {
+            sub: phone,
+            fullname,
         };
         const secret = process.env.SECRET;
 
@@ -114,7 +116,7 @@ export class AuthService {
             const user = await this.authModel.findOne({
                 phone: socialDto.phone
             });
-            const access_token = await this.signToken(socialDto.phone);
+            const access_token = await this.signToken(socialDto.phone, socialDto.fullname);
             if (!user) {
                 const dataInsert = {
                     ip: socialDto.ip,
@@ -178,28 +180,25 @@ export class AuthService {
     }
 
     public async reinstall(reinstall: Reinstall) {
-        try {
-            const user = await this.authModel.find({
-                phone: reinstall.phone,
-                mac: [{ mac: reinstall.mac }]
-            });
-            const access_token = await this.signToken(reinstall.phone);
+        const user = await this.authModel.findOne({
+            phone: reinstall.phone,
+            mac: [{ mac: reinstall.mac }]
+        });
 
-            if (user.length < 1) {
-                return {
-                    code: 80010,
-                    data: access_token,
-                    message: 'Not found phone number or MAC address of device'
-                };
-            }
+        return user;
 
-            return {
-                code: 80011,
-                data: access_token,
-                message: 'Reinstall successfully'
-            };
-        } catch (error) {
-            throw new NotFoundException(error);
-        }
+        // if (user.length < 1) {
+        //     return {
+        //         code: 80010,
+        //         data: access_token,
+        //         message: 'Not found phone number or MAC address of device'
+        //     };
+        // }
+
+        // return {
+        //     code: 80011,
+        //     data: access_token,
+        //     message: 'Reinstall successfully'
+        // };
     }
 }

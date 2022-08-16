@@ -14,15 +14,20 @@ export class UserService {
         private readonly userModel: Model<User>
     ) {}
 
-    async updateUser(user: User, dto: UserDto) {
-        await user.update(dto);
-        await user.save();
-        const newUser = await this.userModel.find({ _id: user.id });
-        return {
-            code: 40002,
-            data: newUser,
-            message: 'Update successfully'
-        };
+    async findUserById(id: string) {
+        return await this.userModel.findById(id);
+    }
+
+    async findByEmail(email: string) {
+        return await this.userModel.findOne({ where: { email } });
+    }
+
+    async findByPhoneNumber(phone: string) {
+        return await this.userModel.findOne({ where: { phone } });
+    }
+
+    async updateUser(userRequest: User, user: UserDto) {
+        return await this.userModel.findByIdAndUpdate({_id: userRequest.id}, user);
     }
 
     public async findAll(paginationQuery: PaginationQueryDto): Promise<any> {

@@ -8,7 +8,7 @@ import {
     Put,
     UploadedFile,
     UseInterceptors,
-    Query
+    Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
@@ -26,6 +26,7 @@ import {
     ApiBearerAuth,
     ApiParam
 } from '@nestjs/swagger';
+import { STATUSCODE } from '../../constants';
 @UseGuards(JwtStrategy)
 @ApiBearerAuth('Authorization')
 @ApiTags('user')
@@ -95,7 +96,19 @@ export class UserController {
     @UseGuards(JwtGuard)
     @Post('update')
     async updateUser(@Request() req, @Body() dto: UserDto) {
-        return await this.userService.updateUser(req.user, dto);
+        const user = await this.userService.updateUser(req.user, dto);
+        if(!user) {
+            return {
+                code: STATUSCODE.USER_NOT_FOUND_400,
+                data: null,
+                message: 'User not found'
+            }
+        }
+        return {
+            code: STATUSCODE.USER_UPDATE_SUCCESS_402,
+            data: user,
+            message: 'Update successfully'
+        };
     }
 
     @Get()
