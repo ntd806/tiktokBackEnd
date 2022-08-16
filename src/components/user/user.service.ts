@@ -1,18 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import { JwtService } from '@nestjs/jwt';
+import { STATUSCODE } from '../../constants';
+import { BaseErrorResponse, BaseResponse } from '../../common';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
     constructor(
         private readonly jwt: JwtService,
         @InjectModel(User.name)
-        private readonly userModel: Model<User>
-    ) {}
+        private readonly userModel: Model<User>,
+        private authService: AuthService,
+    ) { }
 
     async findUserById(id: string) {
         return await this.userModel.findById(id);
@@ -26,88 +30,111 @@ export class UserService {
         return await this.userModel.findOne({ where: { phone } });
     }
 
+    async getUser(user: User) {
+        try {
+            const userInfo = await this.findUserById(user.id);
+            if (!userInfo) {
+                return new BaseErrorResponse(
+                    STATUSCODE.USER_NOT_FOUND_400,
+                    'User not found'
+                );
+            }
+            return new BaseResponse(
+                STATUSCODE.USER_READ_SUCCESS_407,
+                userInfo,
+                'Get user info successfully'
+            );
+        } catch (err) {
+            return new BaseErrorResponse(
+                STATUSCODE.USER_NOT_FOUND_400,
+                'User not found'
+            );
+        }
+    }
+
     async updateUser(userRequest: User, user: UserDto) {
-        return await this.userModel.findByIdAndUpdate({_id: userRequest.id}, user);
+        try {
+            const userReceive = await this.userModel.findByIdAndUpdate({ _id: userRequest.id }, user);
+            if (!userReceive) {
+                return new BaseErrorResponse(
+                    STATUSCODE.USER_NOT_FOUND_400,
+                    'User not found',
+                    null
+                )
+            }
+            return new BaseResponse(
+                STATUSCODE.USER_UPDATE_SUCCESS_402,
+                user,
+                'Update successfully'
+            )
+        } catch (err) {
+            return new BaseErrorResponse(
+                STATUSCODE.USER_NOT_FOUND_400,
+                'User not found',
+                null
+            )
+        }
+    }
+
+    async updateSomeField<T>(userRequest: User, user: T) {
+        return await this.userModel.findByIdAndUpdate({ _id: userRequest.id }, { $set: user }, { new: true });
     }
 
     public async findAll(paginationQuery: PaginationQueryDto): Promise<any> {
         const { limit, offset } = paginationQuery;
 
         const users = await this.userModel.find().skip(offset).limit(limit);
-        return {
-            code: 40009,
-            data: users,
-            message: `Get list user successfully`
-        };
+        return new BaseResponse(STATUSCODE.USER_LIST_SUCESS_409,
+            users,
+            `Get list user successfully`,
+        )
     }
 
     public async updatePhoneNumber(user: User, dto: UpdateUserDto) {
         try {
-            const checkUser = await this.userModel.find({ _id: user.id });
-            if (checkUser.length < 1) {
-                return {
-                    code: 40012,
-                    data: [],
-                    message: 'Not found user'
-                };
+            const userByPhone = await this.findUserById(user.id);
+            if (!userByPhone) {
+                return new BaseErrorResponse(
+                    STATUSCODE.PHONE_NOTFOUND_4012,
+                    'User not found');
             }
-
-            await user.update(dto);
-            await user.save();
-            const newUser = await this.userModel.find({ _id: user.id });
-            const access_token = await this.signToken(dto.phone);
-            return {
-                code: 40011,
-                data: {
-                    newUser,
-                    access_token
+            const newUser = await this.updateSomeField(user, dto);
+            const access_token = await this.authService.signToken(dto.phone, newUser.fullname);
+            return new BaseResponse(
+                STATUSCODE.PHONE_UPDATE_SUCCESS_4011,
+                {
+                    user: newUser,
+                    access_token: access_token,
                 },
-                message: 'Update phone number successfully'
-            };
+                'Update phone number successfully'
+            )
         } catch (error) {
-            console.log(error);
-            throw new NotFoundException(error);
+            return new BaseErrorResponse(
+                STATUSCODE.PHONE_NOTFOUND_4012,
+                'User not found');
         }
     }
 
-    public async updateAvata(user: User, dto: AvataDto) {
+    async updateAvatar(user: User, dto: AvataDto) {
         try {
-            const checkUser = await this.userModel.find({ _id: user.id });
-            if (checkUser.length < 1) {
-                return {
-                    code: 40012,
-                    data: [],
-                    message: 'Not found user'
-                };
+            const userById = await this.findUserById(user.id);
+            if (!userById) {
+                return new BaseErrorResponse(
+                    STATUSCODE.PHONE_NOTFOUND_4012,
+                    'User not found');
             }
 
-            await user.update(dto);
-            await user.save();
-            const newUser = await this.userModel.find({ _id: user.id });
-            return {
-                code: 40013,
-                data: newUser,
-                message: 'Update avata number successfully'
-            };
+            const newUser = await this.updateSomeField(user, dto);
+            return new BaseResponse(
+                STATUSCODE.USER_AVATAR_UPLOADED_4013,
+                newUser,
+                'Update avata number successfully'
+            )
         } catch (error) {
             console.log(error);
-            throw new NotFoundException(error);
+            return new BaseErrorResponse(
+                STATUSCODE.PHONE_NOTFOUND_4012,
+                'User not found');
         }
-    }
-
-    async signToken(phone: string): Promise<{ access_token: string }> {
-        const payload = {
-            sub: phone
-        };
-        const secret = process.env.SECRET;
-
-        const token = await this.jwt.signAsync(payload, {
-            expiresIn: '365d',
-            secret: secret
-        });
-
-        return {
-            access_token: token
-        };
     }
 }
