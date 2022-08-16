@@ -129,6 +129,10 @@ export class UserController {
         status: 40012,
         description: 'Not found user'
     })
+    @ApiResponse({
+        status: 40015,
+        description: 'Phone number has taken'
+    })
     @UseGuards(JwtGuard)
     @Put('update-phone')
     public async updateGame(
