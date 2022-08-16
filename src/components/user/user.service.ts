@@ -47,6 +47,15 @@ export class UserService {
                 };
             }
 
+            const checkPhone = await this.userModel.find({ phone: dto.phone });
+            if (checkPhone.length >= 1) {
+                return {
+                    code: 40015,
+                    data: [],
+                    message: 'Phone number has taken'
+                };
+            }
+
             await user.update(dto);
             await user.save();
             const newUser = await this.userModel.find({ _id: user.id });
