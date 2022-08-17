@@ -126,6 +126,10 @@ export class UserController {
         status: STATUSCODE.PHONE_NOTFOUND_4012,
         description: 'Phone number not found'
     })
+    @ApiResponse({
+        status: 40015,
+        description: 'Phone number has taken'
+    })
     @UseGuards(JwtGuard)
     @Put('update-phone')
     public async updateGame(
