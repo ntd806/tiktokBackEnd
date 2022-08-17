@@ -4,8 +4,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateOtpDto {
     @ApiProperty()
     @IsNotEmpty()
-    @Matches(/(^\+84|^0)\d{9}$/g, {
-        message: 'this is not Viet Nam phone number'
+    @Matches(/(^\+d{1,4})\d{9,10}$/g, {
+        message: 'Invalid phone number'
     })
     phoneNumber: string;
 }

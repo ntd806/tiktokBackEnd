@@ -3,7 +3,6 @@ import {
     IsString,
     IsDateString,
     IsEmail,
-    IsMACAddress,
     Matches,
     IsIP,
     Length
@@ -19,7 +18,6 @@ export class AuthDto {
 
     @ApiProperty()
     @IsString()
-    @IsMACAddress()
     mac: string;
 
     @ApiProperty({
@@ -27,8 +25,8 @@ export class AuthDto {
     })
     @IsNotEmpty()
     @IsString()
-    @Matches(/(^\+84|^0)\d{9}$/g, {
-        message: 'this is not Viet Nam phone number'
+    @Matches(/(^\+d{1,4})\d{9,10}$/g, {
+        message: 'Invalid phone number'
     })
     phone: string;
 
@@ -51,7 +49,13 @@ export class AuthDto {
         description: 'Fullname of user'
     })
     @IsString()
-    @Length(0, 127)
+    @IsNotEmpty()
+    @Length(0, 30, {
+        message: 'Full name must be less than 30 characters'
+    })
+    @Matches(/^[a-zA-Z0-9\s]+$/gi, {
+        message: 'Invalid username',
+    })
     fullname: string;
 
     @ApiProperty({

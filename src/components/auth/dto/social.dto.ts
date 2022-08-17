@@ -3,7 +3,6 @@ import {
     IsNotEmpty,
     IsNumber,
     IsEmail,
-    IsMACAddress,
     Length,
     Matches,
     IsIP,
@@ -24,9 +23,7 @@ export class SocialDto {
         description: 'MAC address'
     })
     @ApiProperty()
-    @IsNotEmpty()
     @IsString()
-    @IsMACAddress()
     mac: string;
 
     @ApiProperty({
@@ -53,7 +50,12 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    @Length(0, 127)
+    @Length(0, 30, {
+        message: 'Full name must be less than 30 characters'
+    })
+    @Matches(/^[a-zA-Z0-9\s]+$/gi, {
+        message: 'Invalid username',
+    })
     fullname: string;
 
     @ApiProperty({
@@ -62,8 +64,8 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    @Matches(/(^\+84|^0)\d{9}$/g, {
-        message: 'this is not Viet Nam phone number'
+    @Matches(/(^\+d{1,4})\d{9,10}$/g, {
+        message: 'Invalid phone number'
     })
     phone: string;
 
