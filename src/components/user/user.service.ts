@@ -7,6 +7,7 @@ import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import { JwtService } from '../../common';
 import { STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
+import { UserDto as UserCreateDto } from '../../models';
 
 @Injectable()
 export class UserService {
@@ -26,6 +27,14 @@ export class UserService {
 
     async findByPhoneNumber(phone: string) {
         return await this.userModel.findOne({ where: { phone } });
+    }
+
+    async create(user: UserCreateDto) {
+        return await this.userModel.create(user);
+    }
+
+    async createUserByGGFb<T>(user: T) {
+        return await this.userModel.create(user);
     }
 
     async getUser(user: User) {
@@ -76,6 +85,10 @@ export class UserService {
 
     async updateSomeField<T>(userRequest: User, user: T) {
         return await this.userModel.findByIdAndUpdate({ _id: userRequest.id }, { $set: user }, { new: true });
+    }
+
+    async updateSomeFieldWithId<T>(_id: string, user: T) {
+        return await this.userModel.findByIdAndUpdate({ _id }, { $set: user }, { new: true });
     }
 
     public async findAll(paginationQuery: PaginationQueryDto): Promise<any> {

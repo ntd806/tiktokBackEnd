@@ -6,7 +6,6 @@ export class SocialDto {
         description: 'email of user'
     })
     @IsNotEmpty()
-    @IsNotEmpty()
     @IsString()
     email: string;
 
