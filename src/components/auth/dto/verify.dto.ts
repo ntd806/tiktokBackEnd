@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsMACAddress, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class VerifyDto {
@@ -7,6 +7,9 @@ export class VerifyDto {
     })
     @IsNotEmpty()
     @IsString()
+    @Matches(/(^\+84|^0)\d{9}$/g, {
+        message: 'this is not Viet Nam phone number'
+    })
     phone: string;
 
     @ApiProperty({
@@ -14,5 +17,6 @@ export class VerifyDto {
     })
     @ApiProperty()
     @IsString()
+    @IsMACAddress()
     mac: string;
 }

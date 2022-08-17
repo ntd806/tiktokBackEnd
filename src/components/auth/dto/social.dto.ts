@@ -1,4 +1,14 @@
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+    IsString,
+    IsNotEmpty,
+    IsNumber,
+    IsEmail,
+    IsMACAddress,
+    Length,
+    Matches,
+    IsIP,
+    IsUrl
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SocialDto {
@@ -7,6 +17,7 @@ export class SocialDto {
     })
     @IsNotEmpty()
     @IsString()
+    @IsEmail()
     email: string;
 
     @ApiProperty({
@@ -15,6 +26,7 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @IsMACAddress()
     mac: string;
 
     @ApiProperty({
@@ -23,6 +35,7 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    //todo: don't know format
     token: string;
 
     @ApiProperty({
@@ -31,6 +44,7 @@ export class SocialDto {
     @ApiProperty()
     @IsString()
     @IsNotEmpty()
+    //todo: don't know format
     id: string;
 
     @ApiProperty({
@@ -39,6 +53,7 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @Length(0, 127)
     fullname: string;
 
     @ApiProperty({
@@ -47,6 +62,9 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @Matches(/(^\+84|^0)\d{9}$/g, {
+        message: 'this is not Viet Nam phone number'
+    })
     phone: string;
 
     @ApiProperty({
@@ -55,6 +73,7 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @IsIP()
     ip: string;
 
     @ApiProperty({
@@ -63,6 +82,7 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
+    @IsUrl()
     url: string;
 
     @ApiProperty({
