@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthDto, VerifyDto, SocialDto, SignInDto } from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
-import { STATUSCODE } from 'src/constants';
+import { STATUSCODE } from '../../constants';
 @ApiTags('auth')
 @Controller('/api/v1/auth')
 export class AuthController {

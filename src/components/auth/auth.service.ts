@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { BaseErrorResponse, BaseResponse, JwtService } from '../../common';
 import { AuthDto, SocialDto, VerifyDto, SignInDto } from './dto';
-import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { UserService } from '../user/user.service';
 import { UserDto } from '../../models';
 @Injectable()
