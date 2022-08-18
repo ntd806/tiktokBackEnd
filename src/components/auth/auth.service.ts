@@ -42,19 +42,22 @@ export class AuthService {
                 );
             }
 
-            if (user.mac.find((m) => m.mac == verifyDto.mac)) {
-                return new BaseResponse(
-                    STATUSCODE.PHONE_USED_OLD_DEVICE_804,
-                    false,
-                    MESSAGE.PHONE_USE_OLD_DEVICE
-                );
+            if(Array.isArray(user.mac)) {
+                if (user.mac.find(macAdd => macAdd === verifyDto.mac)) {
+                    return new BaseResponse(
+                        STATUSCODE.PHONE_USED_OLD_DEVICE_804,
+                        true,
+                        MESSAGE.PHONE_USE_OLD_DEVICE
+                    );
+                }
             }
 
             return new BaseResponse(
                 STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
-                false,
+                true,
                 MESSAGE.PHONE_USE_ANOTHER_DEVICE
             );
+
 
         } catch (error) {
             throw new NotFoundException(error);
@@ -100,7 +103,7 @@ export class AuthService {
             const user = await this.userService.findByPhoneNumber(signIn.phone);
             if (user && user.mac) {
                 if(Array.isArray(user.mac)) {
-                    const userByMac = user.mac.find(item => item.mac === signIn.mac);
+                    const userByMac = user.mac.find(item => item === signIn.mac);
                     if (userByMac) {
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_OLD_DEVICE_804,
@@ -108,7 +111,7 @@ export class AuthService {
                             MESSAGE.PHONE_USE_OLD_DEVICE
                         );
                     } else {
-                        const macs = [...user.mac, { mac: signIn.mac }]
+                        const macs = [...user.mac, signIn.mac]
                         await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
@@ -124,7 +127,7 @@ export class AuthService {
                             MESSAGE.PHONE_USE_OLD_DEVICE
                         );
                     } else {
-                        const macs = [user.mac, { mac: signIn.mac }]
+                        const macs = [user.mac, signIn.mac]
                         await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
