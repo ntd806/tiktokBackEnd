@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { BaseErrorResponse, BaseResponse, JwtService } from '../../common';
 import { AuthDto, SocialDto, VerifyDto, SignInDto } from './dto';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
@@ -22,7 +22,7 @@ export class AuthService {
         }
 
         const user = await this.userService.create(dto);
-        const access_token = await this.jwt.signToken(user.phone, user.fullname);
+        const access_token = this.jwt.signToken(user.phone, user.fullname);
         return new BaseResponse(
             STATUSCODE.REGISTER_SUCCESS_806,
             access_token,
@@ -67,11 +67,7 @@ export class AuthService {
             if (!user) {
                 const dataInsert = {
                     ip: socialDto.ip,
-                    mac: [
-                        {
-                            mac: socialDto.mac
-                        }
-                    ],
+                    mac: [socialDto.mac],
                     phone: socialDto.phone,
                     fullname: socialDto.fullname,
                     social: {
@@ -99,31 +95,54 @@ export class AuthService {
     }
 
     public async signIn(signIn: SignInDto) {
-        const user = await this.userService.findByPhoneNumber(signIn.phone);
 
-        if (user) {
-            const userByMac = user.mac.find(item => item.mac === signIn.mac);
-            if (userByMac) {
-                return new BaseResponse(
-                    STATUSCODE.PHONE_USED_OLD_DEVICE_804,
-                    this.jwt.signToken(user.phone, user.fullname),
-                    MESSAGE.PHONE_USE_OLD_DEVICE
-                );
+        try {
+            const user = await this.userService.findByPhoneNumber(signIn.phone);
+            if (user && user.mac) {
+                if(Array.isArray(user.mac)) {
+                    const userByMac = user.mac.find(item => item.mac === signIn.mac);
+                    if (userByMac) {
+                        return new BaseResponse(
+                            STATUSCODE.PHONE_USED_OLD_DEVICE_804,
+                            this.jwt.signToken(user.phone, user.fullname),
+                            MESSAGE.PHONE_USE_OLD_DEVICE
+                        );
+                    } else {
+                        const macs = [...user.mac, { mac: signIn.mac }]
+                        await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
+                        return new BaseResponse(
+                            STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
+                            this.jwt.signToken(user.phone, user.fullname),
+                            MESSAGE.PHONE_USE_ANOTHER_DEVICE
+                        );
+                    }
+                } else {
+                    if(user.mac === signIn.mac) {
+                        return new BaseResponse(
+                            STATUSCODE.PHONE_USED_OLD_DEVICE_804,
+                            this.jwt.signToken(user.phone, user.fullname),
+                            MESSAGE.PHONE_USE_OLD_DEVICE
+                        );
+                    } else {
+                        const macs = [user.mac, { mac: signIn.mac }]
+                        await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
+                        return new BaseResponse(
+                            STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
+                            this.jwt.signToken(user.phone, user.fullname),
+                            MESSAGE.PHONE_USE_ANOTHER_DEVICE
+                        );
+                    }
+                }
+
+    
             } else {
-                const macs = [...user.mac, { mac: signIn.mac }]
-                await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
-                return new BaseResponse(
-                    STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
-                    this.jwt.signToken(user.phone, user.fullname),
-                    MESSAGE.PHONE_USE_ANOTHER_DEVICE
+                return new BaseErrorResponse(
+                    STATUSCODE.NOTFOUND_PHONE_OR_MAC_810,
+                    MESSAGE_ERROR.USER_NOT_FOUND
                 );
             }
-
-        } else {
-            return new BaseErrorResponse(
-                STATUSCODE.NOTFOUND_PHONE_OR_MAC_810,
-                MESSAGE_ERROR.USER_NOT_FOUND
-            );
+        } catch (error) {
+            throw new BadRequestException(error)
         }
     }
 }
