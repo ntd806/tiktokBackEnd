@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsDateString, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsDateString, IsEmail, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
@@ -34,6 +34,12 @@ export class UserDto {
         description: 'Fullname of user'
     })
     @IsString()
+    @Length(0, 30, {
+        message: 'Full name must be less than 30 characters'
+    })
+    @Matches(/^[a-zA-Z0-9\s]+$/gi, {
+        message: 'Invalid username',
+    })
     fullname: string;
 
     @ApiProperty({

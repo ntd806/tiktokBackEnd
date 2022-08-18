@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsDateString } from 'class-validator';
+import { IsNotEmpty, IsString, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SignInDto {
@@ -13,5 +13,8 @@ export class SignInDto {
     })
     @IsNotEmpty()
     @IsString()
+    @Matches(/(^\+d{1,4})\d{9,10}$/g, {
+        message: 'Invalid phone number'
+    })
     phone: string;
 }
