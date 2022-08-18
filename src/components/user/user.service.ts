@@ -22,11 +22,11 @@ export class UserService {
     }
 
     async findByEmail(email: string) {
-        return await this.userModel.findOne({ where: { email } });
+        return await this.userModel.findOne({email});
     }
 
     async findByPhoneNumber(phone: string) {
-        return await this.userModel.findOne({ where: { phone } });
+        return await this.userModel.findOne({ phone });
     }
 
     async create(user: UserCreateDto) {
