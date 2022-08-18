@@ -6,7 +6,6 @@ export class SignInDto {
         description: 'MAC address'
     })
     @IsString()
-    @IsMACAddress()
     mac: string;
 
     @ApiProperty({

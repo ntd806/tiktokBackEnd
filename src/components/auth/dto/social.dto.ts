@@ -26,7 +26,6 @@ export class SocialDto {
     @ApiProperty()
     @IsNotEmpty()
     @IsString()
-    @IsMACAddress()
     mac: string;
 
     @ApiProperty({

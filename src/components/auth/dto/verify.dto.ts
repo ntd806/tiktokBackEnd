@@ -17,6 +17,5 @@ export class VerifyDto {
     })
     @ApiProperty()
     @IsString()
-    @IsMACAddress()
     mac: string;
 }

@@ -19,7 +19,6 @@ export class AuthDto {
 
     @ApiProperty()
     @IsString()
-    @IsMACAddress()
     mac: string;
 
     @ApiProperty({
