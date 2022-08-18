@@ -12,7 +12,6 @@ export class AuthService {
     ) { }
 
     async signup(dto: UserDto) {
-
         const userFind = await this.userService.findByPhoneNumber(dto.phone);
         if (userFind) {
             return new BaseErrorResponse(
