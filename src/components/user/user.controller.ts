@@ -8,7 +8,7 @@ import {
     Put,
     UploadedFile,
     UseInterceptors,
-    Query
+    Query,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
@@ -26,6 +26,7 @@ import {
     ApiBearerAuth,
     ApiParam
 } from '@nestjs/swagger';
+import { STATUSCODE } from '../../constants';
 @UseGuards(JwtStrategy)
 @ApiBearerAuth('Authorization')
 @ApiTags('user')
@@ -34,35 +35,31 @@ export class UserController {
     constructor(private userService: UserService) {}
 
     @ApiOperation({
-        summary: 'Get info user'
+        summary: 'Get user information'
     })
     @ApiResponse({
-        status: 40007,
-        description: 'Get successfully'
+        status: STATUSCODE.USER_READ_SUCCESS_407,
+        description: 'Get user information successfully'
     })
     @UseGuards(JwtGuard)
     @Get('info')
     async info(@Request() req) {
-        return {
-            code: 40007,
-            data: req.user,
-            message: 'Get successfully'
-        };
+        return await this.userService.getUser(req.user);
     }
 
     @ApiOperation({
-        summary: 'Update avata of user'
+        summary: 'Update avatar of user'
     })
     @ApiResponse({
-        status: 40013,
-        description: 'Update avata number successfully'
+        status: STATUSCODE.USER_AVATAR_UPLOADED_4013,
+        description: 'Update avatar successfully'
     })
     @ApiResponse({
-        status: 40012,
-        description: 'Not found user'
+        status: STATUSCODE.PHONE_NOTFOUND_4012,
+        description: 'Phone not found'
     })
     @UseGuards(JwtGuard)
-    @Post('update-avata')
+    @Post('update-avatar')
     @ApiBody({
         schema: {
             type: 'object',
@@ -82,14 +79,14 @@ export class UserController {
         @UploadedFile('file') file
     ) {
         dto.avatar = file.filename;
-        return await this.userService.updateAvata(req.user, dto);
+        return await this.userService.updateAvatar(req.user, dto);
     }
 
     @ApiOperation({
         summary: 'Update user'
     })
     @ApiResponse({
-        status: 40002,
+        status: STATUSCODE.USER_UPDATE_SUCCESS_402,
         description: 'Update successfully'
     })
     @UseGuards(JwtGuard)
@@ -122,12 +119,12 @@ export class UserController {
         summary: 'Update phone number'
     })
     @ApiResponse({
-        status: 40011,
+        status: STATUSCODE.PHONE_UPDATE_SUCCESS_4011,
         description: 'Update phone number successfully'
     })
     @ApiResponse({
-        status: 40012,
-        description: 'Not found user'
+        status: STATUSCODE.PHONE_NOTFOUND_4012,
+        description: 'Phone number not found'
     })
     @ApiResponse({
         status: 40015,

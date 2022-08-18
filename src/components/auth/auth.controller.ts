@@ -1,7 +1,8 @@
 import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthDto, VerifyDto, SocialDto, Reinstall } from './dto';
+import { AuthDto, VerifyDto, SocialDto, SignInDto } from './dto';
 import { ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { STATUSCODE } from '../../constants';
 @ApiTags('auth')
 @Controller('/api/v1/auth')
 export class AuthController {
@@ -11,15 +12,15 @@ export class AuthController {
         summary: 'Register user'
     })
     @ApiResponse({
-        status: 40001,
+        status: STATUSCODE.USER_CREATE_SUCCESS_401,
         description: `Create a user successfully`
     })
     @ApiResponse({
-        status: 80006,
+        status: STATUSCODE.REGISTER_SUCCESS_806,
         description: `Register success`
     })
     @ApiResponse({
-        status: 80002,
+        status: STATUSCODE.REGISTED_FAILED_802,
         description: `Register failed`
     })
     @Post('register')
@@ -31,15 +32,15 @@ export class AuthController {
         summary: 'Verify phone number'
     })
     @ApiResponse({
-        status: 80001,
+        status: STATUSCODE.PHONE_IS_NEW_801,
         description: 'Verify phone number successfully'
     })
     @ApiResponse({
-        status: 80003,
+        status: STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
         description: 'the another device'
     })
     @ApiResponse({
-        status: 80004,
+        status: STATUSCODE.PHONE_USED_OLD_DEVICE_804,
         description: 'The old device'
     })
     @Post('verify-phone-number')
@@ -51,19 +52,19 @@ export class AuthController {
         summary: 'Register social network'
     })
     @ApiResponse({
-        status: 80005,
+        status: STATUSCODE.REGISTER_SOCIAL_SUCCESS_805,
         description: 'Registered by social successfully'
     })
     @ApiResponse({
-        status: 80003,
+        status: STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
         description: 'the another device'
     })
     @ApiResponse({
-        status: 80006,
+        status: STATUSCODE.PHONE_USED_OLD_DEVICE_804,
         description: 'The old device'
     })
     @ApiResponse({
-        status: 80007,
+        status: STATUSCODE.REGISTER_IN_NEW_DEVICE_807,
         description: 'The new device'
     })
     @Post('social-network')
@@ -72,18 +73,18 @@ export class AuthController {
     }
 
     @ApiOperation({
-        summary: 'Reinstall application'
+        summary: 'Signin application'
     })
     @ApiResponse({
-        status: 80010,
+        status: STATUSCODE.NOTFOUND_PHONE_OR_MAC_810,
         description: 'Not found phone number or MAC address of device'
     })
     @ApiResponse({
-        status: 80011,
-        description: 'Reinstall successfully'
+        status: STATUSCODE.SIGNIN_SUCCESS_811,
+        description: 'Signin successfully'
     })
-    @Post('reinstall')
-    async reinstall(@Body() reinstall: Reinstall) {
-        return await this.authService.reinstall(reinstall);
+    @Post('signIn')
+    async signIn(@Body() signIn: SignInDto) {
+        return await this.authService.signIn(signIn);
     }
 }
