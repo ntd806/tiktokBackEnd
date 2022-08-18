@@ -1,4 +1,4 @@
-import { IsString, IsDateString, Length, Matches, IsEmail } from 'class-validator';
+import { IsString, IsDateString, Length, Matches, IsEmail, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
@@ -9,9 +9,12 @@ export class UserDto {
     birthdate: Date;
 
     @ApiProperty({
-        description: '0: male, 1: female'
+        description: 'M: male, F: female'
     })
     @IsString()
+    @Matches(/[M|F]/, {
+        message: 'no gender specified'
+    })
     sex: string;
 
     @ApiProperty({
@@ -31,5 +34,6 @@ export class UserDto {
     })
     @IsString()
     @IsEmail()
-    email: string;
+    @ValidateIf((object, value) => value !== null)
+    email!: string;
 }
