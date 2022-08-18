@@ -33,7 +33,6 @@ export class AuthService {
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
             const user = await this.userService.findByPhoneNumber(verifyDto.phone);
-
             if (!user) {
                 return new BaseResponse(
                     STATUSCODE.PHONE_IS_NEW_801,
