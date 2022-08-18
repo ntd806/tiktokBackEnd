@@ -30,7 +30,7 @@ export class UserService {
     }
 
     async create(user: UserCreateDto) {
-        return await this.userModel.create(user);
+        return await this.userModel.create({...user, mac:[user.mac]});
     }
 
     async createUserByGGFb<T>(user: T) {
@@ -110,7 +110,7 @@ export class UserService {
                     'User not found');
             }
             const newUser = await this.updateSomeField(user, dto);
-            const access_token = await this.jwt.signToken(dto.phone, newUser.fullname);
+            const access_token = this.jwt.signToken(dto.phone, newUser.fullname);
             return new BaseResponse(
                 STATUSCODE.PHONE_UPDATE_SUCCESS_4011,
                 {
