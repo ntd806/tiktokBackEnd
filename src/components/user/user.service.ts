@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import { JwtService } from '../../common';
-import { STATUSCODE } from '../../constants';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
 
@@ -22,19 +22,50 @@ export class UserService {
     }
 
     async findByEmail(email: string) {
-        return await this.userModel.findOne({ where: { email } });
+        return await this.userModel.findOne({ email });
     }
 
     async findByPhoneNumber(phone: string) {
-        return await this.userModel.findOne({ where: { phone } });
+        return await this.userModel.findOne({ phone });
     }
 
     async create(user: UserCreateDto) {
-        return await this.userModel.create({...user, mac:[user.mac]});
+        return await this.userModel.create({ ...user, mac: [user.mac] });
     }
 
     async createUserByGGFb<T>(user: T) {
         return await this.userModel.create(user);
+    }
+
+    async deleteUser(userId: string) {
+        try {
+            const user = await this.userModel.findById(userId);
+            if (user) {
+                await this.userModel.findByIdAndDelete(userId);
+                return new BaseResponse(STATUSCODE.DELETE_USER_SUCCESS,
+                    null,
+                    MESSAGE.DELETE_SUCCESS)
+            }
+            return new BaseErrorResponse(STATUSCODE.USER_NOT_FOUND_400,
+                MESSAGE_ERROR.USER_NOT_FOUND) 
+        } catch (err) {
+            throw new BadRequestException(err)
+        }
+    }
+
+    async deleteAllUsers() {
+        try {
+            const users = await this.userModel.find();
+            for (const user of users) {
+                this.userModel.findByIdAndDelete(user._id)
+            }
+            return new BaseResponse(
+                STATUSCODE.DELETE_ALL_USERS_SUCCESS_205,
+                'Delete all users successfully'
+            )
+        } catch (err) {
+            throw new BadRequestException(err);
+        }
     }
 
     async getUser(user: User) {

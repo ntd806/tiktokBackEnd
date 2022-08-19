@@ -9,6 +9,8 @@ import {
     UploadedFile,
     UseInterceptors,
     Query,
+    Delete,
+    Param,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
@@ -140,5 +142,35 @@ export class UserController {
             req.user,
             UpdateGameDto
         );
+    }
+
+    @ApiOperation({
+        summary: 'Clear all users'
+    })
+    @ApiResponse({
+        status: STATUSCODE.DELETE_ALL_USERS_SUCCESS_205,
+        description: 'Deleted users'
+    })
+    @UseGuards(JwtGuard)
+    @Delete('deleteAllUsers')
+    async deleteAllUsers() {
+        return await this.userService.deleteAllUsers();
+    }
+
+    @ApiResponse({
+        status: STATUSCODE.DELETE_USER_SUCCESS,
+        description: 'Deleted user'
+    })
+    @ApiResponse({
+        status: STATUSCODE.USER_NOT_FOUND_400,
+        description: 'User not found'
+    })
+    @ApiOperation({
+        summary: 'Delete user by userId'
+    })
+    @UseGuards(JwtGuard)
+    @Delete(':userId')
+    async deleteUser(@Param('userId') userId: string) {
+        return await this.userService.deleteUser(userId);
     }
 }
