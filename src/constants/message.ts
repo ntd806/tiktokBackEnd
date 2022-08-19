@@ -5,4 +5,5 @@ export enum MESSAGE {
     PHONE_USE_OLD_DEVICE = 'The old device',
     PHONE_USE_ANOTHER_DEVICE = 'the another device',
     SIGNIN_SUCCESS = 'Sign in successfully',
+    DELETE_SUCCESS = 'Delete successfully'
 }
