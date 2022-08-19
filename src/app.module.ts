@@ -14,6 +14,7 @@ import { ChatModule } from './components/chat/chat.module';
 import { SearchModule } from './components/search/search.module';
 import { TagModule } from './components/tag/tag.module';
 import { AssetsModule } from './components/assets/assets.module';
+import { BannerModule } from './components/banner/banner.module';
 import * as dotenv from 'dotenv';
 dotenv.config();
 @Module({
@@ -35,7 +36,8 @@ dotenv.config();
         SupportModule,
         VideoModule,
         TagModule,
-        AssetsModule
+        AssetsModule,
+        BannerModule
     ],
     controllers: []
 })
