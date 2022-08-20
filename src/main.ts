@@ -17,7 +17,10 @@ import 'reflect-metadata';
     app.useGlobalPipes(new ValidationPipe({
         exceptionFactory: (validationErrors: ValidationError[] = []) => {
             console.error(JSON.stringify(validationErrors));
-            return new BadRequestException(validationErrors);
+            return new BadRequestException(validationErrors.map(error => ({
+                property: error.property,
+                validators: error.constraints
+            })));
           },
     }));
     SwaggerModule.setup('api/v1', app, createDocument(app));
