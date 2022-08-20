@@ -29,12 +29,15 @@ import {
     ApiParam
 } from '@nestjs/swagger';
 import { STATUSCODE } from '../../constants';
+import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
+import { FileSizeValidationPipe } from 'src/validator/pipe/fileSize.pipe';
+import { Express } from 'express';
 @UseGuards(JwtStrategy)
 @ApiBearerAuth('Authorization')
 @ApiTags('user')
 @Controller('/api/v1/user')
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(private userService: UserService) { }
 
     @ApiOperation({
         summary: 'Get user information'
@@ -77,11 +80,14 @@ export class UserController {
     @UseInterceptors(FileInterceptor('file', multerOptions))
     async updateAvata(
         @Request() req,
-        @Body() dto: AvataDto,
-        @UploadedFile('file') file
+        @UploadedFile(
+            ParseFilePipe
+        ) file: Express.Multer.File
     ) {
-        dto.avatar = file.filename;
-        return await this.userService.updateAvatar(req.user, dto);
+        const avatarDto: AvataDto = {
+            avatar: file.filename
+        }
+        return await this.userService.updateAvatar(req.user, avatarDto);
     }
 
     @ApiOperation({

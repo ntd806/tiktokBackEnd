@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsOptional, IsString, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AvataDto {
@@ -6,5 +6,6 @@ export class AvataDto {
         description: 'avatar of user'
     })
     @IsString()
+    @ValidateIf((object, value) => value !== null)
     avatar: string;
 }

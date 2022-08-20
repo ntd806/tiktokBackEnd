@@ -1,5 +1,6 @@
-import { IsNotEmpty, IsOptional, IsPositive } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsPositive } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 
 export class SearchProductDto {
     @IsNotEmpty()
@@ -8,11 +9,13 @@ export class SearchProductDto {
 
     @IsOptional()
     @IsPositive()
-    @ApiProperty()
-    limit = 10;
+    @ApiProperty({default: 10})
+    @Transform(({value}) => Number(value))
+    limit: number;
 
     @IsOptional()
-    @IsPositive()
-    @ApiProperty()
-    offset = 0;
+    @IsNumber()
+    @ApiProperty({default: 0})
+    @Transform(({value}) => Number(value))
+    offset: number;
 }
