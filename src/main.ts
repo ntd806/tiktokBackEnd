@@ -10,8 +10,10 @@ import { BadRequestException, ValidationError, ValidationPipe } from '@nestjs/co
 
 dotenv.config();
 import 'reflect-metadata';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 (async () => {
-    const app = await NestFactory.create(AppModule, { cors: true });
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, { cors: true });
     app.useGlobalFilters(new HttpExceptionFilter());
     const configService = app.get(ConfigService);
     app.useGlobalPipes(new ValidationPipe({
@@ -22,8 +24,10 @@ import 'reflect-metadata';
                 validators: error.constraints
             })));
           },
+          transform: true
     }));
     SwaggerModule.setup('api/v1', app, createDocument(app));
+    app.useStaticAssets(join(__dirname, '..', 'public'));
     await app.listen(configService.get().port);
     console.info('SERVER IS RUNNING ON PORT', configService.get().port);
 })();
