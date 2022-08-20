@@ -26,7 +26,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message:
                 status !== HttpStatus.INTERNAL_SERVER_ERROR
                     ? exception['message']['error'] ||
-                      exception['message'] ||
+                      exception['response']['message'] ||
                       null
                     : 'Internal server error'
         };
