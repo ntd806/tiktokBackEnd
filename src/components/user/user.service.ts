@@ -55,10 +55,10 @@ export class UserService {
 
     async deleteAllUsers() {
         try {
-            const users = await this.userModel.find();
-            for (const user of users) {
-                this.userModel.findByIdAndDelete(user._id)
-            }
+            await this.userModel.deleteMany({});
+            // for (const user of users) {
+            //     this.userModel.findByIdAndDelete(user._id)
+            // }
             return new BaseResponse(
                 STATUSCODE.DELETE_ALL_USERS_SUCCESS_205,
                 'Delete all users successfully'

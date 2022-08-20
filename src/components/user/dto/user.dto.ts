@@ -24,7 +24,7 @@ export class UserDto {
     @Length(0, 30, {
         message: 'Full name must be less than 30 characters'
     })
-    @Matches(/^[a-zA-Z0-9\s]+$/i, {
+    @Matches(/^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/i, {
         message: 'Invalid username',
     })
     fullname: string;
