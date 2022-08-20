@@ -8,6 +8,7 @@ import { JwtService } from '../../common';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
+import { unlink, unlinkSync } from 'fs';
 
 @Injectable()
 export class UserService {
@@ -166,11 +167,16 @@ export class UserService {
                     'User not found');
             }
 
+            if(userById.avatar) {
+                const pathLocation = `./public/image/${userById.avatar}`;
+                unlinkSync(pathLocation);
+            }
+
             const newUser = await this.updateSomeField(user, dto);
             return new BaseResponse(
                 STATUSCODE.USER_AVATAR_UPLOADED_4013,
                 newUser,
-                'Update avata number successfully'
+                'Update avatar successfully'
             )
         } catch (error) {
             console.log(error);
