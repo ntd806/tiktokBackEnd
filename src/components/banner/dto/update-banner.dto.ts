@@ -2,8 +2,10 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateBannerDto } from './create-banner.dto';
 import {
     IsBoolean,
-    IsString
+    IsString,
+    ValidateIf
 } from 'class-validator';
+import { BannerMetadata } from '../entities/banner.entity';
 
 export class UpdateBannerDto extends PartialType(CreateBannerDto) {
     @ApiProperty()
@@ -22,8 +24,9 @@ export class UpdateBannerDto extends PartialType(CreateBannerDto) {
     @IsBoolean()
     transparent?: boolean;
 
-    // @ApiProperty()
-    // metadata?: MetadataDTO;
+    @ApiProperty({required: false})
+    @ValidateIf((object, value) => value !== null)
+    metadata?: BannerMetadata;
 
     @ApiProperty()
     @IsString()
@@ -44,9 +47,4 @@ export class UpdateBannerDto extends PartialType(CreateBannerDto) {
     @ApiProperty()
     @IsBoolean()
     hidden?: false;
-}
-
-interface MetadataDTO {
-    description: string;
-    title: string;
 }

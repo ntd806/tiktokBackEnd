@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsArray, IsDateString, IsNotEmpty, IsString, MaxLength, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TagUpdateDto {
@@ -6,11 +6,47 @@ export class TagUpdateDto {
         description: 'Name of tag'
     })
     @IsString()
+    @IsNotEmpty()
+    @MaxLength(30)
     name: string;
 
     @ApiProperty({
-        description: 'Name of tag update'
+        description: 'Updated by',
+        required: false,
+        default: ''
     })
     @IsString()
-    nameUpdate: string;
+    @IsNotEmpty()
+    updatedBy: string
+
+    @ApiProperty({
+        description: 'Updated at',
+        required: false
+    })
+    @IsDateString()
+    @ValidateIf((object, value) => value !== null)
+    updatedAt: Date;
+
+    @ApiProperty({
+        description: 'Tag related',
+        required: false,
+        default: []
+    })
+    @IsArray()
+    @ValidateIf((object, value) => value !== null)
+    tagRelate: [
+        {
+            tagId: string;
+            tagName: string;
+        }
+    ]
+
+    @ApiProperty({
+        description: 'Tag category',
+        required: false,
+        default: ''
+    })
+    @IsString()
+    @ValidateIf((object, value) => value !== null)
+    tagCategory: string;
 }

@@ -1,17 +1,15 @@
-import { Column, Entity } from 'typeorm';
 import { Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
 
 @Schema()
 export class Banner extends Document {
     _id: string;
 
     @Prop({ required: false, name: 'createdAt' })
-    createdAt: string;
+    createdAt: Date;
 
     @Prop({ required: false, name: 'updatedAt' })
-    updatedAt: string;
+    updatedAt: Date;
 
     @Prop({ required: false, name: 'status' })
     status: string;
@@ -26,13 +24,14 @@ export class Banner extends Document {
     transparent: boolean;
 
     @Prop({ type: Object })
-    metadata: Metadata;
+    metadata: BannerMetadata;
 
     @Prop({ required: false, name: 'title' })
     title: string;
 
     @Prop({ required: false, name: 'campaignId' })
     campaignId: string;
+
     @Prop({ required: false, name: 'startDate' })
     startDate: Date;
 
@@ -40,12 +39,16 @@ export class Banner extends Document {
     endDate: Date;
 
     @Prop({ required: false, name: 'hidden' })
-    hidden: false;
+    hidden: boolean;
 }
 
-interface Metadata {
+export interface BannerMetadata {
     description: string;
     title: string;
+    image: {
+        url: string;
+        name: string;
+    }
 }
 
 const BannerSchema = SchemaFactory.createForClass(Banner);

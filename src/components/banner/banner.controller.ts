@@ -6,39 +6,226 @@ import {
     Patch,
     Param,
     Delete,
-    UseGuards
+    UseGuards,
+    Req,
+    UseInterceptors,
+    UploadedFile,
+    Query,
+    Request
 } from '@nestjs/common';
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { multerBannerOptions } from 'src/vender/helper/Helper';
+import { MESSAGE, STATUSCODE } from 'src/constants';
+import { PaginateQueryDto } from './dto/paginate.dto';
+import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
+import { Express } from 'express'
 
 @ApiBearerAuth('Authorization')
 @ApiTags('banner')
 @UseGuards(JwtGuard)
 @Controller('/api/v1/banner')
 export class BannerController {
-    constructor(private readonly bannerService: BannerService) {}
+    constructor(private readonly bannerService: BannerService) { }
 
     @Post()
-    create(@Body() createBannerDto: CreateBannerDto) {
-        return this.bannerService.create(createBannerDto);
+    @ApiConsumes('multipart/form-data')
+    @UseInterceptors(FileInterceptor('file', multerBannerOptions))
+    @ApiResponse({
+        status: STATUSCODE.BANNER_CREATE_SUCCESS_120,
+        description: MESSAGE.CREATE_SUCCESS
+    })
+    @ApiResponse({
+        status: STATUSCODE.BANNER_CREATE_FAIL_121,
+        description: MESSAGE.CREATE_FAILED
+    })
+    @ApiResponse({
+        status: STATUSCODE.COMMON_BAD_REQUEST,
+        description: 'validation error'
+    })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                createdAt: {
+                    type: 'datetime',
+                    format: 'datetime',
+                    default: 'now()',
+                    nullable: true
+                },
+                updatedAt: {
+                    type: 'datetime',
+                    format: 'datetime',
+                    nullable: true
+                },
+                status: {
+                    type: 'string',
+                },
+                template: {
+                    type: 'string',
+                    nullable: true
+                },
+                imageUrl: {
+                    type: 'string',
+                    nullable: true
+                },
+                transparent: {
+                    type: 'boolean',
+                },
+                metadata: {
+                    type: 'object',
+                    nullable: true
+                },
+                title: {
+                    type: 'string',
+                },
+                campaignId: {
+                    type: 'string',
+                    nullable: true
+                },
+                startDate: {
+                    type: 'datetime',
+                    format: 'datetime',
+                    default: 'now()'
+                },
+                endDate: {
+                    type: 'datetime',
+                    format: 'datetime'
+                },
+                hidden: {
+                    type: 'boolean',
+                    default: false
+                }
+            },
+        }
+    })
+    create(@Request() req, @UploadedFile(
+        ParseFilePipe
+    ) file: Express.Multer.File, @Body() createBannerDto: CreateBannerDto) {
+        return this.bannerService.create(req, createBannerDto, file);
     }
 
     @Get()
-    async findAll() {
-        return await this.bannerService.findAll();
+    @ApiResponse({
+        status: STATUSCODE.BANNER_LIST_SUCCESS_128,
+        description: MESSAGE.LIST_SUCCESS
+    })
+    @ApiResponse({
+        status: STATUSCODE.BANNER_LIST_FAIL_129,
+        description: MESSAGE.LIST_FAILED
+    })
+    @ApiResponse({
+        status: STATUSCODE.COMMON_BAD_REQUEST,
+        description: 'validation error'
+    })
+    async paginateBanner(
+        @Query() paginateQuery: PaginateQueryDto
+    ) {
+        return await this.bannerService.paginateBanner(paginateQuery.offset, paginateQuery.limit);
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.bannerService.findOne(id);
+    @ApiResponse({
+        status: STATUSCODE.BANNER_READ_SUCCESS_124,
+        description: MESSAGE.LIST_SUCCESS
+    })
+    @ApiResponse({
+        status: STATUSCODE.BANNER_READ_FAIL_125,
+        description: MESSAGE.LIST_FAILED
+    })
+    @ApiResponse({
+        status: STATUSCODE.COMMON_NOT_FOUND,
+        description: 'not found'
+    })
+    async getById(@Param('id') id: string) {
+        return await this.bannerService.getBannerById(id);
     }
 
     @Patch(':id')
-    update(@Param('id') id: string, @Body() updateBannerDto: UpdateBannerDto) {
-        return this.bannerService.update(id, updateBannerDto);
+    @ApiResponse({
+        status: STATUSCODE.BANNER_UPDATE_SUCCESS_122,
+        description: MESSAGE.UPDATE_SUCCESS
+    })
+    @ApiResponse({
+        status: STATUSCODE.BANNER_UPDATE_FAIL_123,
+        description: MESSAGE.UPDATE_FAILED
+    })
+    @ApiResponse({
+        status: STATUSCODE.COMMON_NOT_FOUND,
+        description: 'not found'
+    })
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary',
+                },
+                createdAt: {
+                    type: 'datetime',
+                    format: 'datetime',
+                    default: 'now()',
+                    nullable: true
+                },
+                updatedAt: {
+                    type: 'datetime',
+                    format: 'datetime',
+                    nullable: true
+                },
+                status: {
+                    type: 'string',
+                },
+                template: {
+                    type: 'string',
+                    nullable: true
+                },
+                imageUrl: {
+                    type: 'string',
+                    nullable: true
+                },
+                transparent: {
+                    type: 'boolean',
+                },
+                metadata: {
+                    type: 'object',
+                    nullable: true
+                },
+                title: {
+                    type: 'string',
+                },
+                campaignId: {
+                    type: 'string',
+                    nullable: true
+                },
+                startDate: {
+                    type: 'datetime',
+                    format: 'datetime',
+                    default: 'now()'
+                },
+                endDate: {
+                    type: 'datetime',
+                    format: 'datetime'
+                },
+                hidden: {
+                    type: 'boolean',
+                    default: false
+                }
+            },
+        }
+    })
+    @UseInterceptors(FileInterceptor('file', multerBannerOptions))
+    update(@Request() req, @Param('id') id: string, @UploadedFile(ParseFilePipe) file: Express.Multer.File, @Body() updateBannerDto: UpdateBannerDto) {
+        return this.bannerService.update(req, id, updateBannerDto, file);
     }
 
     @Delete(':id')

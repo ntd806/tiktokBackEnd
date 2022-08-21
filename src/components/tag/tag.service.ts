@@ -1,124 +1,97 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TagDto, TagUpdateDto } from './dto';
-import { User } from './model/user.schema';
+import { Tag } from './model/tag.schema';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
+import { BaseErrorResponse, BaseResponse } from 'src/common';
 
 @Injectable()
 export class TagService {
     constructor(
-        @InjectModel(User.name)
-        private readonly userModel: Model<User>
+        @InjectModel(Tag.name)
+        private readonly tagModel: Model<Tag>
     ) {}
 
-    public async findAll(user: User, paginationQuery: PaginationQueryDto) {
+    public async findTagsPaginate(paginationQuery: PaginationQueryDto) {
         try {
             const { limit, offset } = paginationQuery;
-            return {
-                code: 10005,
-                data: user.tag.slice((offset - 1) * limit, offset * limit),
-                message: 'Get list tag successfully'
-            };
+            const tags = await this.tagModel.find().skip(offset).limit(limit);
+            return new BaseResponse(
+                STATUSCODE.TAG_LIST_SUCCESS_105,
+                tags,
+                'Get list tag successfully'
+            );
         } catch (err) {
-            return {
-                code: 10006,
-                data: false,
-                message: 'Get list tag failed'
-            };
+            throw new BadRequestException('Get list tag failed');
         }
     }
 
-    public async create(user: User, TagDto: TagDto) {
-        let tagCreate = [];
-        if (typeof user.tag == 'undefined') {
-            tagCreate = [{ name: TagDto.name }];
-        } else {
-            tagCreate = user.tag;
-            const index = tagCreate.find(({ name }) => name === TagDto.name);
-            if (index) {
-                return {
-                    code: 10002,
-                    data: true,
-                    message: 'Error: Tag not created!'
-                };
-            } else {
-                tagCreate.push({ name: TagDto.name });
-            }
-        }
-        await this.userModel.findOneAndUpdate(
-            { _id: user._id },
-            {
-                tag: tagCreate
-            }
-        );
-        return {
-            code: 10001,
-            data: true,
-            message: 'Create Tag successfully'
-        };
+    async getTagById(tagId: string) {
+        return await this.tagModel.findById(tagId);
     }
 
-    public async update(user: User, TagUpdateDto: TagUpdateDto) {
-        if (typeof user.tag == 'undefined') {
-            return {
-                code: 10004,
-                data: false,
-                message: 'Update tag failed'
-            };
-        } else {
-            const index = user.tag
-                .map(function (e) {
-                    return e.name;
-                })
-                .indexOf(TagUpdateDto.name);
-            if (index > -1) {
-                user.tag.splice(index, 1);
-                user.tag.push({ name: TagUpdateDto.nameUpdate });
-                await user.save();
-                return {
-                    code: 10003,
-                    data: false,
-                    message: 'Update tag successfully'
-                };
-            } else {
-                return {
-                    code: 10004,
-                    data: false,
-                    message: 'Error: Tag not updated!'
-                };
-            }
+    async updateTag<T>(tagId: string, tagUpdate: T) {
+        this.tagModel.findByIdAndUpdate({ _id: tagId }, { $set: tagUpdate }, { new: true })
+    }
+
+    async deleteTagById(tagId: string) {
+        return await this.tagModel.findByIdAndDelete(tagId);
+    }
+
+    public async create(tagDto: TagDto) {
+        try {
+            const tag = await this.tagModel.create(tagDto);
+            return new BaseResponse(STATUSCODE.TAG_CREATE_SUCCESS_101,
+                tag,
+                MESSAGE.CREATE_SUCCESS
+                )
+        } catch (err) {
+            throw new BadRequestException(MESSAGE_ERROR.CREATE_FAILED)
         }
     }
 
-    public async remove(user: User, TagDto: TagDto) {
-        if (typeof user.tag == 'undefined') {
-            return {
-                code: 10007,
-                data: false,
-                message: 'Delete tag failed'
-            };
-        } else {
-            const index = user.tag
-                .map(function (e) {
-                    return e.name;
-                })
-                .indexOf(TagDto.name);
-            if (index > -1) {
-                user.tag.splice(index, 1);
-                await user.save();
-                return {
-                    code: 10008,
-                    data: false,
-                    message: 'Delete tag successfully'
-                };
-            } else {
-                return {
-                    code: 10007,
-                    data: false,
-                    message: 'Delete tag false'
-                };
+    public async update(tagId: string, tagUpdateDto: TagUpdateDto) {
+        try {
+            const tag = await this.getTagById(tagId);
+            if(!tag) {
+                return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND)
             }
+
+            const newTag = await this.updateTag(tagId, tagUpdateDto);
+            return new BaseResponse(
+                STATUSCODE.TAG_UPDATE_SUCCESS_103,
+                newTag,
+                MESSAGE.UPDATE_SUCCESS
+            )
+        } catch (err) {
+            throw new BadRequestException(MESSAGE_ERROR.UPDATE_FAILED);
         }
+    }
+
+    async deleteTag(tagId: string) {
+        try {
+            const tag = await this.getTagById(tagId);
+            if(!tag) {
+                return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND);
+            }
+            await this.deleteTagById(tagId);
+            return new BaseResponse(STATUSCODE.TAG_DELETE_SUCCESS_107, null, MESSAGE.DELETE_SUCCESS)
+        } catch (err) {
+            throw new BadRequestException(MESSAGE_ERROR.DELETE_FAILED)
+        }
+    }
+
+    async getTag(tagId: string) {
+        try {
+            const tag = await this.getTagById(tagId);
+            if(!tag) {
+                return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND);
+            }
+            return new BaseResponse(STATUSCODE.TAG_DELETE_SUCCESS_107, tag, MESSAGE.DELETE_SUCCESS)
+        } catch (err) {
+            throw new BadRequestException(MESSAGE_ERROR.NOT_FOUND)
+        } 
     }
 }
