@@ -87,7 +87,7 @@ export class UserController {
         const avatarDto: AvataDto = {
             metadata: {
                 name: file.filename,
-                url:`${req.headers['x-forwarded-proto'] ?? req.protocol}://${req.headers.host}/image/${file.filename}`
+                url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
             }
         }
         return await this.userService.updateAvatar(req.user, avatarDto);

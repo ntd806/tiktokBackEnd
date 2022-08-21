@@ -6,22 +6,28 @@ import {
     ValidateIf
 } from 'class-validator';
 import { BannerMetadata } from '../entities/banner.entity';
+import { Transform } from 'class-transformer';
 
 export class UpdateBannerDto extends PartialType(CreateBannerDto) {
     @ApiProperty()
     @IsString()
     status?: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+        default: ''
+    })
     @IsString()
+    @ValidateIf((object, value) => value !== null && value !== undefined)
     imageUrl?: string;
 
     @ApiProperty()
     @IsString()
     template?: string;
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @IsBoolean()
+    @Transform(value => Boolean(value))
     transparent?: boolean;
 
     @ApiProperty({required: false})
@@ -44,7 +50,8 @@ export class UpdateBannerDto extends PartialType(CreateBannerDto) {
     @IsString()
     endDate?: Date;
 
-    @ApiProperty()
+    @ApiProperty({ default: false})
     @IsBoolean()
-    hidden?: false;
+    @Transform(value => Boolean(value))
+    hidden?: boolean;
 }

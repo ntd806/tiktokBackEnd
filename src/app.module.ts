@@ -17,6 +17,7 @@ import { AssetsModule } from './components/assets/assets.module';
 import { BannerModule } from './components/banner/banner.module';
 import * as dotenv from 'dotenv';
 import { MulterModule } from '@nestjs/platform-express';
+import { DESTINATION } from './constants';
 dotenv.config();
 @Module({
     imports: [
@@ -40,7 +41,7 @@ dotenv.config();
         AssetsModule,
         BannerModule,
         MulterModule.register({
-            dest: './public/image'
+            dest: DESTINATION.IMAGE
         })
     ],
     controllers: []

@@ -55,17 +55,6 @@ export class BannerController {
                     type: 'string',
                     format: 'binary',
                 },
-                createdAt: {
-                    type: 'datetime',
-                    format: 'datetime',
-                    default: 'now()',
-                    nullable: true
-                },
-                updatedAt: {
-                    type: 'datetime',
-                    format: 'datetime',
-                    nullable: true
-                },
                 status: {
                     type: 'string',
                 },
@@ -73,16 +62,8 @@ export class BannerController {
                     type: 'string',
                     nullable: true
                 },
-                imageUrl: {
-                    type: 'string',
-                    nullable: true
-                },
                 transparent: {
                     type: 'boolean',
-                },
-                metadata: {
-                    type: 'object',
-                    nullable: true
                 },
                 title: {
                     type: 'string',
@@ -107,10 +88,10 @@ export class BannerController {
             },
         }
     })
-    create(@Request() req, @UploadedFile(
+    create(@Req() req, @UploadedFile(
         ParseFilePipe
     ) file: Express.Multer.File, @Body() createBannerDto: CreateBannerDto) {
-        return this.bannerService.create(req, createBannerDto, file);
+        return this.bannerService.create(req.user.id, createBannerDto, file);
     }
 
     @Get()
@@ -171,17 +152,6 @@ export class BannerController {
                     type: 'string',
                     format: 'binary',
                 },
-                createdAt: {
-                    type: 'datetime',
-                    format: 'datetime',
-                    default: 'now()',
-                    nullable: true
-                },
-                updatedAt: {
-                    type: 'datetime',
-                    format: 'datetime',
-                    nullable: true
-                },
                 status: {
                     type: 'string',
                 },
@@ -189,16 +159,8 @@ export class BannerController {
                     type: 'string',
                     nullable: true
                 },
-                imageUrl: {
-                    type: 'string',
-                    nullable: true
-                },
                 transparent: {
                     type: 'boolean',
-                },
-                metadata: {
-                    type: 'object',
-                    nullable: true
                 },
                 title: {
                     type: 'string',
@@ -224,10 +186,22 @@ export class BannerController {
         }
     })
     @UseInterceptors(FileInterceptor('file', multerBannerOptions))
-    update(@Request() req, @Param('id') id: string, @UploadedFile(ParseFilePipe) file: Express.Multer.File, @Body() updateBannerDto: UpdateBannerDto) {
-        return this.bannerService.update(req, id, updateBannerDto, file);
+    update(@Req() req, @Param('id') id: string, @UploadedFile(ParseFilePipe) file: Express.Multer.File, @Body() updateBannerDto: UpdateBannerDto) {
+        return this.bannerService.update(req.user.id, id, updateBannerDto, file);
     }
 
+    @ApiResponse({
+        status: STATUSCODE.BANNER_DELETE_SUCCESS_126,
+        description: MESSAGE.DELETE_SUCCESS
+    })
+    @ApiResponse({
+        status: STATUSCODE.BANNER_DELETE_FAIL_127,
+        description: MESSAGE.DELETE_FAILED
+    })
+    @ApiResponse({
+        status: STATUSCODE.COMMON_NOT_FOUND,
+        description: 'not found'
+    })
     @Delete(':id')
     remove(@Param('id') id: string) {
         return this.bannerService.remove(id);
