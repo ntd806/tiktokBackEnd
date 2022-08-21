@@ -22,8 +22,11 @@ export class User extends Document {
     @Prop()
     phone: string;
 
-    @Prop()
-    avatar: string;
+    @Prop({type: 'object'})
+    metadata: {
+        url: string;
+        name: string;
+    }
 
     @Prop({ type: 'array' })
     like: [

@@ -6,6 +6,7 @@ import { SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import { HttpExceptionFilter } from './vender/core/filter/exception.filter';
 import { BadRequestException, ValidationError, ValidationPipe } from '@nestjs/common';
+import { urlencoded, json } from 'express';
 // import { Transport } from '@nestjs/microservices';
 
 dotenv.config();
@@ -28,6 +29,8 @@ import { join } from 'path';
     }));
     SwaggerModule.setup('api/v1', app, createDocument(app));
     app.useStaticAssets(join(__dirname, '..', 'public'));
+    app.use(json({ limit: '50mb' }));
+    app.use(urlencoded({ extended: true, limit: '50mb' }));
     await app.listen(configService.get().port);
     console.info('SERVER IS RUNNING ON PORT', configService.get().port);
 })();

@@ -4,6 +4,7 @@ import {
     IsDate,
     IsString
 } from 'class-validator';
+import { BannerMetadata } from '../entities/banner.entity';
 
 export class CreateBannerDto {
     @ApiProperty()
@@ -22,8 +23,8 @@ export class CreateBannerDto {
     @IsBoolean()
     transparent?: boolean;
 
-    // @ApiProperty()
-    // metadata?: MetadataDTO;
+    @ApiProperty({ required: false})
+    metadata?: BannerMetadata;
 
     @ApiProperty()
     @IsString()

@@ -8,14 +8,17 @@ import { JwtService } from '../../common';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
-import { unlink, unlinkSync } from 'fs';
+import { unlinkSync } from 'fs';
+import { HttpAdapterHost } from '@nestjs/core'
+import { Request } from 'express';
 
 @Injectable()
 export class UserService {
     constructor(
         private readonly jwt: JwtService,
         @InjectModel(User.name)
-        private readonly userModel: Model<User>
+        private readonly userModel: Model<User>,
+        private httpAdapterHost: HttpAdapterHost
     ) { }
 
     async findUserById(id: string) {
@@ -42,6 +45,9 @@ export class UserService {
         try {
             const user = await this.userModel.findById(userId);
             if (user) {
+                if(user.metadata && user.metadata.name) {
+                    unlinkSync(`./public/image/${user.metadata.name}`)
+                }
                 await this.userModel.findByIdAndDelete(userId);
                 return new BaseResponse(STATUSCODE.DELETE_USER_SUCCESS,
                     null,
@@ -162,13 +168,15 @@ export class UserService {
         try {
             const userById = await this.findUserById(user.id);
             if (!userById) {
+                const pathLocation = `./public/image/${dto.metadata.name}`;
+                unlinkSync(pathLocation);
                 return new BaseErrorResponse(
                     STATUSCODE.PHONE_NOTFOUND_4012,
                     'User not found');
             }
 
-            if(userById.avatar) {
-                const pathLocation = `./public/image/${userById.avatar}`;
+            if(userById.metadata && !userById.social) {
+                const pathLocation = `./public/image/${userById.metadata.name}`;
                 unlinkSync(pathLocation);
             }
 
@@ -180,6 +188,8 @@ export class UserService {
             )
         } catch (error) {
             console.log(error);
+            const pathLocation = `./public/image/${dto.metadata.name}`;
+            unlinkSync(pathLocation);
             return new BaseErrorResponse(
                 STATUSCODE.PHONE_NOTFOUND_4012,
                 'User not found');

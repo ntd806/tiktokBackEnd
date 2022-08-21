@@ -7,7 +7,7 @@ import {
     Delete,
     Query,
     UseGuards,
-    Request
+    Param
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -20,6 +20,7 @@ import { TagService } from './tag.service';
 import { TagDto, TagUpdateDto } from './dto';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
 import { JwtGuard } from '../auth/guard';
+import { STATUSCODE } from 'src/constants';
 
 @ApiTags('tag')
 @UseGuards(JwtGuard)
@@ -27,7 +28,7 @@ import { JwtGuard } from '../auth/guard';
 @Controller('/api/v1/tag')
 @UseGuards(JwtGuard)
 export class TagController {
-    constructor(private TagService: TagService) {}
+    constructor(private tagService: TagService) {}
 
     @Get()
     @ApiOperation({
@@ -46,65 +47,79 @@ export class TagController {
         required: true
     })
     @ApiResponse({
-        status: 10005,
+        status: STATUSCODE.TAG_LIST_SUCCESS_105,
         description: 'Get all tag success'
     })
     @ApiResponse({
-        status: 10006,
+        status: STATUSCODE.TAG_LIST_FAIL_106,
         description: 'Get list tag failed'
     })
-    public async getAllTag(
-        @Request() req,
+    public async getTags(
         @Query() paginationQuery: PaginationQueryDto
     ) {
-        return await this.TagService.findAll(req.user, paginationQuery);
+        return await this.tagService.findTagsPaginate(paginationQuery);
+    }
+
+    @ApiResponse({
+        status: STATUSCODE.TAG_READ_SUCCESS_110,
+        description: 'Get tag success'
+    })
+    @ApiResponse({
+        status: STATUSCODE.TAG_READ_FAIL_111,
+        description: 'Get tag failed'
+    })
+    @Get(':tagId')
+    public async getTag(
+        @Param('tagId') tagId: string
+    ) {
+        return await this.tagService.getTag(tagId);
     }
 
     @ApiOperation({
         summary: 'Add new tag'
     })
     @ApiResponse({
-        status: 10001,
+        status: STATUSCODE.TAG_CREATE_SUCCESS_101,
         description: 'Tag has been created successfully'
     })
     @ApiResponse({
-        status: 10002,
-        description: 'Error: Tag not created!'
+        status: STATUSCODE.TAG_CREATE_FAIL_102,
+        description: 'Tag create failed!'
     })
     @Post()
-    public async addTag(@Request() req, @Body() tagDto: TagDto) {
-        return await this.TagService.create(req.user, tagDto);
+    public async createTag(@Body() tagDto: TagDto) {
+        return await this.tagService.create(tagDto);
     }
 
     @ApiOperation({
         summary: 'Update tag by id'
     })
     @ApiResponse({
-        status: 10003,
-        description: 'Tag has been successfully updated'
+        status: STATUSCODE.TAG_UPDATE_SUCCESS_103,
+        description: 'Tag update successfully'
     })
     @ApiResponse({
-        status: 10004,
-        description: 'Error: Tag not updated!'
+        status: STATUSCODE.TAG_UPDATE_FAIL_104,
+        description: 'Tag update failed!'
     })
-    @Put('/update')
-    public async updateTag(@Request() req, @Body() TagUpdateDto: TagUpdateDto) {
-        return await this.TagService.update(req.user, TagUpdateDto);
+    @Put(':tagId')
+    public async updateTag(@Param('tagId') tagId: string, @Body() tagUpdateDto: TagUpdateDto) {
+        return await this.tagService.update(tagId, tagUpdateDto);
     }
 
     @ApiOperation({
         summary: 'Delete tag by id'
     })
     @ApiResponse({
-        status: 10008,
+        status: STATUSCODE.TAG_DELETE_SUCCESS_107,
         description: 'Tag has been deleted'
     })
     @ApiResponse({
-        status: 10007,
+        status: STATUSCODE.TAG_DELETE_FAIL_108,
         description: 'Delete tag failed'
     })
-    @Delete('/delete')
-    public async deleteTag(@Request() req, @Body() tagDto: TagDto) {
-        return await this.TagService.remove(req.user, tagDto);
+    @Delete(':tagId')
+    public async deleteTag(@Param('tagId') tagId: string) {
+        return await this.tagService.deleteTagById(tagId);
     }
 }
