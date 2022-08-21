@@ -2,6 +2,7 @@ import path = require('path');
 import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { DESTINATION } from 'src/constants';
 
 // Multer configuration
 export const multerConfig = {
@@ -35,7 +36,7 @@ export const multerOptions = {
     // Storage properties
     storage: diskStorage({
         // Destination storage path details
-        destination: './public/image',
+        destination: DESTINATION.IMAGE,
         // File modification details
         filename: (req: any, file: any, cb: any) => {
             // Calling the callback passing the random name generated with the original extension name
@@ -74,7 +75,7 @@ export const multerBannerOptions = {
     // Storage properties
     storage: diskStorage({
         // Destination storage path details
-        destination: './public/image/banner',
+        destination: DESTINATION.BANNER,
         // File modification details
         filename: (req: any, file: any, cb: any) => {
             // Calling the callback passing the random name generated with the original extension name

@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import { JwtService } from '../../common';
-import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
+import { DESTINATION, MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
 import { unlinkSync } from 'fs';
@@ -46,7 +46,7 @@ export class UserService {
             const user = await this.userModel.findById(userId);
             if (user) {
                 if(user.metadata && user.metadata.name) {
-                    unlinkSync(`./public/image/${user.metadata.name}`)
+                    unlinkSync(`${DESTINATION.IMAGE}/${user.metadata.name}`)
                 }
                 await this.userModel.findByIdAndDelete(userId);
                 return new BaseResponse(STATUSCODE.DELETE_USER_SUCCESS,
@@ -168,7 +168,7 @@ export class UserService {
         try {
             const userById = await this.findUserById(user.id);
             if (!userById) {
-                const pathLocation = `./public/image/${dto.metadata.name}`;
+                const pathLocation = `${DESTINATION.IMAGE}/${dto.metadata.name}`;
                 unlinkSync(pathLocation);
                 return new BaseErrorResponse(
                     STATUSCODE.PHONE_NOTFOUND_4012,
@@ -176,7 +176,7 @@ export class UserService {
             }
 
             if(userById.metadata && !userById.social) {
-                const pathLocation = `./public/image/${userById.metadata.name}`;
+                const pathLocation = `${DESTINATION.IMAGE}/${userById.metadata.name}`;
                 unlinkSync(pathLocation);
             }
 
@@ -188,7 +188,7 @@ export class UserService {
             )
         } catch (error) {
             console.log(error);
-            const pathLocation = `./public/image/${dto.metadata.name}`;
+            const pathLocation = `${DESTINATION.IMAGE}/${dto.metadata.name}`;
             unlinkSync(pathLocation);
             return new BaseErrorResponse(
                 STATUSCODE.PHONE_NOTFOUND_4012,

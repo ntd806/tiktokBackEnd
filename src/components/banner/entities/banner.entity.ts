@@ -14,7 +14,7 @@ export class Banner extends Document {
     @Prop({ required: false, name: 'status' })
     status: string;
 
-    @Prop({ required: false, name: 'imageUrl' })
+    @Prop({ required: false, name: 'imageUrl', default: '' })
     imageUrl: string;
 
     @Prop({ required: false, name: 'template' })
@@ -40,6 +40,12 @@ export class Banner extends Document {
 
     @Prop({ required: false, name: 'hidden' })
     hidden: boolean;
+
+    @Prop({ required: false, name: 'createdBy' })
+    createdBy: string;
+
+    @Prop({ required: false, name: 'updatedBy' })
+    updatedBy: string;
 }
 
 export interface BannerMetadata {
@@ -52,7 +58,5 @@ export interface BannerMetadata {
 }
 
 const BannerSchema = SchemaFactory.createForClass(Banner);
-
-BannerSchema.set('timestamps', { createdAt: true, updatedAt: true });
 
 export { BannerSchema };
