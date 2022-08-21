@@ -75,7 +75,7 @@ export class BannerController {
                 startDate: {
                     type: 'datetime',
                     format: 'datetime',
-                    default: 'now()'
+                    default: null
                 },
                 endDate: {
                     type: 'datetime',
@@ -151,6 +151,8 @@ export class BannerController {
                 file: {
                     type: 'string',
                     format: 'binary',
+                    nullable: true,
+                    
                 },
                 status: {
                     type: 'string',
@@ -172,7 +174,7 @@ export class BannerController {
                 startDate: {
                     type: 'datetime',
                     format: 'datetime',
-                    default: 'now()'
+                    default: null
                 },
                 endDate: {
                     type: 'datetime',
@@ -186,8 +188,8 @@ export class BannerController {
         }
     })
     @UseInterceptors(FileInterceptor('file', multerBannerOptions))
-    update(@Req() req, @Param('id') id: string, @UploadedFile(ParseFilePipe) file: Express.Multer.File, @Body() updateBannerDto: UpdateBannerDto) {
-        return this.bannerService.update(req.user.id, id, updateBannerDto, file);
+    update(@Req() req, @Param('id') id: string,  @Body() updateBannerDto: UpdateBannerDto) {
+        return this.bannerService.update(req.user.id, id, updateBannerDto, req.file);
     }
 
     @ApiResponse({

@@ -83,11 +83,11 @@ export class BannerService {
         }
     }
 
-    async update(updatedBy: string, id: string, updateBannerDto: UpdateBannerDto, file?: Express.Multer.File) {
+    async update(updatedBy: string, id: string, updateBannerDto: UpdateBannerDto, file: Express.Multer.File) {
         try {
             const banner = await this.getById(id);
             if (!banner) {
-                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
+                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210, MESSAGE_ERROR.NOT_FOUND)
             }
 
             if(file) {
@@ -96,9 +96,18 @@ export class BannerService {
                     url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
                 }
                 if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
-                    unlinkSync(`${DESTINATION.BANNER}/${banner.metadata.image.name}`);
+                    try {
+                        unlinkSync(`${DESTINATION.BANNER}/${banner.metadata.image.name}`);
+                    } catch (e) {
 
-                    updateBannerDto.metadata.image = image;
+                    }
+
+                    const metadata = {
+                        ...banner.metadata,
+                        title: updateBannerDto.title || banner.metadata.title,
+                        image
+                    }
+                    updateBannerDto.metadata = metadata;
                     updateBannerDto.imageUrl = image.url;
 
                 } else {
@@ -122,6 +131,7 @@ export class BannerService {
             const newBanner = await this.updateById(id, updateWithTracking);
             return new BaseResponse(STATUSCODE.BANNER_UPDATE_SUCCESS_122, newBanner, 'success');
         } catch (error) {
+            console.log(error);
             if(file) {
                 unlinkSync(`${DESTINATION.BANNER}/${file.filename}`);
             }
