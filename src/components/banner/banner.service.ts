@@ -1,34 +1,126 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Banner } from './entities/banner.entity';
+import { Banner, BannerMetadata } from './entities/banner.entity';
+import { BaseErrorResponse, BaseResponse } from 'src/common';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
+import { Express, Request } from 'express'
+import { unlinkSync } from 'fs';
 
 @Injectable()
 export class BannerService {
     constructor(
         @InjectModel(Banner.name)
         private readonly model: Model<Banner>
-    ) {}
+    ) { }
 
-    create(createBannerDto: CreateBannerDto) {
-        return this.model.create({ ...createBannerDto });
+    async getById(id: string) {
+        return await this.model.findById(id)
     }
 
-    async findAll() {
-        return this.model.find();
+    async deleteById(id: string) {
+        return await this.model.findByIdAndDelete(id)
     }
 
-    findOne(id: string) {
-        return this.model.findById(id).exec();
+    async updateById<T>(id: string, banner: T) {
+        return await this.model.findByIdAndUpdate(id, { $set: banner }, { new: true })
     }
 
-    update(id: string, updateBannerDto: UpdateBannerDto) {
-        return this.model.findByIdAndUpdate(id, { ...updateBannerDto });
+    async create(request: Request, createBannerDto: CreateBannerDto, file: Express.Multer.File) {
+        const image = {
+            name: file.filename,
+            url:`${request.headers['x-forwarded-proto'] ?? request.protocol}://${request.headers.host}/image/${file.filename}`
+        }
+        const metadata: BannerMetadata = {
+            title: createBannerDto.title,
+            description: '',
+            image
+        }
+        createBannerDto.metadata = metadata;
+        try {
+            const banner = await this.model.create(createBannerDto);
+            return new BaseResponse(
+                STATUSCODE.BANNER_CREATE_SUCCESS_120,
+                banner,
+                MESSAGE.CREATE_SUCCESS
+            )
+        } catch (error) {
+            unlinkSync(`./public/image/banner/${image.name}`);
+            throw new BadRequestException(MESSAGE_ERROR.CREATE_FAILED)
+        }
     }
 
-    remove(id: string) {
-        return this.model.findByIdAndDelete({ _id: id });
+    async paginateBanner(offset: number, limit: number) {
+        try {
+            const banners = await this.model.find().skip(offset).limit(limit);
+            return new BaseResponse(STATUSCODE.BANNER_LIST_SUCCESS_128, banners, 'success');
+        } catch (error) {
+            throw new BadRequestException('get banners error')
+        }
+    }
+
+    async getBannerById(id: string) {
+        try {
+            const banner = await this.getById(id);
+            if (!banner) {
+                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
+            }
+            return new BaseResponse(STATUSCODE.BANNER_READ_SUCCESS_124, banner, 'success');
+        } catch (error) {
+            throw new NotFoundException(MESSAGE_ERROR.NOT_FOUND)
+        }
+    }
+
+    async update(request: Request , id: string, updateBannerDto: UpdateBannerDto, file?: Express.Multer.File) {
+        try {
+            const banner = await this.getById(id);
+            if (!banner) {
+                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
+            }
+
+            if(file) {
+                const image = {
+                    name: file.filename,
+                    url:`${request.headers['x-forwarded-proto'] ?? request.protocol}://${request.headers.host}/image/${file.filename}`
+                }
+                if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
+                    unlinkSync(`./public/image/banner/${banner.metadata.image.name}`);
+
+                    updateBannerDto.metadata.image = image;
+
+                } else {
+                    const metadata: BannerMetadata = {
+                        title: updateBannerDto.title || banner.title,
+                        description: '',
+                        image
+                    }
+
+                    updateBannerDto.metadata = metadata;
+                }
+            }
+
+            const newBanner = await this.updateById(id, updateBannerDto);
+            return new BaseResponse(STATUSCODE.BANNER_UPDATE_SUCCESS_122, newBanner, 'success');
+        } catch (error) {
+            if(file) {
+                unlinkSync(`./public/image/banner/${file.filename}`);
+            }
+            throw new NotFoundException(MESSAGE_ERROR.NOT_FOUND)
+        }
+    }
+
+    async remove(id: string) {
+        try {
+            const banner = await this.getById(id);
+            if (!banner) {
+                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
+            }
+            await this.deleteById(id);
+            return new BaseResponse(STATUSCODE.BANNER_DELETE_SUCCESS_126, null, 'success');
+        } catch (error) {
+            throw new NotFoundException(MESSAGE_ERROR.NOT_FOUND)
+        }
     }
 }

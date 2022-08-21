@@ -85,7 +85,10 @@ export class UserController {
         ) file: Express.Multer.File
     ) {
         const avatarDto: AvataDto = {
-            avatar: file.filename
+            metadata: {
+                name: file.filename,
+                url:`${req.headers['x-forwarded-proto'] ?? req.protocol}://${req.headers.host}/image/${file.filename}`
+            }
         }
         return await this.userService.updateAvatar(req.user, avatarDto);
     }
