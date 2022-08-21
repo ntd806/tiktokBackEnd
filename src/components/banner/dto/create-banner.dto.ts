@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
     IsBoolean,
     IsDate,
-    IsString
+    IsString,
+    ValidateIf
 } from 'class-validator';
 import { BannerMetadata } from '../entities/banner.entity';
 
@@ -11,16 +13,21 @@ export class CreateBannerDto {
     @IsString()
     status?: string;
 
-    @ApiProperty()
+    @ApiProperty({
+        required: false,
+        default: ''
+    })
     @IsString()
+    @ValidateIf((object, value) => value !== null && value !== undefined)
     imageUrl?: string;
 
     @ApiProperty()
     @IsString()
     template?: string;
 
-    @ApiProperty()
+    @ApiProperty({default: true})
     @IsBoolean()
+    @Transform(value => Boolean(value))
     transparent?: boolean;
 
     @ApiProperty({ required: false})
@@ -44,10 +51,7 @@ export class CreateBannerDto {
 
     @ApiProperty()
     @IsBoolean()
-    hidden?: false;
+    @Transform(value => Boolean(value))
+    hidden?: boolean;
 }
-//
-// interface MetadataDTO {
-//     description?: string;
-//     title?: string;
-// }
+

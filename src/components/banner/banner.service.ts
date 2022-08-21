@@ -5,9 +5,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Banner, BannerMetadata } from './entities/banner.entity';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
-import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
-import { Express, Request } from 'express'
+import { DESTINATION, MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
+import { Express } from 'express'
 import { unlinkSync } from 'fs';
+import { BaseTracking } from 'src/models';
+import * as moment from 'moment';
 
 @Injectable()
 export class BannerService {
@@ -28,10 +30,10 @@ export class BannerService {
         return await this.model.findByIdAndUpdate(id, { $set: banner }, { new: true })
     }
 
-    async create(request: Request, createBannerDto: CreateBannerDto, file: Express.Multer.File) {
+    async create(userId: string, createBannerDto: CreateBannerDto, file: Express.Multer.File) {
         const image = {
             name: file.filename,
-            url:`${request.headers['x-forwarded-proto'] ?? request.protocol}://${request.headers.host}/image/${file.filename}`
+            url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
         }
         const metadata: BannerMetadata = {
             title: createBannerDto.title,
@@ -39,15 +41,23 @@ export class BannerService {
             image
         }
         createBannerDto.metadata = metadata;
+        createBannerDto.imageUrl = image.url;
         try {
-            const banner = await this.model.create(createBannerDto);
+            const withTracking: CreateBannerDto & BaseTracking = {
+                ...createBannerDto,
+                createdAt: moment().toDate(),
+                createdBy: userId,
+                updatedBy: null,
+                updatedAt: null
+            }
+            const banner = await this.model.create(withTracking);
             return new BaseResponse(
                 STATUSCODE.BANNER_CREATE_SUCCESS_120,
                 banner,
                 MESSAGE.CREATE_SUCCESS
             )
         } catch (error) {
-            unlinkSync(`./public/image/banner/${image.name}`);
+            unlinkSync(`${DESTINATION.BANNER}/${image.name}`);
             throw new BadRequestException(MESSAGE_ERROR.CREATE_FAILED)
         }
     }
@@ -73,22 +83,32 @@ export class BannerService {
         }
     }
 
-    async update(request: Request , id: string, updateBannerDto: UpdateBannerDto, file?: Express.Multer.File) {
+    async update(updatedBy: string, id: string, updateBannerDto: UpdateBannerDto, file: Express.Multer.File) {
         try {
             const banner = await this.getById(id);
             if (!banner) {
-                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
+                return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210, MESSAGE_ERROR.NOT_FOUND)
             }
 
             if(file) {
                 const image = {
                     name: file.filename,
-                    url:`${request.headers['x-forwarded-proto'] ?? request.protocol}://${request.headers.host}/image/${file.filename}`
+                    url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
                 }
                 if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
-                    unlinkSync(`./public/image/banner/${banner.metadata.image.name}`);
+                    try {
+                        unlinkSync(`${DESTINATION.BANNER}/${banner.metadata.image.name}`);
+                    } catch (e) {
 
-                    updateBannerDto.metadata.image = image;
+                    }
+
+                    const metadata = {
+                        ...banner.metadata,
+                        title: updateBannerDto.title || banner.metadata.title,
+                        image
+                    }
+                    updateBannerDto.metadata = metadata;
+                    updateBannerDto.imageUrl = image.url;
 
                 } else {
                     const metadata: BannerMetadata = {
@@ -98,14 +118,22 @@ export class BannerService {
                     }
 
                     updateBannerDto.metadata = metadata;
+                    updateBannerDto.imageUrl = image.url;
                 }
             }
 
-            const newBanner = await this.updateById(id, updateBannerDto);
+            const updateWithTracking: UpdateBannerDto & BaseTracking = {
+                ...updateBannerDto,
+                updatedAt: moment().toDate(),
+                updatedBy
+            }
+
+            const newBanner = await this.updateById(id, updateWithTracking);
             return new BaseResponse(STATUSCODE.BANNER_UPDATE_SUCCESS_122, newBanner, 'success');
         } catch (error) {
+            console.log(error);
             if(file) {
-                unlinkSync(`./public/image/banner/${file.filename}`);
+                unlinkSync(`${DESTINATION.BANNER}/${file.filename}`);
             }
             throw new NotFoundException(MESSAGE_ERROR.NOT_FOUND)
         }
@@ -116,6 +144,9 @@ export class BannerService {
             const banner = await this.getById(id);
             if (!banner) {
                 return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
+            }
+            if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
+                unlinkSync(`${DESTINATION.BANNER}/${banner.metadata.image.name}`);
             }
             await this.deleteById(id);
             return new BaseResponse(STATUSCODE.BANNER_DELETE_SUCCESS_126, null, 'success');
