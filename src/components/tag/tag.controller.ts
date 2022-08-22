@@ -26,7 +26,6 @@ import { STATUSCODE } from 'src/constants';
 @UseGuards(JwtGuard)
 @ApiBearerAuth('Authorization')
 @Controller('/api/v1/tag')
-@UseGuards(JwtGuard)
 export class TagController {
     constructor(private tagService: TagService) {}
 

@@ -4,7 +4,7 @@ import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
 export class FileSizeValidationPipe implements PipeTransform {
   transform(value: any, metadata: ArgumentMetadata) {
     // "value" is an object containing the file's attributes and metadata
-    const oneKb = 5000;
-    return value.size < oneKb;
+    const maxSize = 5000;
+    return value.size <= maxSize;
   }
 }
