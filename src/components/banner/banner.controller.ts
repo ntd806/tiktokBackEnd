@@ -76,7 +76,6 @@ export class BannerController {
                 startDate: {
                     type: 'datetime',
                     format: 'datetime',
-                    default: null
                 },
                 endDate: {
                     type: 'datetime',
@@ -90,8 +89,7 @@ export class BannerController {
         }
     })
     create(@Req() req, @UploadedFile(
-        ParseFilePipe,
-        FileSizeValidationPipe
+        ParseFilePipe
     ) file: Express.Multer.File, @Body() createBannerDto: CreateBannerDto) {
         return this.bannerService.create(req.user.id, createBannerDto, file);
     }
@@ -176,7 +174,6 @@ export class BannerController {
                 startDate: {
                     type: 'datetime',
                     format: 'datetime',
-                    default: null
                 },
                 endDate: {
                     type: 'datetime',
