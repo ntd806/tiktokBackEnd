@@ -7,7 +7,8 @@ import {
     Delete,
     Query,
     UseGuards,
-    Param
+    Param,
+    Req
 } from '@nestjs/common';
 import {
     ApiTags,
@@ -86,8 +87,8 @@ export class TagController {
         description: 'Tag create failed!'
     })
     @Post()
-    public async createTag(@Body() tagDto: TagDto) {
-        return await this.tagService.create(tagDto);
+    public async createTag(@Req() req, @Body() tagDto: TagDto) {
+        return await this.tagService.create(req.user.id, tagDto);
     }
 
     @ApiOperation({
@@ -102,8 +103,8 @@ export class TagController {
         description: 'Tag update failed!'
     })
     @Put(':tagId')
-    public async updateTag(@Param('tagId') tagId: string, @Body() tagUpdateDto: TagUpdateDto) {
-        return await this.tagService.update(tagId, tagUpdateDto);
+    public async updateTag(@Req() req, @Param('tagId') tagId: string, @Body() tagUpdateDto: TagUpdateDto) {
+        return await this.tagService.update(req.user.id, tagId, tagUpdateDto);
     }
 
     @ApiOperation({
@@ -119,6 +120,6 @@ export class TagController {
     })
     @Delete(':tagId')
     public async deleteTag(@Param('tagId') tagId: string) {
-        return await this.tagService.deleteTagById(tagId);
+        return await this.tagService.deleteTag(tagId);
     }
 }

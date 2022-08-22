@@ -6,6 +6,8 @@ import { Tag } from './model/tag.schema';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
+import { BaseTracking } from 'src/models';
+import * as moment from 'moment';
 
 @Injectable()
 export class TagService {
@@ -40,9 +42,14 @@ export class TagService {
         return await this.tagModel.findByIdAndDelete(tagId);
     }
 
-    public async create(tagDto: TagDto) {
+    public async create(userId: string, tagDto: TagDto) {
         try {
-            const tag = await this.tagModel.create(tagDto);
+            const withTracking: TagDto & BaseTracking = {
+                ...tagDto,
+                createdAt: moment().toDate(),
+                createdBy: userId
+            }
+            const tag = await this.tagModel.create(withTracking);
             return new BaseResponse(STATUSCODE.TAG_CREATE_SUCCESS_101,
                 tag,
                 MESSAGE.CREATE_SUCCESS
@@ -52,14 +59,20 @@ export class TagService {
         }
     }
 
-    public async update(tagId: string, tagUpdateDto: TagUpdateDto) {
+    public async update(userId: string, tagId: string, tagUpdateDto: TagUpdateDto) {
         try {
             const tag = await this.getTagById(tagId);
             if(!tag) {
                 return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND)
             }
 
-            const newTag = await this.updateTag(tagId, tagUpdateDto);
+            const withTracking: TagUpdateDto & BaseTracking ={
+                ...tagUpdateDto,
+                updatedAt: moment().toDate(),
+                updatedBy: userId
+            }
+
+            const newTag = await this.updateTag(tagId, withTracking);
             return new BaseResponse(
                 STATUSCODE.TAG_UPDATE_SUCCESS_103,
                 newTag,
