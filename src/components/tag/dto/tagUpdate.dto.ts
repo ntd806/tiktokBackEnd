@@ -11,23 +11,6 @@ export class TagUpdateDto {
     name: string;
 
     @ApiProperty({
-        description: 'Updated by',
-        required: false,
-        default: ''
-    })
-    @IsString()
-    @IsNotEmpty()
-    updatedBy: string
-
-    @ApiProperty({
-        description: 'Updated at',
-        required: false
-    })
-    @IsDateString()
-    @ValidateIf((object, value) => value !== null)
-    updatedAt: Date;
-
-    @ApiProperty({
         description: 'Tag related',
         required: false,
         default: []
