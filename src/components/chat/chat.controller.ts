@@ -15,10 +15,10 @@ import {
 } from '@nestjs/common';
 import {
     ApiTags,
-    ApiParam,
     ApiOperation,
     ApiResponse,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiQuery
 } from '@nestjs/swagger';
 import { ChatService } from './chat.service';
 import { CreateChatDto, UpdateChatDto } from './dto';
@@ -29,7 +29,6 @@ import { JwtGuard } from '../auth/guard';
 @UseGuards(JwtGuard)
 @ApiBearerAuth('Authorization')
 @Controller('/api/v1/chat')
-@UseGuards(JwtGuard)
 export class ChatController {
     constructor(private ChatService: ChatService) {}
 
@@ -37,13 +36,13 @@ export class ChatController {
     @ApiOperation({
         summary: 'Get all chats by user'
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
         required: true
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'offset',
         type: 'number',
         description: 'enter offset of record',

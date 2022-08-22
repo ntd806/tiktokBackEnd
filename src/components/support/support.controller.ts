@@ -15,10 +15,10 @@ import {
 } from '@nestjs/common';
 import {
     ApiTags,
-    ApiParam,
     ApiOperation,
     ApiResponse,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiQuery
 } from '@nestjs/swagger';
 import { SupportService } from './support.service';
 import { CreateSupportDto, UpdateSupportDto } from './dto';
@@ -29,7 +29,6 @@ import { JwtGuard } from '../auth/guard';
 @UseGuards(JwtGuard)
 @ApiBearerAuth('Authorization')
 @Controller('/api/v1/support')
-@UseGuards(JwtGuard)
 export class SupportController {
     constructor(private SupportService: SupportService) {}
 
@@ -37,13 +36,13 @@ export class SupportController {
     @ApiOperation({
         summary: 'Get all supports by user'
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
         required: true
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'offset',
         type: 'number',
         description: 'enter offset of record',

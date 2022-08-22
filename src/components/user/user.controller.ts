@@ -26,7 +26,7 @@ import {
     ApiResponse,
     ApiOperation,
     ApiBearerAuth,
-    ApiParam
+    ApiQuery
 } from '@nestjs/swagger';
 import { STATUSCODE } from '../../constants';
 import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
@@ -110,13 +110,13 @@ export class UserController {
     @ApiOperation({
         summary: 'Get all users'
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
         required: true
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'offset',
         type: 'number',
         description: 'enter offset of record',
