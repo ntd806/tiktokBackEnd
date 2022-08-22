@@ -24,6 +24,7 @@ import { MESSAGE, STATUSCODE } from 'src/constants';
 import { PaginateQueryDto } from './dto/paginate.dto';
 import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
 import { Express } from 'express'
+import { FileSizeValidationPipe } from 'src/validator/pipe/fileSize.pipe';
 
 @ApiBearerAuth('Authorization')
 @ApiTags('banner')
@@ -89,7 +90,8 @@ export class BannerController {
         }
     })
     create(@Req() req, @UploadedFile(
-        ParseFilePipe
+        ParseFilePipe,
+        FileSizeValidationPipe
     ) file: Express.Multer.File, @Body() createBannerDto: CreateBannerDto) {
         return this.bannerService.create(req.user.id, createBannerDto, file);
     }

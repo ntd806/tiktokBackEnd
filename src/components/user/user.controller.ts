@@ -28,7 +28,7 @@ import {
     ApiBearerAuth,
     ApiQuery
 } from '@nestjs/swagger';
-import { STATUSCODE } from '../../constants';
+import { IMAGE_PATH_SERVER, STATUSCODE } from 'src/constants';
 import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
 import { FileSizeValidationPipe } from 'src/validator/pipe/fileSize.pipe';
 import { Express } from 'express';
@@ -81,13 +81,14 @@ export class UserController {
     async updateAvata(
         @Request() req,
         @UploadedFile(
-            ParseFilePipe
+            ParseFilePipe,
+            FileSizeValidationPipe
         ) file: Express.Multer.File
     ) {
         const avatarDto: AvataDto = {
             metadata: {
                 name: file.filename,
-                url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+                url:`${IMAGE_PATH_SERVER}/${file.filename}`
             }
         }
         return await this.userService.updateAvatar(req.user, avatarDto);
