@@ -10,22 +10,6 @@ export class TagDto {
     name: string;
 
     @ApiProperty({
-        description: 'Created at',
-        default: 'now()'
-    })
-    @IsDateString()
-    @ValidateIf((object, value) => value !== null)
-    createdAt: Date;
-
-    @ApiProperty({
-        description: 'Updated at',
-        required: false
-    })
-    @IsDateString()
-    @ValidateIf((object, value) => value !== null)
-    updatedAt: Date;
-
-    @ApiProperty({
         description: 'Tag related',
         required: false,
         default: []
@@ -38,25 +22,6 @@ export class TagDto {
             tagName: string;
         }
     ]
-
-    @ApiProperty({
-        description: 'Created by',
-        required: true,
-        default: ''
-    })
-    @IsString()
-    @IsNotEmpty()
-    @ValidateIf((object, value) => value !== null)
-    createdBy: string
-
-    @ApiProperty({
-        description: 'Updated by',
-        required: false,
-        default: ''
-    })
-    @IsString()
-    @ValidateIf((object, value) => value !== null)
-    updatedBy: string
 
     @ApiProperty({
         description: 'Tag category',
