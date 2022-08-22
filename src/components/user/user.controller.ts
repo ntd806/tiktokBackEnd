@@ -26,9 +26,9 @@ import {
     ApiResponse,
     ApiOperation,
     ApiBearerAuth,
-    ApiParam
+    ApiQuery
 } from '@nestjs/swagger';
-import { STATUSCODE } from '../../constants';
+import { STATUSCODE } from 'src/constants';
 import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
 import { FileSizeValidationPipe } from 'src/validator/pipe/fileSize.pipe';
 import { Express } from 'express';
@@ -81,7 +81,7 @@ export class UserController {
     async updateAvata(
         @Request() req,
         @UploadedFile(
-            ParseFilePipe
+            ParseFilePipe,
         ) file: Express.Multer.File
     ) {
         const avatarDto: AvataDto = {
@@ -110,13 +110,13 @@ export class UserController {
     @ApiOperation({
         summary: 'Get all users'
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
         required: true
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'offset',
         type: 'number',
         description: 'enter offset of record',

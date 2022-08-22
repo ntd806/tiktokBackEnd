@@ -33,7 +33,7 @@ export class BannerService {
     async create(userId: string, createBannerDto: CreateBannerDto, file: Express.Multer.File) {
         const image = {
             name: file.filename,
-            url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+            url:`${process.env.URL_DOMAIN_SERVER}/image/banner/${file.filename}`
         }
         const metadata: BannerMetadata = {
             title: createBannerDto.title,
@@ -93,7 +93,7 @@ export class BannerService {
             if(file) {
                 const image = {
                     name: file.filename,
-                    url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+                    url:`${process.env.URL_DOMAIN_SERVER}/image/banner/${file.filename}`
                 }
                 if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
                     try {

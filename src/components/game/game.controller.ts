@@ -13,10 +13,10 @@ import {
 } from '@nestjs/common';
 import {
     ApiTags,
-    ApiParam,
     ApiOperation,
     ApiResponse,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiQuery
 } from '@nestjs/swagger';
 import { GameService } from './game.service';
 import { CreateGameDto, UpdateGameDto } from './dto';
@@ -27,7 +27,6 @@ import { JwtGuard } from '../auth/guard';
 @UseGuards(JwtGuard)
 @ApiBearerAuth('Authorization')
 @Controller('/api/v1/game')
-@UseGuards(JwtGuard)
 export class GameController {
     constructor(private GameService: GameService) {}
 
@@ -35,13 +34,13 @@ export class GameController {
     @ApiOperation({
         summary: 'Get all games'
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
         required: true
     })
-    @ApiParam({
+    @ApiQuery({
         name: 'offset',
         type: 'number',
         description: 'enter offset of record',
