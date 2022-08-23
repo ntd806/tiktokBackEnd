@@ -1,11 +1,11 @@
 import { STATUSCODE } from "../../constants";
 
 export class BaseResponse {
-    code: STATUSCODE;
+    code: STATUSCODE | number;
     message: string;
     data: any;
   
-    constructor(code: STATUSCODE, data?: any, message?: string) {
+    constructor(code: STATUSCODE | number, data?: any, message?: string) {
       this.code = code;
       this.message = message;
       this.data = data || null;

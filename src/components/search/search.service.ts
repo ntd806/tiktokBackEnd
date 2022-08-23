@@ -3,6 +3,8 @@ import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { SearchServiceInterface } from './interface/search.service.interface';
 import { ConfigSearch } from './config/config.search';
 import { productIndex } from './constant/product.elastic';
+import { BaseResponse } from 'src/common';
+import { MESSAGE, STATUSCODE } from 'src/constants';
 // import { ProductSearchObject } from './model/product.search.object';
 @Injectable()
 export class SearchService
@@ -15,12 +17,13 @@ export class SearchService
 
     public async insertIndex(bulkData: any): Promise<any> {
         const data = this.productDocument(bulkData);
-        return this.bulk(data)
-            .then((res) => res)
-            .catch((err) => {
-                console.log(err);
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+        try {
+            const res = await this.bulk(data);
+            return new BaseResponse(HttpStatus.CREATED, res, MESSAGE.CREATE_SUCCESS)
+        } catch (err) {
+            console.log(err);
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public async updateIndex(updateData: any): Promise<any> {

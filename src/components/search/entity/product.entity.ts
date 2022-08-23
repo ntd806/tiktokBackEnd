@@ -1,3 +1,4 @@
+import { Metadata } from 'src/models';
 import { Column, Entity, ObjectIdColumn } from 'typeorm';
 
 @Entity({ name: 'products' })
@@ -23,17 +24,32 @@ export class Product {
     @Column({
         type: 'string'
     })
-    preview: string;
-
-    @Column({
-        type: 'string'
-    })
     previewImage: string;
 
     @Column({
         type: 'string'
     })
-    tag: string;
+    tagId: string;
+
+    @Column({
+        type: 'datetime'
+    })
+    createdAt: Date;
+
+    @Column({
+        type: 'string'
+    })
+    createdBy: string;
+
+    @Column({
+        type: 'datetime'
+    })
+    updatedAt: Date;
+
+    @Column({
+        type: 'string'
+    })
+    updatedBy: string;
 
     @Column({
         type: 'number'
@@ -44,4 +60,9 @@ export class Product {
         type: 'number'
     })
     type: number;
+
+    @Column({
+        type: 'raw'
+    })
+    metadata: Metadata;
 }
