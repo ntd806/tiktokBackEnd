@@ -1,4 +1,4 @@
-import { MaxLength, IsNotEmpty, IsEmail, IsString } from 'class-validator';
+import { MaxLength, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 export class CreateGameDto {
     @ApiProperty()
@@ -15,7 +15,6 @@ export class CreateGameDto {
 
     @ApiProperty()
     @IsString()
-    @IsEmail()
     @IsNotEmpty()
     readonly image: string;
 }

@@ -9,7 +9,9 @@ import {
     Param,
     Res,
     UploadedFile,
-    UseInterceptors
+    UseInterceptors,
+    HttpStatus,
+    Req
 } from '@nestjs/common';
 import { SearchService } from './search.service';
 import {
@@ -17,19 +19,25 @@ import {
     ApiOperation,
     ApiResponse,
     ApiBody,
-    ApiConsumes
+    ApiConsumes,
+    ApiBearerAuth
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
     CreateProductDto,
     UpdateProductDto,
-    SearchProductDto
+    SearchProductDto,
+    ProductMetadata
 } from './dto/index';
 import { multerOptions } from '../../vender/helper/Helper';
 import { Observable, of } from 'rxjs';
 import { join } from 'path';
+import { Express } from 'express';
+import { Metadata } from 'src/models';
+import * as moment from 'moment';
 @Controller('/api/v1/search')
 @ApiTags('search')
+@ApiBearerAuth('Authorization')
 export class SearchController {
     constructor(private searchService: SearchService) {}
 
@@ -43,7 +51,8 @@ export class SearchController {
             properties: {
                 file: {
                     type: 'string',
-                    format: 'binary'
+                    format: 'binary',
+                    description: 'image file upload, if available image url please empty field'
                 },
                 name: {
                     type: 'string'
@@ -54,11 +63,14 @@ export class SearchController {
                 url: {
                     type: 'string'
                 },
-                preview: {
-                    type: 'string'
+                previewImage: {
+                    type: 'string',
+                    nullable: true,
+                    description: 'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'
                 },
-                tag: {
-                    type: 'string'
+                tagId: {
+                    type: 'string',
+                    description: '_id tag from tag list, if _id from tag list is empty, please create a new tag and assign _id here'
                 },
                 type: {
                     type: 'number'
@@ -72,15 +84,35 @@ export class SearchController {
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('file', multerOptions))
     @ApiResponse({
-        status: 200,
+        status: HttpStatus.CREATED,
         description: 'insert index success'
     })
     public async insertIndex(
+        @Req() req,
         @Body() createProductDto: CreateProductDto,
-        @UploadedFile('file') file
+        @UploadedFile('file') file: Express.Multer.File
     ): Promise<any> {
-        createProductDto.previewImage = file.filename;
-        return this.searchService.insertIndex(createProductDto);
+        const product = {
+            ...createProductDto,
+            metadata: {} as Metadata,
+            createdAt: moment().toDate(),
+            createdBy: req.user.id
+        }
+        if(file) {
+            const url = `${process.env.URL_DOMAIN_SERVER}/image/video/${file.filename}`
+            product.previewImage = url;
+
+            product.metadata = {
+                url,
+                name: file.filename,
+            }
+        } else {
+            product.metadata = {
+                url: product.previewImage,
+                name: '',
+            }
+        }
+        return await this.searchService.insertIndex(product);
     }
 
     @Put('update-index')
@@ -92,9 +124,15 @@ export class SearchController {
         description: 'update index success'
     })
     public async updateIndex(
-        @Body() updateGameDto: UpdateProductDto
+        @Req() req,
+        @Body() updateDto: UpdateProductDto
     ): Promise<any> {
-        return this.searchService.updateIndex(updateGameDto);
+        const product = {
+            ...updateDto,
+            updatedBy: req.user.id,
+            updatedAt: moment().toDate()
+        }
+        return this.searchService.updateIndex(product);
     }
 
     @Get('search-index')
@@ -144,7 +182,7 @@ export class SearchController {
         @Res() res
     ): Observable<Object> {
         return of(
-            res.sendFile(join(process.cwd(), 'public/image/' + imagename))
+            res.sendFile(join(process.cwd(), 'public/image/video' + imagename))
         );
     }
 }

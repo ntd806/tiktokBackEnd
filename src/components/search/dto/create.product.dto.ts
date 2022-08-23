@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsNumberString, isURL, IsUrl, ValidateIf } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -15,30 +15,28 @@ export class CreateProductDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty()
+    @IsUrl()
     url: string;
 
-    @IsNotEmpty()
     @IsString()
-    @ApiProperty()
-    preview: string;
-
-    @IsNotEmpty()
-    @IsString()
-    @ApiProperty()
+    @ApiProperty({ description: 'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'})
+    @ValidateIf((object, value) => value !== null && value !== undefined)
     previewImage: string;
 
     @IsNotEmpty()
     @IsString()
-    @ApiProperty()
-    tag: string;
+    @ApiProperty({
+        description: 'Tag _id from tag list'
+    })
+    tagId: string;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsNumberString()
     @ApiProperty()
     type: number;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsNumberString()
     @ApiProperty()
     time: number;
 }

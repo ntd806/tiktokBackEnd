@@ -34,6 +34,6 @@ export class UserDto {
     })
     @IsString()
     @IsEmail()
-    @ValidateIf((object, value) => value !== null)
+    @ValidateIf((object, value) => value !== null && value !== undefined)
     email!: string;
 }
