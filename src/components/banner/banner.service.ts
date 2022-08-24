@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Banner, BannerMetadata } from './entities/banner.entity';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
-import { DESTINATION, MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
 import { Express } from 'express'
 import { unlinkSync } from 'fs';
 import { BaseTracking } from 'src/models';
@@ -33,7 +33,7 @@ export class BannerService {
     async create(userId: string, createBannerDto: CreateBannerDto, file: Express.Multer.File) {
         const image = {
             name: file.filename,
-            url:`${process.env.URL_DOMAIN_SERVER}/image/banner/${file.filename}`
+            url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
         }
         const metadata: BannerMetadata = {
             title: createBannerDto.title,
@@ -57,7 +57,7 @@ export class BannerService {
                 MESSAGE.CREATE_SUCCESS
             )
         } catch (error) {
-            unlinkSync(`${DESTINATION.BANNER}/${image.name}`);
+            unlinkSync(`./public/image/${image.name}`);
             throw new BadRequestException(MESSAGE_ERROR.CREATE_FAILED)
         }
     }
@@ -93,11 +93,11 @@ export class BannerService {
             if(file) {
                 const image = {
                     name: file.filename,
-                    url:`${process.env.URL_DOMAIN_SERVER}/image/banner/${file.filename}`
+                    url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
                 }
                 if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
                     try {
-                        unlinkSync(`${DESTINATION.BANNER}/${banner.metadata.image.name}`);
+                        unlinkSync(`./public/image/${banner.metadata.image.name}`);
                     } catch (e) {
 
                     }
@@ -133,7 +133,7 @@ export class BannerService {
         } catch (error) {
             console.log(error);
             if(file) {
-                unlinkSync(`${DESTINATION.BANNER}/${file.filename}`);
+                unlinkSync(`./public/image/${file.filename}`);
             }
             throw new NotFoundException(MESSAGE_ERROR.NOT_FOUND)
         }
@@ -146,7 +146,7 @@ export class BannerService {
                 return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
             }
             if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
-                unlinkSync(`${DESTINATION.BANNER}/${banner.metadata.image.name}`);
+                unlinkSync(`./public/image/${banner.metadata.image.name}`);
             }
             await this.deleteById(id);
             return new BaseResponse(STATUSCODE.BANNER_DELETE_SUCCESS_126, null, 'success');

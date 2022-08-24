@@ -19,7 +19,7 @@ import { UpdateBannerDto } from './dto/update-banner.dto';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { multerBannerOptions } from 'src/vender/helper/Helper';
+import { multerOptions } from 'src/vender/helper/Helper';
 import { MESSAGE, STATUSCODE } from 'src/constants';
 import { PaginateQueryDto } from './dto/paginate.dto';
 import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
@@ -35,7 +35,7 @@ export class BannerController {
 
     @Post()
     @ApiConsumes('multipart/form-data')
-    @UseInterceptors(FileInterceptor('file', multerBannerOptions))
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     @ApiResponse({
         status: STATUSCODE.BANNER_CREATE_SUCCESS_120,
         description: MESSAGE.CREATE_SUCCESS
@@ -186,7 +186,7 @@ export class BannerController {
             },
         }
     })
-    @UseInterceptors(FileInterceptor('file', multerBannerOptions))
+    @UseInterceptors(FileInterceptor('file', multerOptions))
     update(@Req() req, @Param('id') id: string,  @Body() updateBannerDto: UpdateBannerDto) {
         return this.bannerService.update(req.user.id, id, updateBannerDto, req.file);
     }

@@ -19,6 +19,14 @@ export class CreateProductDto {
     url: string;
 
     @IsString()
+    @ApiProperty({
+        description: 'preview URL'
+    })
+    @IsUrl()
+    @ValidateIf((object, value) => value !== null && value !== undefined)
+    preview: string;
+
+    @IsString()
     @ApiProperty({ description: 'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'})
     @ValidateIf((object, value) => value !== null && value !== undefined)
     previewImage: string;
