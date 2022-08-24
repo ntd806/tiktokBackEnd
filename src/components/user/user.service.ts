@@ -5,10 +5,10 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import { JwtService } from '../../common';
-import { DESTINATION, MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
-import { unlinkSync } from 'fs';
+import { readFileSync, unlinkSync } from 'fs';
 import { HttpAdapterHost } from '@nestjs/core'
 import { Request } from 'express';
 
@@ -46,7 +46,7 @@ export class UserService {
             const user = await this.userModel.findById(userId);
             if (user) {
                 if(user.metadata && user.metadata.name) {
-                    unlinkSync(`${DESTINATION.IMAGE}/${user.metadata.name}`)
+                    unlinkSync(`./public/image/${user.metadata.name}`)
                 }
                 await this.userModel.findByIdAndDelete(userId);
                 return new BaseResponse(STATUSCODE.DELETE_USER_SUCCESS,
@@ -168,16 +168,20 @@ export class UserService {
         try {
             const userById = await this.findUserById(user.id);
             if (!userById) {
-                const pathLocation = `${DESTINATION.IMAGE}/${dto.metadata.name}`;
-                unlinkSync(pathLocation);
+                const pathLocation = `./public/image/${dto.metadata.name}`;
+                if(readFileSync(pathLocation)) {
+                    unlinkSync(pathLocation);
+                }
                 return new BaseErrorResponse(
                     STATUSCODE.PHONE_NOTFOUND_4012,
                     'User not found');
             }
 
-            if(userById.metadata && !userById.social) {
-                const pathLocation = `${DESTINATION.IMAGE}/${userById.metadata.name}`;
-                unlinkSync(pathLocation);
+            if(userById.metadata && Object.keys(userById.metadata).length > 0  && !userById.social) {
+                const pathLocation = `./public/image/${userById.metadata.name}`;
+                if(readFileSync(pathLocation)) {
+                    unlinkSync(pathLocation);
+                }
             }
 
             const newUser = await this.updateSomeField(user, dto);
@@ -188,8 +192,10 @@ export class UserService {
             )
         } catch (error) {
             console.log(error);
-            const pathLocation = `${DESTINATION.IMAGE}/${dto.metadata.name}`;
-            unlinkSync(pathLocation);
+            const pathLocation = `./public/image/${dto.metadata.name}`;
+            if(readFileSync(pathLocation)) {
+                unlinkSync(pathLocation);
+            }
             return new BaseErrorResponse(
                 STATUSCODE.PHONE_NOTFOUND_4012,
                 'User not found');

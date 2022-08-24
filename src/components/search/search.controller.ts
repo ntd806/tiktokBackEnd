@@ -63,6 +63,10 @@ export class SearchController {
                 url: {
                     type: 'string'
                 },
+                preview: {
+                    type: 'string',
+                    description: 'preview url'
+                },
                 previewImage: {
                     type: 'string',
                     nullable: true,
@@ -99,7 +103,7 @@ export class SearchController {
             createdBy: req.user.id
         }
         if(file) {
-            const url = `${process.env.URL_DOMAIN_SERVER}/image/video/${file.filename}`
+            const url = `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
             product.previewImage = url;
 
             product.metadata = {
@@ -182,7 +186,7 @@ export class SearchController {
         @Res() res
     ): Observable<Object> {
         return of(
-            res.sendFile(join(process.cwd(), 'public/image/video' + imagename))
+            res.sendFile(join(process.cwd(), 'public/image/' + imagename))
         );
     }
 }
