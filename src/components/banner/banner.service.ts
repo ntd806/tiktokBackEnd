@@ -7,7 +7,7 @@ import { Banner, BannerMetadata } from './entities/banner.entity';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
 import { Express } from 'express'
-import { unlinkSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 import { BaseTracking } from 'src/models';
 import * as moment from 'moment';
 
@@ -33,7 +33,7 @@ export class BannerService {
     async create(userId: string, createBannerDto: CreateBannerDto, file: Express.Multer.File) {
         const image = {
             name: file.filename,
-            url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+            url: `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
         }
         const metadata: BannerMetadata = {
             title: createBannerDto.title,
@@ -90,16 +90,16 @@ export class BannerService {
                 return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210, MESSAGE_ERROR.NOT_FOUND)
             }
 
-            if(file) {
+            if (file) {
                 const image = {
                     name: file.filename,
-                    url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+                    url: `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
                 }
-                if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
-                    try {
+                if (banner.metadata && banner.metadata.image && banner.metadata.image.name) {
+                    const pathLocation = `./public/image/${banner.metadata.image.name}`;
+                    const isExisted = existsSync(pathLocation)
+                    if (isExisted) {
                         unlinkSync(`./public/image/${banner.metadata.image.name}`);
-                    } catch (e) {
-
                     }
 
                     const metadata = {
@@ -132,7 +132,7 @@ export class BannerService {
             return new BaseResponse(STATUSCODE.BANNER_UPDATE_SUCCESS_122, newBanner, 'success');
         } catch (error) {
             console.log(error);
-            if(file) {
+            if (file) {
                 unlinkSync(`./public/image/${file.filename}`);
             }
             throw new NotFoundException(MESSAGE_ERROR.NOT_FOUND)
@@ -145,8 +145,12 @@ export class BannerService {
             if (!banner) {
                 return new BaseErrorResponse(STATUSCODE.BANNER_NOT_FOUND_1210)
             }
-            if(banner.metadata && banner.metadata.image && banner.metadata.image.name) {
-                unlinkSync(`./public/image/${banner.metadata.image.name}`);
+            if (banner.metadata && banner.metadata.image && banner.metadata.image.name) {
+                const pathLocation = `./public/image/${banner.metadata.image.name}`;
+                const isExisted = existsSync(pathLocation);
+                if(isExisted) {
+                    unlinkSync(`./public/image/${banner.metadata.image.name}`);
+                }
             }
             await this.deleteById(id);
             return new BaseResponse(STATUSCODE.BANNER_DELETE_SUCCESS_126, null, 'success');
