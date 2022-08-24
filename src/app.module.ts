@@ -13,11 +13,10 @@ import { SupportModule } from './components/support/support.module';
 import { ChatModule } from './components/chat/chat.module';
 import { SearchModule } from './components/search/search.module';
 import { TagModule } from './components/tag/tag.module';
-import { AssetsModule } from './components/assets/assets.module';
+import { ImageModule } from './components/image/image.module';
 import { BannerModule } from './components/banner/banner.module';
 import * as dotenv from 'dotenv';
 import { MulterModule } from '@nestjs/platform-express';
-import { DESTINATION } from './constants';
 dotenv.config();
 @Module({
     imports: [
@@ -38,10 +37,10 @@ dotenv.config();
         SupportModule,
         VideoModule,
         TagModule,
-        AssetsModule,
+        ImageModule,
         BannerModule,
         MulterModule.register({
-            dest: DESTINATION.IMAGE
+            dest: './public/image'
         })
     ],
     controllers: []
