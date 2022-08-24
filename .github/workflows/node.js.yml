@@ -28,6 +28,7 @@ jobs:
       matrix:
         node-version: [16.x]
     steps:
+    - run: cp -r /tmp/public /var/www/html/toto/actions-runner/_work/tiktokBackEnd/tiktokBackEnd/public
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
@@ -40,6 +41,5 @@ jobs:
     - run: pm2 stop 0
     - run: pm2 start 0
     # - run: npm run start:prod
-    - run: cp -r /tmp/public /var/www/html/toto/actions-runner/_work/tiktokBackEnd/tiktokBackEnd/public
     # run: rm -rf /tmp/public/*
     - run: sudo systemctl restart nginx
