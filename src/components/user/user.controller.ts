@@ -102,8 +102,34 @@ export class UserController {
     })
     @UseGuards(JwtGuard)
     @Post('update')
-    async updateUser(@Request() req, @Body() dto: UserDto) {
-        return await this.userService.updateUser(req.user, dto);
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                file: {
+                    type: 'string',
+                    format: 'binary'
+                },
+                fullname: {
+                    type: 'string',
+                },
+                birthdate: {
+                    type: 'date'
+                },
+                email: {
+                    type: 'string',
+                    nullable: true
+                },
+                sex: {
+                    type: 'string',
+                }
+            }
+        }
+    })
+    @UseInterceptors(FileInterceptor('file', multerOptions))
+    async updateUser(@Request() req, @Body() dto: UserDto, @UploadedFile('file') file: Express.Multer.File) {
+        return await this.userService.updateUser(req.user, dto, file);
     }
 
     @Get()

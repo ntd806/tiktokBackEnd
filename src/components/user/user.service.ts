@@ -8,7 +8,7 @@ import { JwtService } from '../../common';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
 import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
-import { readFileSync, unlinkSync } from 'fs';
+import { readFileSync, unlinkSync, existsSync } from 'fs';
 import { HttpAdapterHost } from '@nestjs/core'
 import { Request } from 'express';
 
@@ -45,8 +45,13 @@ export class UserService {
         try {
             const user = await this.userModel.findById(userId);
             if (user) {
-                if(user.metadata && user.metadata.name) {
-                    unlinkSync(`./public/image/${user.metadata.name}`)
+                if (user.metadata && user.metadata.name) {
+                    const pathLocation = `./public/image/${user.metadata.name}`;
+                    const isExisted = existsSync(pathLocation);
+                    if (isExisted) {
+                        unlinkSync(`./public/image/${user.metadata.name}`)
+                    }
+
                 }
                 await this.userModel.findByIdAndDelete(userId);
                 return new BaseResponse(STATUSCODE.DELETE_USER_SUCCESS,
@@ -54,7 +59,7 @@ export class UserService {
                     MESSAGE.DELETE_SUCCESS)
             }
             return new BaseErrorResponse(STATUSCODE.USER_NOT_FOUND_400,
-                MESSAGE_ERROR.USER_NOT_FOUND) 
+                MESSAGE_ERROR.USER_NOT_FOUND)
         } catch (err) {
             throw new BadRequestException(err)
         }
@@ -97,8 +102,25 @@ export class UserService {
         }
     }
 
-    async updateUser(userRequest: User, user: UserDto) {
+    async updateUser(userRequest: User, user: UserDto, file: Express.Multer.File) {
         try {
+            const userInfo =  await this.findUserById(userRequest.id);
+            if(file && userInfo) {
+                const metadata = {
+                    name: file.filename,
+                    url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+                }
+
+                if(userInfo.metadata && userInfo.metadata.name) {
+                    const pathLocation = `./public/image/${userInfo.metadata.name}`;
+                    const isExisted = existsSync(pathLocation);
+                    if(isExisted) {
+                        unlinkSync(pathLocation);
+                    }
+                }
+
+                user['metadata'] = metadata;
+            }
             const userReceive = await this.userModel.findByIdAndUpdate({ _id: userRequest.id }, user);
             if (!userReceive) {
                 return new BaseErrorResponse(
@@ -109,10 +131,14 @@ export class UserService {
             }
             return new BaseResponse(
                 STATUSCODE.USER_UPDATE_SUCCESS_402,
-                user,
+                userReceive,
                 'Update successfully'
             )
         } catch (err) {
+            if(file) {
+                const pathLocation = `./public/image/${file.filename}`;
+                unlinkSync(pathLocation);
+            }
             return new BaseErrorResponse(
                 STATUSCODE.USER_NOT_FOUND_400,
                 'User not found',
@@ -169,7 +195,8 @@ export class UserService {
             const userById = await this.findUserById(user.id);
             if (!userById) {
                 const pathLocation = `./public/image/${dto.metadata.name}`;
-                if(readFileSync(pathLocation)) {
+                const isExisted = existsSync(pathLocation);
+                if (isExisted) {
                     unlinkSync(pathLocation);
                 }
                 return new BaseErrorResponse(
@@ -177,9 +204,10 @@ export class UserService {
                     'User not found');
             }
 
-            if(userById.metadata && Object.keys(userById.metadata).length > 0  && !userById.social) {
+            if (userById.metadata && Object.keys(userById.metadata).length > 0 && !userById.social) {
                 const pathLocation = `./public/image/${userById.metadata.name}`;
-                if(readFileSync(pathLocation)) {
+                const isExisted = existsSync(pathLocation);
+                if (isExisted) {
                     unlinkSync(pathLocation);
                 }
             }
@@ -193,7 +221,8 @@ export class UserService {
         } catch (error) {
             console.log(error);
             const pathLocation = `./public/image/${dto.metadata.name}`;
-            if(readFileSync(pathLocation)) {
+            const isExisted = existsSync(pathLocation);
+            if (isExisted) {
                 unlinkSync(pathLocation);
             }
             return new BaseErrorResponse(
