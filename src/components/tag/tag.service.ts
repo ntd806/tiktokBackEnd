@@ -35,7 +35,7 @@ export class TagService {
     }
 
     async updateTag<T>(tagId: string, tagUpdate: T) {
-        this.tagModel.findByIdAndUpdate({ _id: tagId }, { $set: tagUpdate }, { new: true })
+        return this.tagModel.findByIdAndUpdate({ _id: tagId }, { $set: tagUpdate }, { new: true })
     }
 
     async deleteTagById(tagId: string) {
