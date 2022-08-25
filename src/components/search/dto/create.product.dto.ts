@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsNumber, IsNumberString, isURL, IsUrl, ValidateIf } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, IsNumberString, isURL, IsUrl, ValidateIf, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -31,12 +31,19 @@ export class CreateProductDto {
     @ValidateIf((object, value) => value !== null && value !== undefined)
     previewImage: string;
 
-    @IsNotEmpty()
+    @IsOptional()
     @IsString()
+    @ValidateIf((object, value) => value !== null && value !== undefined)
     @ApiProperty({
         description: 'Tag _id from tag list'
     })
     tagId: string;
+
+    @IsNotEmpty()
+    @ApiProperty({
+        description: 'hashtag'
+    })
+    tag: string;
 
     @IsNotEmpty()
     @IsNumberString()

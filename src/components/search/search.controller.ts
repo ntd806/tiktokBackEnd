@@ -75,6 +75,9 @@ export class SearchController {
                     nullable: true,
                     description: 'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'
                 },
+                tag: {
+                    type: 'string',
+                },
                 tagId: {
                     type: 'string',
                     description: '_id tag from tag list, if _id from tag list is empty, please create a new tag and assign _id here'
