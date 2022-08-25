@@ -11,7 +11,8 @@ import {
     UploadedFile,
     UseInterceptors,
     HttpStatus,
-    Req
+    Req,
+    UseGuards
 } from '@nestjs/common';
 import { SearchService } from './search.service';
 import {
@@ -35,11 +36,13 @@ import { join } from 'path';
 import { Express } from 'express';
 import { Metadata } from 'src/models';
 import * as moment from 'moment';
+import { JwtGuard } from '../auth/guard';
 @Controller('/api/v1/search')
 @ApiTags('search')
 @ApiBearerAuth('Authorization')
+@UseGuards(JwtGuard)
 export class SearchController {
-    constructor(private searchService: SearchService) {}
+    constructor(private searchService: SearchService) { }
 
     @Post('insert-index')
     @ApiOperation({
@@ -102,7 +105,7 @@ export class SearchController {
             createdAt: moment().toDate(),
             createdBy: req.user.id
         }
-        if(file) {
+        if (file) {
             const url = `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
             product.previewImage = url;
 
