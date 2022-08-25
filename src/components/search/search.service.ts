@@ -27,33 +27,30 @@ export class SearchService
     }
 
     public async updateIndex(updateData: any): Promise<any> {
-        const data = this.productDocument(updateData);
-        await this.productDocument(updateData.id);
+       return  await this.productDocument(updateData);
         // return this.insertIndex(data);
     }
 
     public async searchIndex(searchData: any): Promise<any> {
         // const data = ProductSearchObject.searchObject(searchData);
-        return this.search({
-            index: productIndex._index,
-            body: {
-                size: searchData.limit,
-                from: searchData.offset,
-                query: {
-                    multi_match: {
-                        query: searchData.search,
-                        fields: ['name', 'description', 'url', 'preview', 'tag']
+        try {
+            const res = await this.search({
+                index: productIndex._index,
+                body: {
+                    size: searchData.limit,
+                    from: searchData.offset,
+                    query: {
+                        multi_match: {
+                            query: searchData.search,
+                            fields: ['name', 'description', 'url', 'preview', 'tag']
+                        }
                     }
                 }
-            }
-        })
-            .then((res) => {
-                return res;
             })
-            .catch((err) => {
-                console.log(err);
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-            });
+            return res;
+        } catch (err) {
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public async deleteIndex(indexData: any): Promise<any> {

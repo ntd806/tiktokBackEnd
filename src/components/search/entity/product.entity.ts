@@ -32,6 +32,11 @@ export class Product {
     tagId: string;
 
     @Column({
+        type: 'string'
+    })
+    tag: string;
+
+    @Column({
         type: 'datetime'
     })
     createdAt: Date;
