@@ -398,3 +398,7 @@ tiktok/.env
 tiktok/dist
 data
 esdata
+dist
+src/components/config
+.env
+public
