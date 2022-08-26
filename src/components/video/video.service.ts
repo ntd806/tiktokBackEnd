@@ -1,4 +1,4 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
 import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,6 +8,9 @@ import { ConfigSearch } from '../search/config/config.search';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { productIndex } from '../search/constant/product.elastic';
 import { SearchProductDto } from '../search/dto';
+import { VideoPaginateDto } from './dto';
+import { BaseErrorResponse, BaseResponse } from 'src/common';
+import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
 @Injectable()
 export class VideoService extends ElasticsearchService {
     constructor(
@@ -207,5 +210,29 @@ export class VideoService extends ElasticsearchService {
             .catch((err) => {
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
+    }
+
+    async getVideos(videoPaginate: VideoPaginateDto) {
+        try {
+            const videos = await this.search({
+                index: productIndex._index,
+                body: {
+                    size: videoPaginate.limit,
+                    from: videoPaginate.offset,
+                    query: {
+                        match_all: {}
+                    }
+                }
+            })
+
+            return new BaseResponse(STATUSCODE.LISTED_SUCCESS_9010, {
+                videos: videos.hits.hits,
+                total: videos.hits.total
+            },
+            MESSAGE.LIST_SUCCESS
+            )
+        } catch (err) {
+            throw new BaseErrorResponse(STATUSCODE.LISTED_FAIL_9011, MESSAGE.LIST_FAILED, err)
+        }
     }
 }
