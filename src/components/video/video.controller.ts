@@ -23,6 +23,8 @@ import {
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
 import { multerOptions } from 'src/vender/helper/Helper';
+import { VideoPaginateDto } from './dto';
+import { STATUSCODE } from 'src/constants';
 @ApiBearerAuth('Authorization')
 @ApiTags('video')
 @UseGuards(JwtGuard)
@@ -136,12 +138,45 @@ export class VideoController {
         required: true
     })
     @Get('get-relative-video-by-tag')
-    @UseInterceptors(FileInterceptor('file', multerOptions))
     async getRelativeVideoByTag(
         @Query() searchProductDto: SearchProductDto,
-        @UploadedFile() file
     ) {
-        console.log(file);
         return await this.videoService.getRelativeVideoByTag(searchProductDto);
+    }
+
+    @ApiOperation({
+        summary: 'Get list video'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_SUCCESS_9010,
+        description: 'Get list video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_FAIL_9011,
+        description: 'Get list video failed'
+    })
+    @ApiQuery({
+        name: 'search',
+        type: 'string',
+        description: 'filter',
+        required: false
+    })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    @Get('get-videos')
+    async getVideos(
+        @Query() paginate: VideoPaginateDto,
+    ) {
+        return await this.videoService.getVideos(paginate);
     }
 }
