@@ -8,7 +8,7 @@ import { ConfigSearch } from '../search/config/config.search';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { productIndex } from '../search/constant/product.elastic';
 import { SearchProductDto } from '../search/dto';
-import { VideoPaginateDto } from './dto';
+import { VideoPaginateDto, NameVideoDto } from './dto';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
 @Injectable()
@@ -235,4 +235,28 @@ export class VideoService extends ElasticsearchService {
             throw new BaseErrorResponse(STATUSCODE.LISTED_FAIL_9011, MESSAGE.LIST_FAILED, err)
         }
     }
+
+    async getDetailVideos(nameVideoDto: NameVideoDto) {
+        try {
+            const videos = await this.search({
+                index: productIndex._index,
+                body: {
+                    query: {
+                        match_phrase: {
+                            name: nameVideoDto.name
+                        }
+                    }
+                }
+            })
+
+            return new BaseResponse(STATUSCODE.LISTED_SUCCESS_9010, {
+                videos: videos.hits.hits,
+                total: videos.hits.total
+            },
+            MESSAGE.LIST_SUCCESS
+            )
+        } catch (err) {
+            throw new BaseErrorResponse(STATUSCODE.LISTED_FAIL_9011, MESSAGE.LIST_FAILED, err)
+        }
+    } 
 }
