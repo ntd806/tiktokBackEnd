@@ -19,7 +19,11 @@ export class SearchService
         const data = this.productDocument(bulkData);
         try {
             const res = await this.bulk(data);
-            return new BaseResponse(HttpStatus.CREATED, res, MESSAGE.CREATE_SUCCESS)
+            return new BaseResponse(
+                HttpStatus.CREATED,
+                res,
+                MESSAGE.CREATE_SUCCESS
+            );
         } catch (err) {
             console.log(err);
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -27,7 +31,7 @@ export class SearchService
     }
 
     public async updateIndex(updateData: any): Promise<any> {
-       return  await this.productDocument(updateData);
+        return await this.productDocument(updateData);
         // return this.insertIndex(data);
     }
 
@@ -42,11 +46,17 @@ export class SearchService
                     query: {
                         multi_match: {
                             query: searchData.search,
-                            fields: ['name', 'description', 'url', 'preview', 'tag']
+                            fields: [
+                                'name',
+                                'description',
+                                'url',
+                                'preview',
+                                'tag'
+                            ]
                         }
                     }
                 }
-            })
+            });
             return res;
         } catch (err) {
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);

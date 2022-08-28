@@ -2,20 +2,20 @@ import { UnsupportedMediaTypeException } from '@nestjs/common';
 import { Express } from 'express';
 
 export function fileMimetypeFilter(...mimetypes: string[]) {
-  return (
-    req,
-    file: Express.Multer.File,
-    callback: (error: Error | null, acceptFile: boolean) => void,
-  ) => {
-    if (mimetypes.some((m) => file.mimetype.includes(m))) {
-      callback(null, true);
-    } else {
-      callback(
-        new UnsupportedMediaTypeException(
-          `File type is not matching: ${mimetypes.join(', ')}`,
-        ),
-        false,
-      );
-    }
-  };
+    return (
+        req,
+        file: Express.Multer.File,
+        callback: (error: Error | null, acceptFile: boolean) => void
+    ) => {
+        if (mimetypes.some((m) => file.mimetype.includes(m))) {
+            callback(null, true);
+        } else {
+            callback(
+                new UnsupportedMediaTypeException(
+                    `File type is not matching: ${mimetypes.join(', ')}`
+                ),
+                false
+            );
+        }
+    };
 }

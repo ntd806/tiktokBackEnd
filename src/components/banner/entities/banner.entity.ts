@@ -54,7 +54,7 @@ export interface BannerMetadata {
     image: {
         url: string;
         name: string;
-    }
+    };
 }
 
 const BannerSchema = SchemaFactory.createForClass(Banner);

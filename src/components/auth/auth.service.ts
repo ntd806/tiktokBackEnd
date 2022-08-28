@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+    BadRequestException,
+    Injectable,
+    NotFoundException
+} from '@nestjs/common';
 import { BaseErrorResponse, BaseResponse, JwtService } from '../../common';
 import { AuthDto, SocialDto, VerifyDto, SignInDto } from './dto';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from '../../constants';
@@ -9,7 +13,7 @@ export class AuthService {
     constructor(
         private readonly jwt: JwtService,
         private userService: UserService
-    ) { }
+    ) {}
 
     async signup(dto: UserDto) {
         const userFind = await this.userService.findByPhoneNumber(dto.phone);
@@ -17,7 +21,7 @@ export class AuthService {
             return new BaseErrorResponse(
                 STATUSCODE.REGISTED_FAILED_802,
                 MESSAGE_ERROR.PHONE_EXISTED
-            )
+            );
         }
 
         const user = await this.userService.create(dto);
@@ -31,7 +35,9 @@ export class AuthService {
 
     async verifyPhoneNumber(verifyDto: VerifyDto) {
         try {
-            const user = await this.userService.findByPhoneNumber(verifyDto.phone);
+            const user = await this.userService.findByPhoneNumber(
+                verifyDto.phone
+            );
             if (!user) {
                 return new BaseResponse(
                     STATUSCODE.PHONE_IS_NEW_801,
@@ -40,8 +46,8 @@ export class AuthService {
                 );
             }
 
-            if(Array.isArray(user.mac)) {
-                if (user.mac.find(macAdd => macAdd === verifyDto.mac)) {
+            if (Array.isArray(user.mac)) {
+                if (user.mac.find((macAdd) => macAdd === verifyDto.mac)) {
                     return new BaseResponse(
                         STATUSCODE.PHONE_USED_OLD_DEVICE_804,
                         true,
@@ -55,8 +61,6 @@ export class AuthService {
                 true,
                 MESSAGE.PHONE_USE_ANOTHER_DEVICE
             );
-
-
         } catch (error) {
             throw new NotFoundException(error);
         }
@@ -64,7 +68,9 @@ export class AuthService {
 
     async socialNetwork(socialDto: SocialDto) {
         try {
-            const user = await this.userService.findByPhoneNumber(socialDto.phone);
+            const user = await this.userService.findByPhoneNumber(
+                socialDto.phone
+            );
             if (!user) {
                 const dataInsert = {
                     ip: socialDto.ip,
@@ -79,7 +85,9 @@ export class AuthService {
                         url: socialDto.url
                     }
                 };
-                const newUser = await this.userService.createUserByGGFb(dataInsert);
+                const newUser = await this.userService.createUserByGGFb(
+                    dataInsert
+                );
                 return new BaseResponse(
                     STATUSCODE.REGISTER_SOCIAL_SUCCESS_805,
                     this.jwt.signToken(newUser.phone, newUser.fullname)
@@ -96,12 +104,13 @@ export class AuthService {
     }
 
     public async signIn(signIn: SignInDto) {
-
         try {
             const user = await this.userService.findByPhoneNumber(signIn.phone);
             if (user && user.mac) {
-                if(Array.isArray(user.mac)) {
-                    const userByMac = user.mac.find(item => item === signIn.mac);
+                if (Array.isArray(user.mac)) {
+                    const userByMac = user.mac.find(
+                        (item) => item === signIn.mac
+                    );
                     if (userByMac) {
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_OLD_DEVICE_804,
@@ -109,8 +118,10 @@ export class AuthService {
                             MESSAGE.PHONE_USE_OLD_DEVICE
                         );
                     } else {
-                        const macs = [...user.mac, signIn.mac]
-                        await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
+                        const macs = [...user.mac, signIn.mac];
+                        await this.userService.updateSomeFieldWithId(user.id, {
+                            mac: macs
+                        });
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
                             this.jwt.signToken(user.phone, user.fullname),
@@ -118,15 +129,17 @@ export class AuthService {
                         );
                     }
                 } else {
-                    if(user.mac === signIn.mac) {
+                    if (user.mac === signIn.mac) {
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_OLD_DEVICE_804,
                             this.jwt.signToken(user.phone, user.fullname),
                             MESSAGE.PHONE_USE_OLD_DEVICE
                         );
                     } else {
-                        const macs = [user.mac, signIn.mac]
-                        await this.userService.updateSomeFieldWithId(user.id, { mac: macs });
+                        const macs = [user.mac, signIn.mac];
+                        await this.userService.updateSomeFieldWithId(user.id, {
+                            mac: macs
+                        });
                         return new BaseResponse(
                             STATUSCODE.PHONE_USED_ANOTHER_DEVICE_803,
                             this.jwt.signToken(user.phone, user.fullname),
@@ -134,8 +147,6 @@ export class AuthService {
                         );
                     }
                 }
-
-    
             } else {
                 return new BaseErrorResponse(
                     STATUSCODE.NOTFOUND_PHONE_OR_MAC_810,
@@ -143,7 +154,7 @@ export class AuthService {
                 );
             }
         } catch (error) {
-            throw new BadRequestException(error)
+            throw new BadRequestException(error);
         }
     }
 }

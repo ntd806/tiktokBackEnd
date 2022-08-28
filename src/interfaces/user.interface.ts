@@ -1,3 +1,3 @@
 export interface ParamUser<T> {
-    user: T
+    user: T;
 }

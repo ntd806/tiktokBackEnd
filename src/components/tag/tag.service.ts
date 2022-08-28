@@ -35,7 +35,11 @@ export class TagService {
     }
 
     async updateTag<T>(tagId: string, tagUpdate: T) {
-        return this.tagModel.findByIdAndUpdate({ _id: tagId }, { $set: tagUpdate }, { new: true })
+        return this.tagModel.findByIdAndUpdate(
+            { _id: tagId },
+            { $set: tagUpdate },
+            { new: true }
+        );
     }
 
     async deleteTagById(tagId: string) {
@@ -48,36 +52,44 @@ export class TagService {
                 ...tagDto,
                 createdAt: moment().toDate(),
                 createdBy: userId
-            }
+            };
             const tag = await this.tagModel.create(withTracking);
-            return new BaseResponse(STATUSCODE.TAG_CREATE_SUCCESS_101,
+            return new BaseResponse(
+                STATUSCODE.TAG_CREATE_SUCCESS_101,
                 tag,
                 MESSAGE.CREATE_SUCCESS
-                )
+            );
         } catch (err) {
-            throw new BadRequestException(MESSAGE_ERROR.CREATE_FAILED)
+            throw new BadRequestException(MESSAGE_ERROR.CREATE_FAILED);
         }
     }
 
-    public async update(userId: string, tagId: string, tagUpdateDto: TagUpdateDto) {
+    public async update(
+        userId: string,
+        tagId: string,
+        tagUpdateDto: TagUpdateDto
+    ) {
         try {
             const tag = await this.getTagById(tagId);
-            if(!tag) {
-                return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND)
+            if (!tag) {
+                return new BaseErrorResponse(
+                    STATUSCODE.TAG_NOT_FOUND_109,
+                    MESSAGE_ERROR.NOT_FOUND
+                );
             }
 
-            const withTracking: TagUpdateDto & BaseTracking ={
+            const withTracking: TagUpdateDto & BaseTracking = {
                 ...tagUpdateDto,
                 updatedAt: moment().toDate(),
                 updatedBy: userId
-            }
+            };
 
             const newTag = await this.updateTag(tagId, withTracking);
             return new BaseResponse(
                 STATUSCODE.TAG_UPDATE_SUCCESS_103,
                 newTag,
                 MESSAGE.UPDATE_SUCCESS
-            )
+            );
         } catch (err) {
             throw new BadRequestException(MESSAGE_ERROR.UPDATE_FAILED);
         }
@@ -86,25 +98,39 @@ export class TagService {
     async deleteTag(tagId: string) {
         try {
             const tag = await this.getTagById(tagId);
-            if(!tag) {
-                return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND);
+            if (!tag) {
+                return new BaseErrorResponse(
+                    STATUSCODE.TAG_NOT_FOUND_109,
+                    MESSAGE_ERROR.NOT_FOUND
+                );
             }
             await this.deleteTagById(tagId);
-            return new BaseResponse(STATUSCODE.TAG_DELETE_SUCCESS_107, null, MESSAGE.DELETE_SUCCESS)
+            return new BaseResponse(
+                STATUSCODE.TAG_DELETE_SUCCESS_107,
+                null,
+                MESSAGE.DELETE_SUCCESS
+            );
         } catch (err) {
-            throw new BadRequestException(MESSAGE_ERROR.DELETE_FAILED)
+            throw new BadRequestException(MESSAGE_ERROR.DELETE_FAILED);
         }
     }
 
     async getTag(tagId: string) {
         try {
             const tag = await this.getTagById(tagId);
-            if(!tag) {
-                return new BaseErrorResponse(STATUSCODE.TAG_NOT_FOUND_109, MESSAGE_ERROR.NOT_FOUND);
+            if (!tag) {
+                return new BaseErrorResponse(
+                    STATUSCODE.TAG_NOT_FOUND_109,
+                    MESSAGE_ERROR.NOT_FOUND
+                );
             }
-            return new BaseResponse(STATUSCODE.TAG_DELETE_SUCCESS_107, tag, MESSAGE.DELETE_SUCCESS)
+            return new BaseResponse(
+                STATUSCODE.TAG_DELETE_SUCCESS_107,
+                tag,
+                MESSAGE.DELETE_SUCCESS
+            );
         } catch (err) {
-            throw new BadRequestException(MESSAGE_ERROR.NOT_FOUND)
-        } 
+            throw new BadRequestException(MESSAGE_ERROR.NOT_FOUND);
+        }
     }
 }

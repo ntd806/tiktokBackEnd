@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsDateString, IsEmail, Length, Matches, ValidateIf } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsString,
+    IsDateString,
+    IsEmail,
+    Length,
+    Matches,
+    ValidateIf
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
@@ -40,9 +48,12 @@ export class UserDto {
     @Length(0, 30, {
         message: 'Full name must be less than 30 characters'
     })
-    @Matches(/^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/i, {
-        message: 'Invalid username',
-    })
+    @Matches(
+        /^[a-zA-Z0-9ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+$/i,
+        {
+            message: 'Invalid username'
+        }
+    )
     fullname: string;
 
     @ApiProperty({

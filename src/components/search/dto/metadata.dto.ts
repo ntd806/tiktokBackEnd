@@ -1,5 +1,5 @@
-import { Metadata } from "src/models";
+import { Metadata } from 'src/models';
 
 export class ProductMetadata {
-    metadata: Metadata
+    metadata: Metadata;
 }

@@ -1,4 +1,9 @@
-import { IsNotEmptyObject, IsOptional, IsString, ValidateIf } from 'class-validator';
+import {
+    IsNotEmptyObject,
+    IsOptional,
+    IsString,
+    ValidateIf
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AvataDto {

@@ -4,14 +4,12 @@ import { JwtPayload } from '../../interfaces';
 
 @Injectable()
 export class JwtService {
-    constructor(
-        private readonly jwt: NestJSJwtService,
-    ) {}
+    constructor(private readonly jwt: NestJSJwtService) {}
 
     signToken(phone: string, fullname: string): { access_token: string } {
         const payload: JwtPayload = {
             sub: phone,
-            fullname,
+            fullname
         };
         const secret = process.env.SECRET;
 
@@ -25,10 +23,13 @@ export class JwtService {
         };
     }
 
-    async signAsyncToken(phone: string, fullname: string): Promise<{ access_token: string }> {
+    async signAsyncToken(
+        phone: string,
+        fullname: string
+    ): Promise<{ access_token: string }> {
         const payload: JwtPayload = {
             sub: phone,
-            fullname,
+            fullname
         };
         const secret = process.env.SECRET;
 
