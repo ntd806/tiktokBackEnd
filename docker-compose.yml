@@ -18,7 +18,7 @@ services:
             - mongo-express
             - kibana
             - redis
-            - nginx
+            # - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
@@ -104,10 +104,10 @@ services:
             - '6379:6379'
         networks:
             - nesjs-network
-    nginx:
-        build: ./nginx
-        ports:
-            - 80:80
+    # nginx:
+    #     build: ./nginx
+    #     ports:
+    #         - 80:80
         # depends_on:
             # - dev
 networks:

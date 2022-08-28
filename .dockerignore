@@ -3,3 +3,6 @@ npm-debug.log
 Dockerfile
 package-lock.json
 .dockerignore
+data
+dist
+esdata
