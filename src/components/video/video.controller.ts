@@ -22,8 +22,7 @@ import {
     ApiQuery
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
-import { multerOptions } from 'src/vender/helper/Helper';
-import { VideoPaginateDto } from './dto';
+import { VideoPaginateDto, NameVideoDto } from './dto';
 import { STATUSCODE } from 'src/constants';
 @ApiBearerAuth('Authorization')
 @ApiTags('video')
@@ -178,5 +177,29 @@ export class VideoController {
         @Query() paginate: VideoPaginateDto,
     ) {
         return await this.videoService.getVideos(paginate);
+    }
+
+    @ApiOperation({
+        summary: 'Get detail video'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_SUCCESS_9010,
+        description: 'Get video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_FAIL_9011,
+        description: 'Get video failed'
+    })
+    @ApiQuery({
+        name: 'name',
+        type: 'string',
+        description: 'name of video need to get',
+        required: false
+    })
+    @Get('get-detail-video')
+    async getDetailVideos(
+        @Query() nameVideo: NameVideoDto,
+    ) {
+        return await this.videoService.getDetailVideos(nameVideo);
     }
 }
