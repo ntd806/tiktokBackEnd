@@ -3,10 +3,9 @@ import { diskStorage } from 'multer';
 import { v4 as uuid } from 'uuid';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
-
 // Multer configuration
 export const multerConfig = {
-    dest: './public/image',
+    dest: './public/image'
 };
 
 // Multer upload options

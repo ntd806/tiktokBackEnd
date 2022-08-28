@@ -9,20 +9,20 @@ import { JwtPayload } from '../../../interfaces/jwt.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-
-    constructor(@InjectModel(User.name) private authModel: Model<User>,
-    private userService: UserService
+    constructor(
+        @InjectModel(User.name) private authModel: Model<User>,
+        private userService: UserService
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
             secretOrKey: process.env.SECRET,
-            ignoreExpiration: false,
+            ignoreExpiration: false
         });
     }
 
     async validate(payload: JwtPayload) {
         const user = await this.userService.findByPhoneNumber(payload.sub);
-        if(!user) {
+        if (!user) {
             return new UnauthorizedException();
         }
         return user;

@@ -9,13 +9,13 @@ export class SearchProductDto {
 
     @IsOptional()
     @IsPositive()
-    @ApiProperty({default: 10})
-    @Transform(({value}) => Number(value))
+    @ApiProperty({ default: 10 })
+    @Transform(({ value }) => Number(value))
     limit: number;
 
     @IsOptional()
     @IsNumber()
-    @ApiProperty({default: 0})
-    @Transform(({value}) => Number(value))
+    @ApiProperty({ default: 0 })
+    @Transform(({ value }) => Number(value))
     offset: number;
 }

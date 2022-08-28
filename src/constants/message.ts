@@ -12,5 +12,5 @@ export enum MESSAGE {
     CREATE_FAILED = 'Create failed',
     UPDATE_FAILED = 'Update failed',
     LIST_SUCCESS = 'List successfully',
-    LIST_FAILED = 'List failed',
+    LIST_FAILED = 'List failed'
 }

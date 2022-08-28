@@ -35,11 +35,11 @@ export class User extends Document {
         }
     ];
 
-    @Prop({type: 'object' })
+    @Prop({ type: 'object' })
     metadata: {
         url: string;
         name: string;
-    }
+    };
 
     @Prop({ type: 'object' })
     social: {

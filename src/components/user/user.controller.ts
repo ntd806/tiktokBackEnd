@@ -10,7 +10,7 @@ import {
     UseInterceptors,
     Query,
     Delete,
-    Param,
+    Param
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
@@ -37,7 +37,7 @@ import { Express } from 'express';
 @ApiTags('user')
 @Controller('/api/v1/user')
 export class UserController {
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService) {}
 
     @ApiOperation({
         summary: 'Get user information'
@@ -80,16 +80,14 @@ export class UserController {
     @UseInterceptors(FileInterceptor('file', multerOptions))
     async updateAvata(
         @Request() req,
-        @UploadedFile(
-            ParseFilePipe,
-        ) file: Express.Multer.File
+        @UploadedFile(ParseFilePipe) file: Express.Multer.File
     ) {
         const avatarDto: AvataDto = {
             metadata: {
                 name: file.filename,
-                url:`${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+                url: `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
             }
-        }
+        };
         return await this.userService.updateAvatar(req.user, avatarDto);
     }
 
@@ -112,7 +110,7 @@ export class UserController {
                     format: 'binary'
                 },
                 fullname: {
-                    type: 'string',
+                    type: 'string'
                 },
                 birthdate: {
                     type: 'date'
@@ -122,13 +120,17 @@ export class UserController {
                     nullable: true
                 },
                 sex: {
-                    type: 'string',
+                    type: 'string'
                 }
             }
         }
     })
     @UseInterceptors(FileInterceptor('file', multerOptions))
-    async updateUser(@Request() req, @Body() dto: UserDto, @UploadedFile('file') file: Express.Multer.File) {
+    async updateUser(
+        @Request() req,
+        @Body() dto: UserDto,
+        @UploadedFile('file') file: Express.Multer.File
+    ) {
         return await this.userService.updateUser(req.user, dto, file);
     }
 

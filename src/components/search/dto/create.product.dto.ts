@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsString, IsNumber, IsNumberString, isURL, IsUrl, ValidateIf, IsOptional } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsString,
+    IsNumber,
+    IsNumberString,
+    isURL,
+    IsUrl,
+    ValidateIf,
+    IsOptional
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -27,7 +36,10 @@ export class CreateProductDto {
     preview: string;
 
     @IsString()
-    @ApiProperty({ description: 'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'})
+    @ApiProperty({
+        description:
+            'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'
+    })
     @ValidateIf((object, value) => value !== null && value !== undefined)
     previewImage: string;
 

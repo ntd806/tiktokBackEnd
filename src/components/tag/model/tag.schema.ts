@@ -11,11 +11,11 @@ export class Tag extends Document {
     @Prop({ type: Date })
     updatedAt: Date;
 
-    @Prop({ type: Array})
-    tagRelate: []
+    @Prop({ type: Array })
+    tagRelate: [];
 
     @Prop()
-    createdBy: string
+    createdBy: string;
 
     @Prop()
     tagCategory: string;

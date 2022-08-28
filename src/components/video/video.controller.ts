@@ -137,9 +137,7 @@ export class VideoController {
         required: true
     })
     @Get('get-relative-video-by-tag')
-    async getRelativeVideoByTag(
-        @Query() searchProductDto: SearchProductDto,
-    ) {
+    async getRelativeVideoByTag(@Query() searchProductDto: SearchProductDto) {
         return await this.videoService.getRelativeVideoByTag(searchProductDto);
     }
 
@@ -173,9 +171,7 @@ export class VideoController {
         required: true
     })
     @Get('get-videos')
-    async getVideos(
-        @Query() paginate: VideoPaginateDto,
-    ) {
+    async getVideos(@Query() paginate: VideoPaginateDto) {
         return await this.videoService.getVideos(paginate);
     }
 }

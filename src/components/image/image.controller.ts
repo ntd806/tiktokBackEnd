@@ -1,6 +1,6 @@
 import { Controller, Res, Get, NotFoundException, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
-import { join } from 'path'
+import { join } from 'path';
 import * as fs from 'fs';
 
 @ApiTags('image')

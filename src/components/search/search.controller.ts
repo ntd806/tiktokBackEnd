@@ -42,7 +42,7 @@ import { JwtGuard } from '../auth/guard';
 @ApiBearerAuth('Authorization')
 @UseGuards(JwtGuard)
 export class SearchController {
-    constructor(private searchService: SearchService) { }
+    constructor(private searchService: SearchService) {}
 
     @Post('insert-index')
     @ApiOperation({
@@ -55,7 +55,8 @@ export class SearchController {
                 file: {
                     type: 'string',
                     format: 'binary',
-                    description: 'image file upload, if available image url please empty field'
+                    description:
+                        'image file upload, if available image url please empty field'
                 },
                 name: {
                     type: 'string'
@@ -73,14 +74,16 @@ export class SearchController {
                 previewImage: {
                     type: 'string',
                     nullable: true,
-                    description: 'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'
+                    description:
+                        'if uploaded image file, please empty field, otherwise please fill image URL here if not upload image file'
                 },
                 tag: {
-                    type: 'string',
+                    type: 'string'
                 },
                 tagId: {
                     type: 'string',
-                    description: '_id tag from tag list, if _id from tag list is empty, please create a new tag and assign _id here'
+                    description:
+                        '_id tag from tag list, if _id from tag list is empty, please create a new tag and assign _id here'
                 },
                 type: {
                     type: 'number'
@@ -107,20 +110,20 @@ export class SearchController {
             metadata: {} as Metadata,
             createdAt: moment().toDate(),
             createdBy: req.user.id
-        }
+        };
         if (file) {
-            const url = `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`
+            const url = `${process.env.URL_DOMAIN_SERVER}/image/${file.filename}`;
             product.previewImage = url;
 
             product.metadata = {
                 url,
-                name: file.filename,
-            }
+                name: file.filename
+            };
         } else {
             product.metadata = {
                 url: product.previewImage,
-                name: '',
-            }
+                name: ''
+            };
         }
         return await this.searchService.insertIndex(product);
     }
@@ -141,7 +144,7 @@ export class SearchController {
             ...updateDto,
             updatedBy: req.user.id,
             updatedAt: moment().toDate()
-        }
+        };
         return this.searchService.updateIndex(product);
     }
 

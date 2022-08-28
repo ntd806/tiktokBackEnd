@@ -1,4 +1,11 @@
-import { IsArray, IsDateString, IsNotEmpty, IsString, MaxLength, ValidateIf } from 'class-validator';
+import {
+    IsArray,
+    IsDateString,
+    IsNotEmpty,
+    IsString,
+    MaxLength,
+    ValidateIf
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TagUpdateDto {
@@ -22,7 +29,7 @@ export class TagUpdateDto {
             tagId: string;
             tagName: string;
         }
-    ]
+    ];
 
     @ApiProperty({
         description: 'Tag category',

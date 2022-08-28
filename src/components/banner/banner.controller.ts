@@ -16,14 +16,20 @@ import {
 import { BannerService } from './banner.service';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiConsumes,
+    ApiResponse,
+    ApiTags
+} from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from 'src/vender/helper/Helper';
 import { MESSAGE, STATUSCODE } from 'src/constants';
 import { PaginateQueryDto } from './dto/paginate.dto';
 import { ParseFilePipe } from 'src/validator/pipe/parse-file.pipe';
-import { Express } from 'express'
+import { Express } from 'express';
 import { FileSizeValidationPipe } from 'src/validator/pipe/fileSize.pipe';
 
 @ApiBearerAuth('Authorization')
@@ -31,7 +37,7 @@ import { FileSizeValidationPipe } from 'src/validator/pipe/fileSize.pipe';
 @UseGuards(JwtGuard)
 @Controller('/api/v1/banner')
 export class BannerController {
-    constructor(private readonly bannerService: BannerService) { }
+    constructor(private readonly bannerService: BannerService) {}
 
     @Post()
     @ApiConsumes('multipart/form-data')
@@ -54,20 +60,20 @@ export class BannerController {
             properties: {
                 file: {
                     type: 'string',
-                    format: 'binary',
+                    format: 'binary'
                 },
                 status: {
-                    type: 'string',
+                    type: 'string'
                 },
                 template: {
                     type: 'string',
                     nullable: true
                 },
                 transparent: {
-                    type: 'boolean',
+                    type: 'boolean'
                 },
                 title: {
-                    type: 'string',
+                    type: 'string'
                 },
                 campaignId: {
                     type: 'string',
@@ -75,7 +81,7 @@ export class BannerController {
                 },
                 startDate: {
                     type: 'datetime',
-                    format: 'datetime',
+                    format: 'datetime'
                 },
                 endDate: {
                     type: 'datetime',
@@ -85,12 +91,14 @@ export class BannerController {
                     type: 'boolean',
                     default: false
                 }
-            },
+            }
         }
     })
-    create(@Req() req, @UploadedFile(
-        ParseFilePipe
-    ) file: Express.Multer.File, @Body() createBannerDto: CreateBannerDto) {
+    create(
+        @Req() req,
+        @UploadedFile(ParseFilePipe) file: Express.Multer.File,
+        @Body() createBannerDto: CreateBannerDto
+    ) {
         return this.bannerService.create(req.user.id, createBannerDto, file);
     }
 
@@ -107,10 +115,11 @@ export class BannerController {
         status: STATUSCODE.COMMON_BAD_REQUEST,
         description: 'validation error'
     })
-    async paginateBanner(
-        @Query() paginateQuery: PaginateQueryDto
-    ) {
-        return await this.bannerService.paginateBanner(paginateQuery.offset, paginateQuery.limit);
+    async paginateBanner(@Query() paginateQuery: PaginateQueryDto) {
+        return await this.bannerService.paginateBanner(
+            paginateQuery.offset,
+            paginateQuery.limit
+        );
     }
 
     @Get(':id')
@@ -151,21 +160,20 @@ export class BannerController {
                 file: {
                     type: 'string',
                     format: 'binary',
-                    nullable: true,
-                    
+                    nullable: true
                 },
                 status: {
-                    type: 'string',
+                    type: 'string'
                 },
                 template: {
                     type: 'string',
                     nullable: true
                 },
                 transparent: {
-                    type: 'boolean',
+                    type: 'boolean'
                 },
                 title: {
-                    type: 'string',
+                    type: 'string'
                 },
                 campaignId: {
                     type: 'string',
@@ -173,7 +181,7 @@ export class BannerController {
                 },
                 startDate: {
                     type: 'datetime',
-                    format: 'datetime',
+                    format: 'datetime'
                 },
                 endDate: {
                     type: 'datetime',
@@ -183,12 +191,21 @@ export class BannerController {
                     type: 'boolean',
                     default: false
                 }
-            },
+            }
         }
     })
     @UseInterceptors(FileInterceptor('file', multerOptions))
-    update(@Req() req, @Param('id') id: string,  @Body() updateBannerDto: UpdateBannerDto) {
-        return this.bannerService.update(req.user.id, id, updateBannerDto, req.file);
+    update(
+        @Req() req,
+        @Param('id') id: string,
+        @Body() updateBannerDto: UpdateBannerDto
+    ) {
+        return this.bannerService.update(
+            req.user.id,
+            id,
+            updateBannerDto,
+            req.file
+        );
     }
 
     @ApiResponse({

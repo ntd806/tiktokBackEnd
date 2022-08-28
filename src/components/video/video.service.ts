@@ -1,4 +1,9 @@
-import { Injectable, HttpException, HttpStatus, InternalServerErrorException } from '@nestjs/common';
+import {
+    Injectable,
+    HttpException,
+    HttpStatus,
+    InternalServerErrorException
+} from '@nestjs/common';
 import { LikeDto } from './dto/like.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
@@ -223,16 +228,22 @@ export class VideoService extends ElasticsearchService {
                         match_all: {}
                     }
                 }
-            })
+            });
 
-            return new BaseResponse(STATUSCODE.LISTED_SUCCESS_9010, {
-                videos: videos.hits.hits,
-                total: videos.hits.total
-            },
-            MESSAGE.LIST_SUCCESS
-            )
+            return new BaseResponse(
+                STATUSCODE.LISTED_SUCCESS_9010,
+                {
+                    videos: videos.hits.hits,
+                    total: videos.hits.total
+                },
+                MESSAGE.LIST_SUCCESS
+            );
         } catch (err) {
-            throw new BaseErrorResponse(STATUSCODE.LISTED_FAIL_9011, MESSAGE.LIST_FAILED, err)
+            throw new BaseErrorResponse(
+                STATUSCODE.LISTED_FAIL_9011,
+                MESSAGE.LIST_FAILED,
+                err
+            );
         }
     }
 }

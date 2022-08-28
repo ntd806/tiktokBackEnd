@@ -54,9 +54,7 @@ export class TagController {
         status: STATUSCODE.TAG_LIST_FAIL_106,
         description: 'Get list tag failed'
     })
-    public async getTags(
-        @Query() paginationQuery: PaginationQueryDto
-    ) {
+    public async getTags(@Query() paginationQuery: PaginationQueryDto) {
         return await this.tagService.findTagsPaginate(paginationQuery);
     }
 
@@ -69,9 +67,7 @@ export class TagController {
         description: 'Get tag failed'
     })
     @Get(':tagId')
-    public async getTag(
-        @Param('tagId') tagId: string
-    ) {
+    public async getTag(@Param('tagId') tagId: string) {
         return await this.tagService.getTag(tagId);
     }
 
@@ -103,7 +99,11 @@ export class TagController {
         description: 'Tag update failed!'
     })
     @Put(':tagId')
-    public async updateTag(@Req() req, @Param('tagId') tagId: string, @Body() tagUpdateDto: TagUpdateDto) {
+    public async updateTag(
+        @Req() req,
+        @Param('tagId') tagId: string,
+        @Body() tagUpdateDto: TagUpdateDto
+    ) {
         return await this.tagService.update(req.user.id, tagId, tagUpdateDto);
     }
 
