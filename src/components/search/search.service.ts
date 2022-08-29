@@ -63,11 +63,12 @@ export class SearchService
         }
     }
 
-    public async deleteIndex(indexData: any): Promise<any> {
+    public async deleteIndex(): Promise<any> {
         return this.indices
-            .delete(indexData)
+            .delete({index:productIndex._index})
             .then((res) => res)
             .catch((err) => {
+                console.log(err);
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
     }

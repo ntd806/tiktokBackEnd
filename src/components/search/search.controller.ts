@@ -170,8 +170,8 @@ export class SearchController {
         status: 200,
         description: 'delete index success'
     })
-    public async deleteIndex(@Body() body): Promise<any> {
-        return this.searchService.deleteIndex(body);
+    public async deleteIndex(): Promise<any> {
+        return this.searchService.deleteIndex();
     }
 
     @Delete('delete-document')
