@@ -65,7 +65,7 @@ export class SearchService
 
     public async deleteIndex(): Promise<any> {
         return this.indices
-            .delete({index:productIndex._index})
+            .delete({ index: productIndex._index })
             .then((res) => res)
             .catch((err) => {
                 console.log(err);
