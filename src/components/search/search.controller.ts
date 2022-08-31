@@ -28,7 +28,6 @@ import {
     CreateProductDto,
     UpdateProductDto,
     SearchProductDto,
-    ProductMetadata
 } from './dto/index';
 import { multerOptions } from '../../vender/helper/Helper';
 import { Observable, of } from 'rxjs';

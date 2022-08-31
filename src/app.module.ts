@@ -17,6 +17,7 @@ import { ImageModule } from './components/image/image.module';
 import { BannerModule } from './components/banner/banner.module';
 import * as dotenv from 'dotenv';
 import { MulterModule } from '@nestjs/platform-express';
+import { TrendModule } from './components/trend/trend.module';
 dotenv.config();
 @Module({
     imports: [
@@ -41,7 +42,8 @@ dotenv.config();
         BannerModule,
         MulterModule.register({
             dest: './public/image'
-        })
+        }),
+        TrendModule
     ],
     controllers: []
 })
