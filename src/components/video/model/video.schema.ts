@@ -12,7 +12,30 @@ export class Video extends Document {
     description: string;
 
     @Prop()
+    esIndex: string;
+
+    @Prop()
     tag: string;
+
+    @Prop({
+        required: false
+    })
+    updatedBy?: string;
+
+    @Prop({
+        required: false
+    })
+    createdBy?: string;
+
+    @Prop({
+        required: false,
+    })
+    createdAt?: Date;
+
+    @Prop({
+        required: false
+    })
+    updatedAt?: Date;
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video);
