@@ -30,7 +30,7 @@ import { STATUSCODE } from 'src/constants';
 @UseGuards(JwtGuard)
 @Controller('/api/v1/video')
 export class VideoController {
-    constructor(private videoService: VideoService) { }
+    constructor(private videoService: VideoService) {}
 
     @ApiOperation({
         summary: 'Like video'
@@ -61,7 +61,7 @@ export class VideoController {
                 streamKey: {
                     type: 'string',
                     description: 'streamKey live stream'
-                },
+                }
             }
         }
     })

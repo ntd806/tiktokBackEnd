@@ -37,7 +37,10 @@ export class SearchService
     public async insertIndex(bulkData: any): Promise<any> {
         try {
             const video = await this.createVideo(bulkData);
-            const data = this.productDocument({...bulkData, videoId: video._id});
+            const data = this.productDocument({
+                ...bulkData,
+                videoId: video._id
+            });
             await this.bulk(data);
 
             return new BaseResponse(
