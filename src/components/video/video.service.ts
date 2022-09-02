@@ -147,7 +147,7 @@ export class VideoService extends ElasticsearchService {
 
         const maps = videos.map(video => ({...video, _source: {
             ...video._source,
-            total_like: result[video._source.videoId]
+            total_like: video._source.videoId ? result[video._source.videoId] : 0
         }}))
 
         return {
