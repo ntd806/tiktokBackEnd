@@ -2,7 +2,6 @@ import { IsString , IsBoolean, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ReactionDto {
-
     @ApiProperty({
         description: '_id of video (streamKey if is live stream)'
     })

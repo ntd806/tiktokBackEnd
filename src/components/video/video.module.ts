@@ -19,4 +19,4 @@ import { Bookmark, BookmarkSchema } from './model/bookmark.schema';
     providers: [VideoService],
     controllers: [VideoController]
 })
-export class VideoModule { }
+export class VideoModule {}

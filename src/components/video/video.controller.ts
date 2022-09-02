@@ -30,7 +30,7 @@ import { STATUSCODE } from 'src/constants';
 @UseGuards(JwtGuard)
 @Controller('/api/v1/video')
 export class VideoController {
-    constructor(private videoService: VideoService) { }
+    constructor(private videoService: VideoService) {}
 
     @ApiOperation({
         summary: 'Like video'
@@ -57,7 +57,7 @@ export class VideoController {
                 videoId: {
                     type: 'string',
                     description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
-                },
+                }
             }
         }
     })

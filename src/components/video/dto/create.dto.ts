@@ -1,7 +1,13 @@
-import { IsString, IsNumber, IsNotEmpty, IsOptional, ValidateIf, IsDateString } from 'class-validator';
+import {
+    IsString,
+    IsNumber,
+    IsNotEmpty,
+    IsOptional,
+    ValidateIf,
+    IsDateString
+} from 'class-validator';
 
 export class CreateVideoDto {
-
     @IsString()
     @IsNotEmpty()
     url: string;
@@ -24,12 +30,18 @@ export class CreateVideoDto {
 
     @IsString()
     @IsOptional()
-    @ValidateIf((object, value) => value !== null && value !== undefined && value.length > 0)
+    @ValidateIf(
+        (object, value) =>
+            value !== null && value !== undefined && value.length > 0
+    )
     updatedBy?: string;
 
     @IsString()
     @IsOptional()
-    @ValidateIf((object, value) => value !== null && value !== undefined && value.length > 0)
+    @ValidateIf(
+        (object, value) =>
+            value !== null && value !== undefined && value.length > 0
+    )
     createdBy?: string;
 
     @IsDateString()
