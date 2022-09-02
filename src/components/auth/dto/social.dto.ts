@@ -1,12 +1,11 @@
 import {
     IsString,
     IsNotEmpty,
-    IsNumber,
     IsEmail,
     Length,
     Matches,
-    IsIP,
-    IsUrl
+    IsUrl,
+    IsBoolean
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -76,15 +75,6 @@ export class SocialDto {
     phone: string;
 
     @ApiProperty({
-        description: 'Ip of user'
-    })
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    @IsIP()
-    ip: string;
-
-    @ApiProperty({
         description: 'url of user'
     })
     @ApiProperty()
@@ -97,7 +87,6 @@ export class SocialDto {
         description: 'Is Google or not Google'
     })
     @ApiProperty()
-    @IsNotEmpty()
-    @IsNumber()
-    isGoogle: number;
+    @IsBoolean()
+    isGoogle: boolean;
 }
