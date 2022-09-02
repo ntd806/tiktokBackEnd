@@ -49,27 +49,34 @@ export class VideoService extends ElasticsearchService {
             userId,
             reactionDate: moment().toISOString(),
             isLiked: true
-        }
+        };
         try {
             console.log(reaction);
-            const reactionFind = await this.reactionModel.findOne({ userId, videoId: reaction.videoId });
+            const reactionFind = await this.reactionModel.findOne({
+                userId,
+                videoId: reaction.videoId
+            });
             if (reactionFind) {
-                await this.updateReaction(reactionFind._id, { isLiked: reactionFind.isLiked ? false : true });
+                await this.updateReaction(reactionFind._id, {
+                    isLiked: reactionFind.isLiked ? false : true
+                });
                 return new BaseResponse(
-                    reactionFind.isLiked ? STATUSCODE.VIDEO_UNLIKE_SUCCESS_903 : STATUSCODE.VIDEO_LIKE_SUCCESS_901,
+                    reactionFind.isLiked
+                        ? STATUSCODE.VIDEO_UNLIKE_SUCCESS_903
+                        : STATUSCODE.VIDEO_LIKE_SUCCESS_901,
                     null,
                     reactionFind.isLiked ? 'Unliked video' : 'Liked this video'
-                )
+                );
             } else {
-                const response = await this.createReaction(reaction)
+                const response = await this.createReaction(reaction);
                 return new BaseResponse(
                     STATUSCODE.VIDEO_LIKE_SUCCESS_901,
                     response,
                     'Liked this video'
-                )
+                );
             }
         } catch (e) {
-            throw new BadRequestException(e)
+            throw new BadRequestException(e);
         }
     }
 
@@ -129,26 +136,33 @@ export class VideoService extends ElasticsearchService {
             {
                 $group: {
                     _id: '$videoId',
-                    total_like: { $sum: { $cond: [{ $eq: ["$isLiked", true] }, 1, 0] } },
+                    total_like: {
+                        $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
+                    }
                 }
             },
             {
                 $group: {
                     _id: null,
-                    root: { $push: { k: "$_id", v: "$total_like" } }
+                    root: { $push: { k: '$_id', v: '$total_like' } }
                 }
             },
             {
-                $replaceRoot: { newRoot: { $arrayToObject: "$root" } }
+                $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
             }
-        ])
+        ]);
 
         const result = aggregate[0];
 
-        const maps = videos.map(video => ({...video, _source: {
-            ...video._source,
-            total_like: video._source.videoId ? result[video._source.videoId] : 0
-        }}))
+        const maps = videos.map((video) => ({
+            ...video,
+            _source: {
+                ...video._source,
+                total_like: video._source.videoId
+                    ? result[video._source.videoId]
+                    : 0
+            }
+        }));
 
         return {
             code: 90009,
@@ -198,7 +212,7 @@ export class VideoService extends ElasticsearchService {
             });
             return response.hits.hits;
         } catch (err) {
-            console.log(err, 'errror')
+            console.log(err, 'errror');
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

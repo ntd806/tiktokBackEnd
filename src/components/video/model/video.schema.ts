@@ -28,7 +28,7 @@ export class Video extends Document {
     createdBy?: string;
 
     @Prop({
-        required: false,
+        required: false
     })
     createdAt?: Date;
 
