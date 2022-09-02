@@ -9,6 +9,12 @@ export class Trend extends Document {
 
     @Prop()
     tag: string;
+
+    @Prop({ type: Date })
+    createddAt: Date;
+
+    @Prop({ type: Date })
+    updateddAt: Date;
 }
 
 export const TrendSchema = SchemaFactory.createForClass(Trend);

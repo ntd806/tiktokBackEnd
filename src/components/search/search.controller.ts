@@ -27,7 +27,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import {
     CreateProductDto,
     UpdateProductDto,
-    SearchProductDto,
+    SearchProductDto
 } from './dto/index';
 import { multerOptions } from '../../vender/helper/Helper';
 import { Observable, of } from 'rxjs';

@@ -15,12 +15,15 @@ import {
 } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { TrendService } from './trend.service';
 
 @Controller('trend')
 @ApiTags('trend')
 @ApiBearerAuth('Authorization')
 @UseGuards(JwtGuard)
 export class TrendController {
+    constructor(private trendService: TrendService) {}
+
     @Post()
     @ApiOperation({
         summary: 'Analytics trend by CSV'
@@ -41,5 +44,6 @@ export class TrendController {
     @ApiConsumes('multipart/form-data')
     @UseInterceptors(FileInterceptor('file', multerCSV))
     async uploadFile(@UploadedFile() file) {
+        return this.trendService.readFile(file.filename);
     }
 }
