@@ -5,23 +5,44 @@ import { ConfigSearch } from './config/config.search';
 import { productIndex } from './constant/product.elastic';
 import { BaseResponse } from 'src/common';
 import { MESSAGE, STATUSCODE } from 'src/constants';
+import { Model } from 'mongoose';
+import { Video } from '../video/model/video.schema';
+import { CreateVideoDto } from '../video/dto';
+import { InjectModel } from '@nestjs/mongoose';
 // import { ProductSearchObject } from './model/product.search.object';
 @Injectable()
 export class SearchService
     extends ElasticsearchService
     implements SearchServiceInterface<any>
 {
-    constructor() {
+    constructor(
+        @InjectModel(Video.name)
+        private videoModel: Model<Video>
+    ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
 
+    async findVideoById(id: string) {
+        return await this.videoModel.findById(id);
+    }
+
+    async findByESIndex(esIndex: string) {
+        return await this.videoModel.findOne({ esIndex });
+    }
+
+    async createVideo(video: CreateVideoDto) {
+        return await this.videoModel.create(video);
+    }
+
     public async insertIndex(bulkData: any): Promise<any> {
-        const data = this.productDocument(bulkData);
         try {
-            const res = await this.bulk(data);
+            const video = await this.createVideo(bulkData);
+            const data = this.productDocument({...bulkData, videoId: video._id});
+            await this.bulk(data);
+
             return new BaseResponse(
                 HttpStatus.CREATED,
-                res,
+                video,
                 MESSAGE.CREATE_SUCCESS
             );
         } catch (err) {
