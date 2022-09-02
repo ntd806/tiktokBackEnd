@@ -18,6 +18,10 @@ export class CreateVideoDto {
 
     @IsString()
     @IsNotEmpty()
+    previewImage: string;
+
+    @IsString()
+    @IsNotEmpty()
     description: string;
 
     @IsString()

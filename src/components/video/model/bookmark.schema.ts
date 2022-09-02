@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 @Schema()
-export class Reaction extends Document {
+export class Bookmark extends Document {
     @Prop()
     url: string;
 
@@ -9,13 +9,10 @@ export class Reaction extends Document {
     userId: string;
 
     @Prop()
-    reactionDate?: Date;
+    bookmarkDate?: Date;
 
     @Prop()
     isLive: boolean;
-
-    @Prop()
-    isLiked: boolean;
 
     @Prop()
     videoId: string;
@@ -24,4 +21,4 @@ export class Reaction extends Document {
     previewImage: string | null | undefined;
 }
 
-export const ReactionSchema = SchemaFactory.createForClass(Reaction);
+export const BookmarkSchema = SchemaFactory.createForClass(Bookmark);

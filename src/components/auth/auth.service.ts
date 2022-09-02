@@ -1,6 +1,7 @@
 import {
     BadRequestException,
     Injectable,
+    InternalServerErrorException,
     NotFoundException
 } from '@nestjs/common';
 import { BaseErrorResponse, BaseResponse, JwtService } from '../../common';
@@ -71,9 +72,9 @@ export class AuthService {
             const user = await this.userService.findByPhoneNumber(
                 socialDto.phone
             );
-            if (!user) {
+            const userByEmail = await this.userService.findByEmail(socialDto.email);
+            if (!user && !userByEmail) {
                 const dataInsert = {
-                    ip: socialDto.ip,
                     mac: [socialDto.mac],
                     phone: socialDto.phone,
                     fullname: socialDto.fullname,
@@ -93,13 +94,19 @@ export class AuthService {
                     this.jwt.signToken(newUser.phone, newUser.fullname)
                 );
             } else {
+                if(userByEmail) {
+                    return new BaseErrorResponse(
+                        STATUSCODE.REGISTED_FAILED_802,
+                        MESSAGE_ERROR.EMAIL_EXISTED
+                    );
+                }
                 return new BaseErrorResponse(
                     STATUSCODE.REGISTED_FAILED_802,
                     MESSAGE_ERROR.PHONE_EXISTED
                 );
             }
         } catch (error) {
-            throw new NotFoundException(error);
+            throw new InternalServerErrorException(error);
         }
     }
 

@@ -20,13 +20,16 @@ import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
 import { Reaction } from './model/reaction.schema';
 import { Video } from './model/video.schema';
 import * as moment from 'moment';
+import { Bookmark } from './model/bookmark.schema';
 @Injectable()
 export class VideoService extends ElasticsearchService {
     constructor(
         @InjectModel(Reaction.name)
         private readonly reactionModel: Model<Reaction>,
         @InjectModel(Video.name)
-        private readonly videoModel: Model<Video>
+        private readonly videoModel: Model<Video>,
+        @InjectModel(Bookmark.name)
+        private readonly bookmarkModel: Model<Bookmark>
     ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
@@ -43,6 +46,40 @@ export class VideoService extends ElasticsearchService {
         return await this.reactionModel.create(reaction);
     }
 
+    async getImageURL(videoId: string) {
+        let imageURL = null;
+        const videoFinder = await this.videoModel.findById(videoId);
+        if (videoFinder) {
+            imageURL = videoFinder.previewImage
+        } else {
+            const document = await this.search({
+                index: productIndex._index,
+                query: {
+                    terms: {
+                        _id: [videoId]
+                    }
+                }
+            })
+            const videos = document.hits.hits;
+            if (videos.length > 0) {
+                imageURL = (videos[0]._source as any).previewImage
+            }
+        }
+        return imageURL;
+    }
+
+    async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
+        return await this.reactionModel.updateMany({videoId}, { $set: reaction }, { multi: true });
+    }
+
+    async deleteBookmark(bookmarkId: string) {
+        return await this.bookmarkModel.findByIdAndDelete(bookmarkId);
+    }
+
+    async createBookmark<T>(bookmark: T) {
+        return await this.bookmarkModel.create(bookmark);
+    }
+
     async reactionVideo(userId: string, reactionDto: ReactionDto) {
         const reaction = {
             ...reactionDto,
@@ -51,15 +88,11 @@ export class VideoService extends ElasticsearchService {
             isLiked: true
         };
         try {
-            console.log(reaction);
-            const reactionFind = await this.reactionModel.findOne({
-                userId,
-                videoId: reaction.videoId
-            });
+            const reactionFind = await this.reactionModel.findOne({ userId, videoId: reaction.videoId });
             if (reactionFind) {
-                await this.updateReaction(reactionFind._id, {
-                    isLiked: reactionFind.isLiked ? false : true
-                });
+                const previewImage = await this.getImageURL(reaction.videoId);
+                await this.updateReaction(reactionFind._id, { isLiked: reactionFind.isLiked ? false : true, previewImage });
+                await this.updateManyReactionByVideoId(reaction.videoId, { previewImage })
                 return new BaseResponse(
                     reactionFind.isLiked
                         ? STATUSCODE.VIDEO_UNLIKE_SUCCESS_903
@@ -68,7 +101,8 @@ export class VideoService extends ElasticsearchService {
                     reactionFind.isLiked ? 'Unliked video' : 'Liked this video'
                 );
             } else {
-                const response = await this.createReaction(reaction);
+                const previewImage = await this.getImageURL(reaction.videoId);
+                const response = await this.createReaction({ ...reaction, previewImage })
                 return new BaseResponse(
                     STATUSCODE.VIDEO_LIKE_SUCCESS_901,
                     response,
@@ -80,21 +114,77 @@ export class VideoService extends ElasticsearchService {
         }
     }
 
-    async getListVideoLiked(user: User, paginationQuery: PaginationQueryDto) {
+    async bookmarkVideo(userId: string, bookmarkDto: ReactionDto) {
+        const bookmark = {
+            ...bookmarkDto,
+            userId,
+            bookmarkDate: moment().toISOString(),
+        }
+        try {
+            const bookmarkFind = await this.bookmarkModel.findOne({ userId, videoId: bookmark.videoId });
+            if (bookmarkFind) {
+                await this.deleteBookmark(bookmarkFind._id)
+                return new BaseResponse(
+                    STATUSCODE.VIDEO_UNBOOKMARK_911,
+                    null,
+                    'Unbookmark video'
+                )
+            } else {
+                const previewImage = await this.getImageURL(bookmark.videoId);
+                const response = await this.createBookmark({ ...bookmark, previewImage })
+                return new BaseResponse(
+                    STATUSCODE.VIDEO_BOOKMARK_SUCCESS_910,
+                    response,
+                    'Bookmark this video'
+                )
+            }
+        } catch (e) {
+            throw new BadRequestException(e)
+        }
+    }
+
+    async getVideoBookmarks(userId: string, pagination: PaginationQueryDto) {
+        try {
+            const { limit, offset } = pagination;
+            const videos = await this.bookmarkModel.find({ userId })
+                .skip(offset)
+                .limit(limit);
+
+            return new BaseResponse(
+                STATUSCODE.VIDEO_LIST_SUCCESS_905,
+                videos,
+                'Get list video successfully'
+            )
+
+        } catch (err) {
+            return new BaseErrorResponse(
+                STATUSCODE.VIDEO_LIST_FAIL_906,
+                'Get list video failed',
+                null,
+            )
+        }
+    }
+
+
+    async getListVideoLiked(userId: string, paginationQuery: PaginationQueryDto) {
         try {
             const { limit, offset } = paginationQuery;
-            console.log(paginationQuery);
-            return {
-                code: 90005,
-                data: user.like.slice((offset - 1) * limit, offset * limit),
-                message: 'Get list video successfully'
-            };
+            const videos = await this.reactionModel.find({ userId, isLiked: true })
+                .skip(offset)
+                .limit(limit);
+
+            return new BaseResponse(
+                STATUSCODE.VIDEO_LIST_SUCCESS_905,
+                videos,
+                'Get list video successfully'
+            )
+
         } catch (err) {
-            return {
-                code: 90006,
-                data: false,
-                message: 'Get list video failed'
-            };
+            return new BaseErrorResponse(
+                STATUSCODE.VIDEO_LIST_FAIL_906,
+                'Get list video failed',
+                null,
+            )
         }
     }
 
@@ -152,17 +242,19 @@ export class VideoService extends ElasticsearchService {
             }
         ]);
 
-        const result = aggregate[0];
 
-        const maps = videos.map((video) => ({
-            ...video,
-            _source: {
+        let result = {};
+
+        if (aggregate.length > 0) {
+            result = aggregate[0]
+        }
+
+        const maps = videos.map(video => ({
+            ...video, _source: {
                 ...video._source,
-                total_like: video._source.videoId
-                    ? result[video._source.videoId]
-                    : 0
+                total_like: video._source.videoId ? result[video._source.videoId] || 0 : video._id ? result[video._id] || 0 : 0
             }
-        }));
+        }))
 
         return {
             code: 90009,
