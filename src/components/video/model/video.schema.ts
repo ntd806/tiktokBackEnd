@@ -36,6 +36,9 @@ export class Video extends Document {
         required: false
     })
     updatedAt?: Date;
+
+    @Prop()
+    previewImage: string;
 }
 
 export const VideoSchema = SchemaFactory.createForClass(Video);

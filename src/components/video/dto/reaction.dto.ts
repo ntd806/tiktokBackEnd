@@ -1,6 +1,5 @@
-import { IsString, IsOptional, ValidateIf, IsBoolean } from 'class-validator';
+import { IsString , IsBoolean, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Transform } from 'class-transformer';
 
 export class ReactionDto {
     @ApiProperty({
@@ -13,6 +12,7 @@ export class ReactionDto {
         description: 'URL of video'
     })
     @IsString()
+    @IsUrl()
     url: string;
 
     @ApiProperty({

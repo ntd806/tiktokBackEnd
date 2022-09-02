@@ -54,13 +54,9 @@ export class VideoController {
                 isLive: {
                     type: 'boolean'
                 },
-                id: {
+                videoId: {
                     type: 'string',
-                    description: 'mongo video _id (ignore if is live stream)'
-                },
-                streamKey: {
-                    type: 'string',
-                    description: 'streamKey live stream'
+                    description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
                 }
             }
         }
@@ -68,6 +64,74 @@ export class VideoController {
     @Post('reaction')
     async reactionVideo(@Request() req, @Body() reactionDto: ReactionDto) {
         return await this.videoService.reactionVideo(req.user.id, reactionDto);
+    }
+
+    @ApiOperation({
+        summary: 'Bookmark video'
+    })
+    @ApiResponse({
+        status: STATUSCODE.VIDEO_BOOKMARK_SUCCESS_910,
+        description: 'Bookmark video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.VIDEO_UNBOOKMARK_911,
+        description: 'Unbookmark video successfully'
+    })
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                url: {
+                    type: 'string',
+                    description: 'url of video'
+                },
+                isLive: {
+                    type: 'boolean'
+                },
+                videoId: {
+                    type: 'string',
+                    description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
+                },
+            }
+        }
+    })
+    @Post('bookmark')
+    async bookmarkVideo(@Request() req, @Body() bookmarkDto: ReactionDto) {
+        return await this.videoService.bookmarkVideo(req.user.id, bookmarkDto);
+    }
+
+    @ApiOperation({
+        summary: 'Get list video bookmark'
+    })
+    @ApiResponse({
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
+        description: 'Get list video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.VIDEO_LIST_FAIL_906,
+        description: 'Get list video failed'
+    })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true,
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    @Get('video-bookmarks')
+    async getVideoBookmarks(
+        @Request() req,
+        @Query() pagination: PaginationQueryDto
+    ) {
+        return await this.videoService.getVideoBookmarks(
+            req.user.id,
+            pagination
+        );
     }
 
     @ApiOperation({
@@ -85,7 +149,7 @@ export class VideoController {
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required: true
+        required: true,
     })
     @ApiQuery({
         name: 'offset',
@@ -99,7 +163,7 @@ export class VideoController {
         @Query() paginationQuery: PaginationQueryDto
     ) {
         return await this.videoService.getListVideoLiked(
-            req.user,
+            req.user.id,
             paginationQuery
         );
     }
