@@ -3,7 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 
 export class ReactionDto {
-
     @ApiProperty({
         description: '_id of video (streamKey if is live stream)'
     })
