@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
-import { LikeDto } from './dto/like.dto';
+import { ReactionDto } from './dto/reaction.dto';
 import { JwtGuard } from '../auth/guard';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
 import {
@@ -19,7 +19,8 @@ import {
     ApiResponse,
     ApiOperation,
     ApiBearerAuth,
-    ApiQuery
+    ApiQuery,
+    ApiBody
 } from '@nestjs/swagger';
 import { SearchProductDto } from '../search/dto';
 import { VideoPaginateDto } from './dto';
@@ -29,38 +30,44 @@ import { STATUSCODE } from 'src/constants';
 @UseGuards(JwtGuard)
 @Controller('/api/v1/video')
 export class VideoController {
-    constructor(private videoService: VideoService) {}
+    constructor(private videoService: VideoService) { }
 
     @ApiOperation({
         summary: 'Like video'
     })
     @ApiResponse({
-        status: 90001,
+        status: STATUSCODE.VIDEO_LIKE_SUCCESS_901,
         description: 'Like video successfully'
     })
     @ApiResponse({
-        status: 90002,
-        description: 'Like video false'
-    })
-    @Post('like')
-    async likeVideo(@Request() req, @Body() likeDto: LikeDto) {
-        return await this.videoService.likeVideo(req.user, likeDto);
-    }
-
-    @ApiOperation({
-        summary: 'Unlike video'
-    })
-    @ApiResponse({
-        status: 9003,
+        status: STATUSCODE.VIDEO_UNLIKE_SUCCESS_903,
         description: 'Unlike video successfully'
     })
-    @ApiResponse({
-        status: 9004,
-        description: 'Unlike video false'
+    @ApiBody({
+        schema: {
+            type: 'object',
+            properties: {
+                url: {
+                    type: 'string',
+                    description: 'url of video'
+                },
+                isLive: {
+                    type: 'boolean'
+                },
+                id: {
+                    type: 'string',
+                    description: 'mongo video _id (ignore if is live stream)'
+                },
+                streamKey: {
+                    type: 'string',
+                    description: 'streamKey live stream'
+                },
+            }
+        }
     })
-    @Post('unlike')
-    async unlikeVideo(@Request() req, @Body() likeDto: LikeDto) {
-        return await this.videoService.unlikeVideo(req.user, likeDto);
+    @Post('reaction')
+    async reactionVideo(@Request() req, @Body() reactionDto: ReactionDto) {
+        return await this.videoService.reactionVideo(req.user.id, reactionDto);
     }
 
     @ApiOperation({

@@ -2,9 +2,10 @@ import {
     Injectable,
     HttpException,
     HttpStatus,
-    InternalServerErrorException
+    InternalServerErrorException,
+    BadRequestException
 } from '@nestjs/common';
-import { LikeDto } from './dto/like.dto';
+import { ReactionDto } from './dto/reaction.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -16,79 +17,60 @@ import { SearchProductDto } from '../search/dto';
 import { VideoPaginateDto } from './dto';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
 import { MESSAGE, MESSAGE_ERROR, STATUSCODE } from 'src/constants';
+import { Reaction } from './model/reaction.schema';
+import { Video } from './model/video.schema';
+import * as moment from 'moment';
 @Injectable()
 export class VideoService extends ElasticsearchService {
     constructor(
-        @InjectModel(User.name)
-        private readonly userModel: Model<User>
+        @InjectModel(Reaction.name)
+        private readonly reactionModel: Model<Reaction>,
+        @InjectModel(Video.name)
+        private readonly videoModel: Model<Video>
     ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
 
-    async likeVideo(user: User, likeDto: LikeDto) {
-        let likeUpdate = [];
-        if (typeof user.like == 'undefined') {
-            likeUpdate = [{ url: likeDto.url, isLive: likeDto.isLive }];
-        } else {
-            likeUpdate = user.like;
-            const index = likeUpdate.find(({ url }) => url === likeDto.url);
-            if (index) {
-                return {
-                    code: 90002,
-                    data: true,
-                    message: 'You have liked this video already'
-                };
-            } else {
-                likeUpdate.push({ url: likeDto.url, isLive: likeDto.isLive });
-            }
-        }
-        console.log(likeUpdate);
-        await this.userModel.findOneAndUpdate(
-            { _id: user._id },
-            {
-                like: likeUpdate
-            }
+    async updateReaction<T>(reactionId: string, reaction: T) {
+        return await this.reactionModel.findByIdAndUpdate(
+            { _id: reactionId },
+            { $set: reaction },
+            { new: true }
         );
-        return {
-            code: 90001,
-            data: true,
-            message: 'Like video successfully'
-        };
     }
 
-    async unlikeVideo(user: User, likeDto: LikeDto) {
-        let likeUpdate = [];
-        if (typeof user.like == 'undefined') {
-            return {
-                code: 90007,
-                data: true,
-                message: 'Does not exist video to unlike'
-            };
-        } else {
-            likeUpdate = user.like;
-            const index = likeUpdate.find(({ url }) => url === likeDto.url);
-            if (index) {
-                likeUpdate = likeUpdate.splice(index, 1);
-            } else {
-                return {
-                    code: 90004,
-                    data: true,
-                    message: 'You have unliked this video already'
-                };
-            }
+    async createReaction<T>(reaction: T) {
+        return await this.reactionModel.create(reaction);
+    }
+
+    async reactionVideo(userId: string, reactionDto: ReactionDto) {
+        const reaction = {
+            ...reactionDto,
+            userId,
+            reactionDate: moment().toISOString(),
+            isLiked: true
         }
-        await this.userModel.findOneAndUpdate(
-            { _id: user._id },
-            {
-                like: likeUpdate
+        try {
+            console.log(reaction);
+            const reactionFind = await this.reactionModel.findOne({ userId, videoId: reaction.videoId });
+            if (reactionFind) {
+                await this.updateReaction(reactionFind._id, { isLiked: reactionFind.isLiked ? false : true });
+                return new BaseResponse(
+                    reactionFind.isLiked ? STATUSCODE.VIDEO_UNLIKE_SUCCESS_903 : STATUSCODE.VIDEO_LIKE_SUCCESS_901,
+                    null,
+                    reactionFind.isLiked ? 'Unliked video' : 'Liked this video'
+                )
+            } else {
+                const response = await this.createReaction(reaction)
+                return new BaseResponse(
+                    STATUSCODE.VIDEO_LIKE_SUCCESS_901,
+                    response,
+                    'Liked this video'
+                )
             }
-        );
-        await user.save();
-        return {
-            code: 90003,
-            data: true,
-            message: 'Unlike video successfully'
-        };
+        } catch (e) {
+            throw new BadRequestException(e)
+        }
     }
 
     async getListVideoLiked(user: User, paginationQuery: PaginationQueryDto) {
@@ -114,7 +96,7 @@ export class VideoService extends ElasticsearchService {
     ): Promise<any> {
         const video = await this.getVideoByUrl(searchProductDto);
 
-        if (video[0]._source.lenght < 1) {
+        if (video[0]._source.length < 1) {
             return {
                 code: 90008,
                 data: [],
@@ -141,11 +123,36 @@ export class VideoService extends ElasticsearchService {
     public async getRelativeVideoByTag(
         searchProductDto: SearchProductDto
     ): Promise<any> {
-        const video = await this.getVideoByTag(searchProductDto);
+        const videos = await this.getVideoByTag(searchProductDto);
+
+        const aggregate = await this.reactionModel.aggregate([
+            {
+                $group: {
+                    _id: '$videoId',
+                    total_like: { $sum: { $cond: [{ $eq: ["$isLiked", true] }, 1, 0] } },
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    root: { $push: { k: "$_id", v: "$total_like" } }
+                }
+            },
+            {
+                $replaceRoot: { newRoot: { $arrayToObject: "$root" } }
+            }
+        ])
+
+        const result = aggregate[0];
+
+        const maps = videos.map(video => ({...video, _source: {
+            ...video._source,
+            total_like: video._source.videoId ? result[video._source.videoId] : 0
+        }}))
 
         return {
             code: 90009,
-            data: video,
+            data: maps,
             message: 'Get relative video by tag successfully'
         };
     }
@@ -175,23 +182,25 @@ export class VideoService extends ElasticsearchService {
     private async getVideoByTag(
         searchProductDto: SearchProductDto
     ): Promise<any> {
-        return await this.search({
-            index: productIndex._index,
-            body: {
-                size: searchProductDto.limit,
-                from: searchProductDto.offset,
-                query: {
-                    multi_match: {
-                        query: searchProductDto.search,
-                        fields: ['tag']
+        try {
+            const response = await this.search({
+                index: productIndex._index,
+                body: {
+                    size: searchProductDto.limit,
+                    from: searchProductDto.offset,
+                    query: {
+                        multi_match: {
+                            query: searchProductDto.search,
+                            fields: ['tag']
+                        }
                     }
                 }
-            }
-        })
-            .then((res) => res.hits.hits)
-            .catch((err) => {
-                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
+            return response.hits.hits;
+        } catch (err) {
+            console.log(err, 'errror')
+            throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     private async getTag(

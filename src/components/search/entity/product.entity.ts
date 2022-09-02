@@ -24,6 +24,11 @@ export class Product {
     @Column({
         type: 'string'
     })
+    videoId: string;
+
+    @Column({
+        type: 'string'
+    })
     previewImage: string;
 
     @Column({
