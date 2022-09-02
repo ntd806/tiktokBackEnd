@@ -181,4 +181,38 @@ export class VideoController {
     async getVideos(@Query() paginate: VideoPaginateDto) {
         return await this.videoService.getVideos(paginate);
     }
+
+    @ApiOperation({
+        summary: 'Get hot trend'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_SUCCESS_9010,
+        description: 'Get list video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_FAIL_9011,
+        description: 'Get list video failed'
+    })
+    @ApiQuery({
+        name: 'search',
+        type: 'string',
+        description: 'filter',
+        required: false
+    })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    @Get('get-videos')
+    async getHotTrend(@Query() paginate: VideoPaginateDto) {
+        return await this.videoService.getHotTrend(paginate);
+    }
 }
