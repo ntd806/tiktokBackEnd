@@ -221,6 +221,14 @@ export class VideoService extends ElasticsearchService {
         };
     }
 
+    getTotalLike(key: string, object: any) {
+        return object[key]?.total_like || 0
+    }
+
+    getBoolean(key: string, object: any) {
+        return object[key]?.isLiked || false
+    }
+
     public async getRelativeVideoByTag(
         searchProductDto: SearchProductDto
     ): Promise<any> {
@@ -232,13 +240,27 @@ export class VideoService extends ElasticsearchService {
                     _id: '$videoId',
                     total_like: {
                         $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
+                    },
+                    reaction: {
+                        $push: {
+                            k: 'isLiked',
+                            v: '$$ROOT.isLiked'
+                        }
                     }
                 }
             },
             {
+                $project: {_id: '$_id', reaction: {
+                    $arrayToObject: '$reaction'
+                }, total_like: '$total_like'},
+            },
+            {
                 $group: {
                     _id: null,
-                    root: { $push: { k: '$_id', v: '$total_like' } }
+                    root: { $push: { k: '$_id', v: {
+                        total_like: '$total_like',
+                        isLiked: '$reaction.isLiked',
+                    }} }
                 }
             },
             {
@@ -256,7 +278,8 @@ export class VideoService extends ElasticsearchService {
         const maps = videos.map(video => ({
             ...video, _source: {
                 ...video._source,
-                total_like: video._source.videoId ? result[video._source.videoId] || 0 : video._id ? result[video._id] || 0 : 0
+                total_like: this.getTotalLike(video._source.videoId || video._id, result),
+                isLiked: this.getBoolean(video._source.videoId || video._id, result)
             }
         }))
 
