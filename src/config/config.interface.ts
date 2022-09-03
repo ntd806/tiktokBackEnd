@@ -16,5 +16,5 @@ export interface ConfigData {
      */
     logLevel: string;
 
-    gatekeeperServiceUrl: string;
+    gatekeeperServiceUrl: string; 
 }
