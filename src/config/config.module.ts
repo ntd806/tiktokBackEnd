@@ -5,7 +5,7 @@ const configFactory = {
     provide: ConfigService,
     useFactory: () => {
         const config = new ConfigService();
-        config.lofusingDotEnv();
+        config.lofusingDotEnv(); 
         return config;
     }
 };

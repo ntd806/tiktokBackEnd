@@ -5,5 +5,5 @@ export const DEFAULT_CONFIG: ConfigData = {
     port: 3000,
     logLevel: 'info',
     mongo: undefined,
-    gatekeeperServiceUrl: undefined
+    gatekeeperServiceUrl: undefined 
 };
