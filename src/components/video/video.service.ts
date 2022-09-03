@@ -8,7 +8,7 @@ import {
 import { ReactionDto } from './dto/reaction.dto';
 import { User } from './model/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { PaginationQueryDto } from './dto/pagination.query.dto';
 import { ConfigSearch } from '../search/config/config.search';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
@@ -48,7 +48,11 @@ export class VideoService extends ElasticsearchService {
 
     async getImageURL(videoId: string) {
         let imageURL = null;
-        const videoFinder = await this.videoModel.findById(videoId);
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(videoId);
+        let videoFinder = null;
+        if(isValidObjectId) {
+            videoFinder = await this.videoModel.findById(videoId);
+        }
         if (videoFinder) {
             imageURL = videoFinder.previewImage
         } else {
