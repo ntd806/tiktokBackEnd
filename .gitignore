@@ -400,5 +400,4 @@ data
 esdata
 .env
 dist
-src/components/config/
 public
