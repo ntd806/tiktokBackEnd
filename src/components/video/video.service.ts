@@ -95,13 +95,13 @@ export class VideoService extends ElasticsearchService {
             const reactionFind = await this.reactionModel.findOne({ userId, videoId: reaction.videoId });
             if (reactionFind) {
                 const previewImage = await this.getImageURL(reaction.videoId);
-                await this.updateReaction(reactionFind._id, { isLiked: reactionFind.isLiked ? false : true, previewImage });
+                const response = await this.updateReaction(reactionFind._id, { isLiked: reactionFind.isLiked ? false : true, previewImage });
                 await this.updateManyReactionByVideoId(reaction.videoId, { previewImage })
                 return new BaseResponse(
                     reactionFind.isLiked
                         ? STATUSCODE.VIDEO_UNLIKE_SUCCESS_903
                         : STATUSCODE.VIDEO_LIKE_SUCCESS_901,
-                    null,
+                    response,
                     reactionFind.isLiked ? 'Unliked video' : 'Liked this video'
                 );
             } else {
@@ -229,6 +229,10 @@ export class VideoService extends ElasticsearchService {
         return object[key]?.isLiked || false
     }
 
+    getBooleanLive(key: string, object: any) {
+        return object[key]?.isLive || false
+    }
+
     public async getRelativeVideoByTag(
         searchProductDto: SearchProductDto
     ): Promise<any> {
@@ -246,12 +250,20 @@ export class VideoService extends ElasticsearchService {
                             k: 'isLiked',
                             v: '$$ROOT.isLiked'
                         }
+                    },
+                    type: {
+                        $push: {
+                            k: 'isLive',
+                            v: '$$ROOT.isLive'
+                        } 
                     }
                 }
             },
             {
                 $project: {_id: '$_id', reaction: {
                     $arrayToObject: '$reaction'
+                }, type: {
+                    $arrayToObject: '$type'
                 }, total_like: '$total_like'},
             },
             {
@@ -260,6 +272,7 @@ export class VideoService extends ElasticsearchService {
                     root: { $push: { k: '$_id', v: {
                         total_like: '$total_like',
                         isLiked: '$reaction.isLiked',
+                        isLive: '$type.isLive',
                     }} }
                 }
             },
@@ -279,7 +292,8 @@ export class VideoService extends ElasticsearchService {
             ...video, _source: {
                 ...video._source,
                 total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                isLiked: this.getBoolean(video._source.videoId || video._id, result)
+                isLiked: this.getBoolean(video._source.videoId || video._id, result),
+                isLive: this.getBooleanLive(video._source.videoId || video._id, result)
             }
         }))
 
