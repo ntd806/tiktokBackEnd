@@ -3,11 +3,14 @@ import {
     ApiTags,
     ApiOperation,
     ApiResponse,
-    ApiBearerAuth
+    ApiBearerAuth,
+    ApiQuery
 } from '@nestjs/swagger';
 import { JwtGuard } from '../auth/guard';
 import { HotService } from './hot.service';
 import { CreateHotDto } from './dto';
+import { SearchProductDto } from '../search/dto';
+import { MESSAGE, STATUSCODE } from 'src/constants';
 
 @ApiTags('hot')
 @UseGuards(JwtGuard)
@@ -30,7 +33,7 @@ export class HotController {
     })
     @Post()
     public async addSupport(@Body() CreateHotDto: CreateHotDto) {
-        return this.hotService.create(CreateHotDto);
+        return this.hotService.add(CreateHotDto);
     }
 
     @Get()
@@ -39,5 +42,39 @@ export class HotController {
     })
     public async getAllGame() {
         return await this.hotService.getHotTrend();
+    }
+
+    @ApiOperation({
+        summary: 'Get hot trend'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_SUCCESS_9010,
+        description: 'Get list video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_FAIL_9011,
+        description: 'Get list video failed'
+    })
+    @ApiQuery({
+        name: 'search',
+        type: 'string',
+        description: 'filter',
+        required: false
+    })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    @Get('get-hot-trend')
+    async getHotTrend(searchProductDto: SearchProductDto) {
+        return await this.hotService.getTrend(searchProductDto);
     }
 }
