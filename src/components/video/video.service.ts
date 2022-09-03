@@ -388,4 +388,37 @@ export class VideoService extends ElasticsearchService {
             );
         }
     }
+
+    async getHotTrend(searchProductDto: SearchProductDto, hot: string) {
+        try {
+            const videos = await this.search({
+                index: productIndex._index,
+                body: {
+                    size: searchProductDto.limit,
+                    from: searchProductDto.offset,
+                    query: {
+                        multi_match: {
+                            query: hot,
+                            fields: ['name', 'description', 'preview', 'tag']
+                        }
+                    }
+                }
+            });
+
+            return new BaseResponse(
+                STATUSCODE.LISTED_SUCCESS_9010,
+                {
+                    videos: videos.hits.hits,
+                    total: videos.hits.total
+                },
+                MESSAGE.LIST_SUCCESS
+            );
+        } catch (err) {
+            throw new BaseErrorResponse(
+                STATUSCODE.LISTED_FAIL_9011,
+                MESSAGE.LIST_FAILED,
+                err
+            );
+        }
+    }
 }
