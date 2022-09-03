@@ -211,8 +211,8 @@ export class VideoController {
         description: 'enter offset of record',
         required: true
     })
-    @Get('get-videos')
-    async getHotTrend(@Query() paginate: VideoPaginateDto) {
-        return await this.videoService.getHotTrend(paginate);
+    @Get('get-hot-trend')
+    async getHotTrend(searchProductDto: SearchProductDto, hot: string) {
+        return await this.videoService.getHotTrend(searchProductDto, hot);
     }
 }
