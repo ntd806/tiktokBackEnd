@@ -53,7 +53,7 @@ export class VideoService extends ElasticsearchService {
             videoFinder = await this.videoModel.findById(videoId);
         }
         if (videoFinder) {
-            imageURL = videoFinder.previewImage
+            imageURL = videoFinder.previewImage;
         } else {
             const document = await this.search({
                 index: productIndex._index,
@@ -62,17 +62,17 @@ export class VideoService extends ElasticsearchService {
                         _id: [videoId]
                     }
                 }
-            })
+            });
             const videos = document.hits.hits;
             if (videos.length > 0) {
-                imageURL = (videos[0]._source as any).previewImage
+                imageURL = (videos[0]._source as any).previewImage;
             }
         }
         return imageURL;
     }
 
     async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
-        return await this.reactionModel.updateMany({ videoId }, { $set: reaction }, { multi: true });
+        return await this.reactionModel.updateMany({videoId}, { $set: reaction }, { multi: true });
     }
 
     async deleteBookmark(bookmarkId: string) {
@@ -91,11 +91,19 @@ export class VideoService extends ElasticsearchService {
             isLiked: true
         };
         try {
-            const reactionFind = await this.reactionModel.findOne({ userId, videoId: reaction.videoId });
+            const reactionFind = await this.reactionModel.findOne({
+                userId,
+                videoId: reaction.videoId
+            });
             if (reactionFind) {
                 const previewImage = await this.getImageURL(reaction.videoId);
-                const response = await this.updateReaction(reactionFind._id, { isLiked: reactionFind.isLiked ? false : true, previewImage });
-                await this.updateManyReactionByVideoId(reaction.videoId, { previewImage })
+                const response = await this.updateReaction(reactionFind._id, {
+                    isLiked: reactionFind.isLiked ? false : true,
+                    previewImage
+                });
+                await this.updateManyReactionByVideoId(reaction.videoId, {
+                    previewImage
+                });
                 return new BaseResponse(
                     reactionFind.isLiked
                         ? STATUSCODE.VIDEO_UNLIKE_SUCCESS_903
@@ -105,7 +113,10 @@ export class VideoService extends ElasticsearchService {
                 );
             } else {
                 const previewImage = await this.getImageURL(reaction.videoId);
-                const response = await this.createReaction({ ...reaction, previewImage })
+                const response = await this.createReaction({
+                    ...reaction,
+                    previewImage
+                });
                 return new BaseResponse(
                     STATUSCODE.VIDEO_LIKE_SUCCESS_901,
                     response,
@@ -121,35 +132,42 @@ export class VideoService extends ElasticsearchService {
         const bookmark = {
             ...bookmarkDto,
             userId,
-            bookmarkDate: moment().toISOString(),
-        }
+            bookmarkDate: moment().toISOString()
+        };
         try {
-            const bookmarkFind = await this.bookmarkModel.findOne({ userId, videoId: bookmark.videoId });
+            const bookmarkFind = await this.bookmarkModel.findOne({
+                userId,
+                videoId: bookmark.videoId
+            });
             if (bookmarkFind) {
-                await this.deleteBookmark(bookmarkFind._id)
+                await this.deleteBookmark(bookmarkFind._id);
                 return new BaseResponse(
                     STATUSCODE.VIDEO_UNBOOKMARK_911,
                     null,
                     'Unbookmark video'
-                )
+                );
             } else {
                 const previewImage = await this.getImageURL(bookmark.videoId);
-                const response = await this.createBookmark({ ...bookmark, previewImage })
+                const response = await this.createBookmark({
+                    ...bookmark,
+                    previewImage
+                });
                 return new BaseResponse(
                     STATUSCODE.VIDEO_BOOKMARK_SUCCESS_910,
                     response,
                     'Bookmark this video'
-                )
+                );
             }
         } catch (e) {
-            throw new BadRequestException(e)
+            throw new BadRequestException(e);
         }
     }
 
     async getVideoBookmarks(userId: string, pagination: PaginationQueryDto) {
         try {
             const { limit, offset } = pagination;
-            const videos = await this.bookmarkModel.find({ userId })
+            const videos = await this.bookmarkModel
+                .find({ userId })
                 .skip(offset)
                 .limit(limit);
 
@@ -157,22 +175,24 @@ export class VideoService extends ElasticsearchService {
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
                 videos,
                 'Get list video successfully'
-            )
-
+            );
         } catch (err) {
             return new BaseErrorResponse(
                 STATUSCODE.VIDEO_LIST_FAIL_906,
                 'Get list video failed',
-                null,
-            )
+                null
+            );
         }
     }
 
-
-    async getListVideoLiked(userId: string, paginationQuery: PaginationQueryDto) {
+    async getListVideoLiked(
+        userId: string,
+        paginationQuery: PaginationQueryDto
+    ) {
         try {
             const { limit, offset } = paginationQuery;
-            const videos = await this.reactionModel.find({ userId, isLiked: true })
+            const videos = await this.reactionModel
+                .find({ userId, isLiked: true })
                 .skip(offset)
                 .limit(limit);
 
@@ -180,14 +200,13 @@ export class VideoService extends ElasticsearchService {
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
                 videos,
                 'Get list video successfully'
-            )
-
+            );
         } catch (err) {
             return new BaseErrorResponse(
                 STATUSCODE.VIDEO_LIST_FAIL_906,
                 'Get list video failed',
-                null,
-            )
+                null
+            );
         }
     }
 
@@ -287,15 +306,15 @@ export class VideoService extends ElasticsearchService {
     }
 
     getTotalLike(key: string, object: any) {
-        return object[key]?.total_like || 0
+        return object[key]?.total_like || 0;
     }
 
     getBoolean(key: string, object: any) {
-        return object[key]?.isLiked || false
+        return object[key]?.isLiked || false;
     }
 
     getBooleanLive(key: string, object: any) {
-        return object[key]?.isLive || false
+        return object[key]?.isLive || false;
     }
 
     public async getRelativeVideoByTag(
@@ -325,26 +344,20 @@ export class VideoService extends ElasticsearchService {
                 }
             },
             {
-                $project: {
-                    _id: '$_id', reaction: {
-                        $arrayToObject: '$reaction'
-                    }, type: {
-                        $arrayToObject: '$type'
-                    }, total_like: '$total_like'
-                },
+                $project: {_id: '$_id', reaction: {
+                    $arrayToObject: '$reaction'
+                }, type: {
+                    $arrayToObject: '$type'
+                }, total_like: '$total_like'},
             },
             {
                 $group: {
                     _id: null,
-                    root: {
-                        $push: {
-                            k: '$_id', v: {
-                                total_like: '$total_like',
-                                isLiked: '$reaction.isLiked',
-                                isLive: '$type.isLive',
-                            }
-                        }
-                    }
+                    root: { $push: { k: '$_id', v: {
+                        total_like: '$total_like',
+                        isLiked: '$reaction.isLiked',
+                        isLive: '$type.isLive',
+                    }} }
                 }
             },
             {
@@ -352,21 +365,30 @@ export class VideoService extends ElasticsearchService {
             }
         ]);
 
-
         let result = {};
 
         if (aggregate.length > 0) {
-            result = aggregate[0]
+            result = aggregate[0];
         }
 
-        const maps = videos.map(video => ({
-            ...video, _source: {
+        const maps = videos.map((video) => ({
+            ...video,
+            _source: {
                 ...video._source,
-                total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                isLiked: this.getBoolean(video._source.videoId || video._id, result),
-                isLive: this.getBooleanLive(video._source.videoId || video._id, result)
+                total_like: this.getTotalLike(
+                    video._source.videoId || video._id,
+                    result
+                ),
+                isLiked: this.getBoolean(
+                    video._source.videoId || video._id,
+                    result
+                ),
+                isLive: this.getBooleanLive(
+                    video._source.videoId || video._id,
+                    result
+                )
             }
-        }))
+        }));
 
         return {
             code: 90009,

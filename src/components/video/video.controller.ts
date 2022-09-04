@@ -56,7 +56,8 @@ export class VideoController {
                 },
                 videoId: {
                     type: 'string',
-                    description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
+                    description:
+                        '_id from Elasticsearch, or _id from Mongo, or streamKey'
                 }
             }
         }
@@ -90,8 +91,9 @@ export class VideoController {
                 },
                 videoId: {
                     type: 'string',
-                    description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
-                },
+                    description:
+                        '_id from Elasticsearch, or _id from Mongo, or streamKey'
+                }
             }
         }
     })
@@ -115,7 +117,7 @@ export class VideoController {
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required: true,
+        required: true
     })
     @ApiQuery({
         name: 'offset',
@@ -138,18 +140,22 @@ export class VideoController {
         summary: 'Get list video liked'
     })
     @ApiResponse({
-        status: 90005,
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
         description: 'Get list video liked successfully'
     })
     @ApiResponse({
         status: 90006,
         description: 'Get list video liked failed'
     })
+    @ApiResponse({
+        status: 500,
+        description: 'Internal Server Error Exception'
+    })
     @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required: true,
+        required: true
     })
     @ApiQuery({
         name: 'offset',
@@ -185,15 +191,15 @@ export class VideoController {
     }
 
     @ApiOperation({
-        summary: 'Get list video liked'
+        summary: 'Get relate video by tag',
     })
     @ApiResponse({
-        status: 90007,
-        description: 'Get list video liked by tag successfully'
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
+        description: 'Get list video by tag successfully'
     })
     @ApiResponse({
-        status: 90008,
-        description: 'Get list video liked by tag failed'
+        status: 500,
+        description: 'Internal Server Error Exception'
     })
     @ApiQuery({
         name: 'limit',
