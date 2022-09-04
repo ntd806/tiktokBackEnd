@@ -137,12 +137,16 @@ export class VideoController {
         summary: 'Get list video liked'
     })
     @ApiResponse({
-        status: 90005,
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
         description: 'Get list video liked successfully'
     })
     @ApiResponse({
         status: 90006,
         description: 'Get list video liked failed'
+    })
+    @ApiResponse({
+        status: 500,
+        description: 'Internal Server Error Exception'
     })
     @ApiQuery({
         name: 'limit',
@@ -168,15 +172,15 @@ export class VideoController {
     }
 
     @ApiOperation({
-        summary: 'Get list video liked'
+        summary: 'Get relate videos'
     })
     @ApiResponse({
-        status: 90005,
-        description: 'Get list video liked successfully'
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
+        description: 'Get list video successfully'
     })
     @ApiResponse({
-        status: 90006,
-        description: 'Get list video liked failed'
+        status: 500,
+        description: 'Internal Server Error Exception'
     })
     @Get('get-relative-video')
     async getRelativeVideo(@Query() searchProductDto: SearchProductDto) {
@@ -184,15 +188,15 @@ export class VideoController {
     }
 
     @ApiOperation({
-        summary: 'Get list video liked'
+        summary: 'Get relate video by tag',
     })
     @ApiResponse({
-        status: 90007,
-        description: 'Get list video liked by tag successfully'
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
+        description: 'Get list video by tag successfully'
     })
     @ApiResponse({
-        status: 90008,
-        description: 'Get list video liked by tag failed'
+        status: 500,
+        description: 'Internal Server Error Exception'
     })
     @ApiQuery({
         name: 'limit',
