@@ -491,7 +491,7 @@ export class VideoService extends ElasticsearchService {
 
     async getVideos(videoPaginate: VideoPaginateDto) {
         const hot = await this.hotService.getHotTrend();
-        if (hot != null && hot != undefined) {
+        if (hot != null || hot != undefined) {
             return this.getTrend(videoPaginate, hot);
         }
 
@@ -541,7 +541,7 @@ export class VideoService extends ElasticsearchService {
     }
 
     private async getTrend(videoPaginate: VideoPaginateDto, hot: string) {
-        if (hot != null && hot != undefined) {
+        if (hot != null || hot != undefined) {
             try {
                 const videos = await this.search({
                     index: productIndex._index,
