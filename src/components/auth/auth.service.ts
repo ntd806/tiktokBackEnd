@@ -72,7 +72,9 @@ export class AuthService {
             const user = await this.userService.findByPhoneNumber(
                 socialDto.phone
             );
-            const userByEmail = await this.userService.findByEmail(socialDto.email);
+            const userByEmail = await this.userService.findByEmail(
+                socialDto.email
+            );
             if (!user && !userByEmail) {
                 const dataInsert = {
                     mac: [socialDto.mac],
@@ -94,7 +96,7 @@ export class AuthService {
                     this.jwt.signToken(newUser.phone, newUser.fullname)
                 );
             } else {
-                if(userByEmail) {
+                if (userByEmail) {
                     return new BaseErrorResponse(
                         STATUSCODE.REGISTED_FAILED_802,
                         MESSAGE_ERROR.EMAIL_EXISTED

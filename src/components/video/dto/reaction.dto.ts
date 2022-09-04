@@ -1,4 +1,4 @@
-import { IsString , IsBoolean, IsUrl } from 'class-validator';
+import { IsString, IsBoolean, IsUrl } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class ReactionDto {
