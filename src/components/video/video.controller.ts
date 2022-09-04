@@ -56,7 +56,8 @@ export class VideoController {
                 },
                 videoId: {
                     type: 'string',
-                    description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
+                    description:
+                        '_id from Elasticsearch, or _id from Mongo, or streamKey'
                 }
             }
         }
@@ -90,8 +91,9 @@ export class VideoController {
                 },
                 videoId: {
                     type: 'string',
-                    description: '_id from Elasticsearch, or _id from Mongo, or streamKey'
-                },
+                    description:
+                        '_id from Elasticsearch, or _id from Mongo, or streamKey'
+                }
             }
         }
     })
@@ -115,7 +117,7 @@ export class VideoController {
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required: true,
+        required: true
     })
     @ApiQuery({
         name: 'offset',
@@ -149,7 +151,7 @@ export class VideoController {
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
-        required: true,
+        required: true
     })
     @ApiQuery({
         name: 'offset',

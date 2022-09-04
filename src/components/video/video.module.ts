@@ -10,11 +10,17 @@ import { Bookmark, BookmarkSchema } from './model/bookmark.schema';
 @Module({
     imports: [
         JwtModule.register({ secret: process.env.SECRET }),
-        MongooseModule.forFeature([{ name: Video.name, schema: VideoSchema }, {
-            name: Reaction.name, schema: ReactionSchema
-        }, {
-            name: Bookmark.name, schema: BookmarkSchema
-        }])
+        MongooseModule.forFeature([
+            { name: Video.name, schema: VideoSchema },
+            {
+                name: Reaction.name,
+                schema: ReactionSchema
+            },
+            {
+                name: Bookmark.name,
+                schema: BookmarkSchema
+            }
+        ])
     ],
     providers: [VideoService],
     controllers: [VideoController]

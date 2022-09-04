@@ -47,7 +47,6 @@ export class HotService extends ElasticsearchService {
         }
     }
 
-
     async getTrend(paginationQueryDto: PaginationQueryDto) {
         const hot = await this.getHotTrend();
         try {
