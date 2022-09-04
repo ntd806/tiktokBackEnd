@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, UseGuards, Delete, Param, Res, HttpStatus } from '@nestjs/common';
 import {
     ApiTags,
     ApiOperation,
@@ -70,5 +70,35 @@ export class HotController {
     @Get('get-hot-trend')
     async getHotTrend(@Query() paginationQueryDto: PaginationQueryDto) {
         return await this.hotService.getTrend(paginationQueryDto);
+    }
+
+    @ApiOperation({
+        summary: 'Delete hot by id'
+    })
+    @ApiResponse({
+        status: 50007,
+        description: 'hot does not exist!'
+    })
+    @ApiResponse({
+        status: 50008,
+        description: 'hot has been deleted'
+    })
+    @Delete('/:id')
+    public async deleteHot(@Res() res, @Param('id') hotId: string) {
+        if (!hotId) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                code: 50007,
+                data: false,
+                message: 'Game does not exist!'
+            });
+        }
+
+        const Game = await this.hotService.remove(hotId);
+
+        return res.status(HttpStatus.OK).json({
+            code: 50008,
+            message: 'Game has been deleted',
+            Game
+        });
     }
 }
