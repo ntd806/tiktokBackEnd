@@ -40,11 +40,12 @@ export class HotService extends ElasticsearchService {
                 })
                 .exec();
 
-            if (trend === null || trend === undefined) {
-                return '';
+            if (trend !== null || trend !== undefined) {
+                return trend[0].trend;
             }
 
-            return trend[0].trend;
+            return '';
+
         } catch (error) {
             console.log(error);
             throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
