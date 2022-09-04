@@ -169,15 +169,15 @@ export class VideoController {
     }
 
     @ApiOperation({
-        summary: 'Get list video liked'
+        summary: 'Get relate videos'
     })
     @ApiResponse({
-        status: 90005,
-        description: 'Get list video liked successfully'
+        status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
+        description: 'Get list video successfully'
     })
     @ApiResponse({
-        status: 90006,
-        description: 'Get list video liked failed'
+        status: 500,
+        description: 'Internal Server Error Exception'
     })
     @Get('get-relative-video')
     async getRelativeVideo(@Query() searchProductDto: SearchProductDto) {

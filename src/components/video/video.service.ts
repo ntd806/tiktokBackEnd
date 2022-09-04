@@ -2,7 +2,8 @@ import {
     Injectable,
     HttpException,
     HttpStatus,
-    BadRequestException
+    BadRequestException,
+    InternalServerErrorException
 } from '@nestjs/common';
 import { ReactionDto } from './dto/reaction.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -48,7 +49,7 @@ export class VideoService extends ElasticsearchService {
         let imageURL = null;
         const isValidObjectId = Types.ObjectId.isValid(videoId);
         let videoFinder = null;
-        if(isValidObjectId) {
+        if (isValidObjectId) {
             videoFinder = await this.videoModel.findById(videoId);
         }
         if (videoFinder) {
@@ -71,7 +72,7 @@ export class VideoService extends ElasticsearchService {
     }
 
     async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
-        return await this.reactionModel.updateMany({videoId}, { $set: reaction }, { multi: true });
+        return await this.reactionModel.updateMany({ videoId }, { $set: reaction }, { multi: true });
     }
 
     async deleteBookmark(bookmarkId: string) {
@@ -193,30 +194,96 @@ export class VideoService extends ElasticsearchService {
     public async getRelativeVideo(
         searchProductDto: SearchProductDto
     ): Promise<any> {
-        const video = await this.getVideoByUrl(searchProductDto);
+        try {
+            const response = await this.search({
+                index: productIndex._index,
+                body: {
+                    size: searchProductDto.limit,
+                    from: searchProductDto.offset,
+                    query: {
+                        multi_match: {
+                            query: searchProductDto.search,
+                            fields: ['name', 'description', 'preview', 'tag', 'url']
+                        }
+                    }
+                }
+            })
 
-        if (video[0]._source.length < 1) {
-            return {
-                code: 90008,
-                data: [],
-                message: 'Not found data'
-            };
-        }
+            const videos: any[] = response.hits.hits;
 
-        let tag = '';
-        for (const v in video[0]._source) {
-            if (v === 'tag') {
-                tag = video[0]._source[v];
-                break;
+            const aggregate = await this.reactionModel.aggregate([
+                {
+                    $group: {
+                        _id: '$videoId',
+                        total_like: {
+                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
+                        },
+                        reaction: {
+                            $push: {
+                                k: 'isLiked',
+                                v: '$$ROOT.isLiked'
+                            }
+                        },
+                        type: {
+                            $push: {
+                                k: 'isLive',
+                                v: '$$ROOT.isLive'
+                            }
+                        }
+                    }
+                },
+                {
+                    $project: {
+                        _id: '$_id', reaction: {
+                            $arrayToObject: '$reaction'
+                        }, type: {
+                            $arrayToObject: '$type'
+                        }, total_like: '$total_like'
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        root: {
+                            $push: {
+                                k: '$_id', v: {
+                                    total_like: '$total_like',
+                                    isLiked: '$reaction.isLiked',
+                                    isLive: '$type.isLive',
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
+                }
+            ]);
+
+            let result = {};
+
+            if (aggregate.length > 0) {
+                result = aggregate[0]
             }
-        }
-        const list = await this.getTag(searchProductDto, tag);
 
-        return {
-            code: 90009,
-            data: list,
-            message: 'Get relative video successfully'
-        };
+            const maps = videos.map(video => ({
+                ...video, _source: {
+                    ...video._source,
+                    total_like: this.getTotalLike(video._source.videoId || video._id, result),
+                    isLiked: this.getBoolean(video._source.videoId || video._id, result),
+                    isLive: this.getBooleanLive(video._source.videoId || video._id, result)
+                }
+            }))
+
+            return new BaseResponse(
+                STATUSCODE.VIDEO_LIST_SUCCESS_905,
+                maps,
+                'Get relate video successfully'
+            )
+        }
+        catch (err) {
+            throw new InternalServerErrorException(err)
+        }
     }
 
     getTotalLike(key: string, object: any) {
@@ -253,25 +320,31 @@ export class VideoService extends ElasticsearchService {
                         $push: {
                             k: 'isLive',
                             v: '$$ROOT.isLive'
-                        } 
+                        }
                     }
                 }
             },
             {
-                $project: {_id: '$_id', reaction: {
-                    $arrayToObject: '$reaction'
-                }, type: {
-                    $arrayToObject: '$type'
-                }, total_like: '$total_like'},
+                $project: {
+                    _id: '$_id', reaction: {
+                        $arrayToObject: '$reaction'
+                    }, type: {
+                        $arrayToObject: '$type'
+                    }, total_like: '$total_like'
+                },
             },
             {
                 $group: {
                     _id: null,
-                    root: { $push: { k: '$_id', v: {
-                        total_like: '$total_like',
-                        isLiked: '$reaction.isLiked',
-                        isLive: '$type.isLive',
-                    }} }
+                    root: {
+                        $push: {
+                            k: '$_id', v: {
+                                total_like: '$total_like',
+                                isLiked: '$reaction.isLiked',
+                                isLive: '$type.isLive',
+                            }
+                        }
+                    }
                 }
             },
             {
