@@ -188,7 +188,7 @@ export class VideoController {
     }
 
     @ApiOperation({
-        summary: 'Get relate video by tag',
+        summary: 'Get relate video by tag'
     })
     @ApiResponse({
         status: STATUSCODE.VIDEO_LIST_SUCCESS_905,
