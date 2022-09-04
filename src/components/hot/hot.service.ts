@@ -82,4 +82,9 @@ export class HotService extends ElasticsearchService {
             );
         }
     }
+
+    public async remove(gameId: string): Promise<any> {
+        const deletedCustomer = await this.hotModel.findByIdAndRemove(gameId);
+        return deletedCustomer;
+    }
 }
