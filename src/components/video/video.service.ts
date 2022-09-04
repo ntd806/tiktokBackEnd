@@ -94,8 +94,15 @@ export class VideoService extends ElasticsearchService {
         return imageURL;
     }
 
-    async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
-        return await this.reactionModel.updateMany({videoId}, { $set: reaction }, { multi: true });
+    async updateManyReactionByVideoId<T>(
+        videoId: string,
+        reaction: T
+    ): Promise<any> {
+        return await this.reactionModel.updateMany(
+            { videoId },
+            { $set: reaction },
+            { multi: true }
+        );
     }
 
     async deleteBookmark(bookmarkId: string) {
@@ -245,11 +252,17 @@ export class VideoService extends ElasticsearchService {
                     query: {
                         multi_match: {
                             query: searchProductDto.search,
-                            fields: ['name', 'description', 'preview', 'tag', 'url']
+                            fields: [
+                                'name',
+                                'description',
+                                'preview',
+                                'tag',
+                                'url'
+                            ]
                         }
                     }
                 }
-            })
+            });
 
             const videos: any[] = response.hits.hits;
 
@@ -276,22 +289,26 @@ export class VideoService extends ElasticsearchService {
                 },
                 {
                     $project: {
-                        _id: '$_id', reaction: {
+                        _id: '$_id',
+                        reaction: {
                             $arrayToObject: '$reaction'
-                        }, type: {
+                        },
+                        type: {
                             $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
+                        },
+                        total_like: '$total_like'
+                    }
                 },
                 {
                     $group: {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_like: '$total_like',
                                     isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
+                                    isLive: '$type.isLive'
                                 }
                             }
                         }
@@ -305,26 +322,35 @@ export class VideoService extends ElasticsearchService {
             let result = {};
 
             if (aggregate.length > 0) {
-                result = aggregate[0]
+                result = aggregate[0];
             }
 
-            const maps = videos.map(video => ({
-                ...video, _source: {
+            const maps = videos.map((video) => ({
+                ...video,
+                _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, result),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, result)
+                    total_like: this.getTotalLike(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    isLiked: this.getBoolean(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    isLive: this.getBooleanLive(
+                        video._source.videoId || video._id,
+                        result
+                    )
                 }
-            }))
+            }));
 
             return new BaseResponse(
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
                 maps,
                 'Get relate video successfully'
-            )
-        }
-        catch (err) {
-            throw new InternalServerErrorException(err)
+            );
+        } catch (err) {
+            throw new InternalServerErrorException(err);
         }
     }
 
@@ -367,20 +393,30 @@ export class VideoService extends ElasticsearchService {
                 }
             },
             {
-                $project: {_id: '$_id', reaction: {
-                    $arrayToObject: '$reaction'
-                }, type: {
-                    $arrayToObject: '$type'
-                }, total_like: '$total_like'},
+                $project: {
+                    _id: '$_id',
+                    reaction: {
+                        $arrayToObject: '$reaction'
+                    },
+                    type: {
+                        $arrayToObject: '$type'
+                    },
+                    total_like: '$total_like'
+                }
             },
             {
                 $group: {
                     _id: null,
-                    root: { $push: { k: '$_id', v: {
-                        total_like: '$total_like',
-                        isLiked: '$reaction.isLiked',
-                        isLive: '$type.isLive',
-                    }} }
+                    root: {
+                        $push: {
+                            k: '$_id',
+                            v: {
+                                total_like: '$total_like',
+                                isLiked: '$reaction.isLiked',
+                                isLive: '$type.isLive'
+                            }
+                        }
+                    }
                 }
             },
             {
