@@ -5,11 +5,8 @@ import {
     Get,
     Request,
     UseGuards,
-    Query,
-    UseInterceptors,
-    UploadedFile
+    Query
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { VideoService } from './video.service';
 import { ReactionDto } from './dto/reaction.dto';
 import { JwtGuard } from '../auth/guard';
