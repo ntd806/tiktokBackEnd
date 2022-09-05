@@ -12,4 +12,4 @@ import { Video, VideoSchema } from '../video/model/video.schema';
     controllers: [SearchController],
     exports: [SearchModule]
 })
-export class SearchModule {}
+export class SearchModule { }
