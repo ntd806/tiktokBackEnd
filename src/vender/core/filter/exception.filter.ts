@@ -25,7 +25,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             method: request.method,
             message: exception['message']['error'] ||
             exception['response']['message'] ||
-            null
+            null,
                 // status !== HttpStatus.INTERNAL_SERVER_ERROR
                 //     ? exception['message']['error'] ||
                 //       exception['response']['message'] ||
