@@ -1,4 +1,15 @@
-import { Controller, UseGuards, Post, Body, Get } from '@nestjs/common';
+import {
+    Controller,
+    Post,
+    Body,
+    Get,
+    Query,
+    UseGuards,
+    Delete,
+    Param,
+    Res,
+    HttpStatus
+} from '@nestjs/common';
 import {
     ApiTags,
     ApiOperation,
@@ -6,16 +17,16 @@ import {
     ApiBearerAuth,
     ApiQuery
 } from '@nestjs/swagger';
-import { JwtGuard } from '../auth/guard';
 import { HotService } from './hot.service';
 import { CreateHotDto } from './dto';
-import { SearchProductDto } from '../search/dto';
-import { MESSAGE, STATUSCODE } from 'src/constants';
+import { STATUSCODE } from 'src/constants';
+import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
+import { JwtGuard } from '../auth/guard';
 
 @ApiTags('hot')
-@UseGuards(JwtGuard)
 @ApiBearerAuth('Authorization')
 @Controller('/api/v1/hot')
+@UseGuards(JwtGuard)
 @Controller('hot')
 export class HotController {
     constructor(private hotService: HotService) {}
@@ -56,12 +67,6 @@ export class HotController {
         description: 'Get list video failed'
     })
     @ApiQuery({
-        name: 'search',
-        type: 'string',
-        description: 'filter',
-        required: false
-    })
-    @ApiQuery({
         name: 'limit',
         type: 'number',
         description: 'enter limit of record',
@@ -74,7 +79,37 @@ export class HotController {
         required: true
     })
     @Get('get-hot-trend')
-    async getHotTrend(searchProductDto: SearchProductDto) {
-        return await this.hotService.getTrend(searchProductDto);
+    async getHotTrend(@Query() paginationQueryDto: PaginationQueryDto) {
+        return await this.hotService.getTrend(paginationQueryDto);
+    }
+
+    @ApiOperation({
+        summary: 'Delete hot by id'
+    })
+    @ApiResponse({
+        status: 50007,
+        description: 'hot does not exist!'
+    })
+    @ApiResponse({
+        status: 50008,
+        description: 'hot has been deleted'
+    })
+    @Delete('/:id')
+    public async deleteHot(@Res() res, @Param('id') hotId: string) {
+        if (!hotId) {
+            return res.status(HttpStatus.BAD_REQUEST).json({
+                code: 50007,
+                data: false,
+                message: 'Game does not exist!'
+            });
+        }
+
+        const Game = await this.hotService.remove(hotId);
+
+        return res.status(HttpStatus.OK).json({
+            code: 50008,
+            message: 'Game has been deleted',
+            Game
+        });
     }
 }

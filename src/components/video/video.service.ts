@@ -20,6 +20,8 @@ import { Reaction } from './model/reaction.schema';
 import { Video } from './model/video.schema';
 import * as moment from 'moment';
 import { Bookmark } from './model/bookmark.schema';
+// import { map } from 'rxjs/operators';
+import { HotService } from '../hot/hot.service';
 @Injectable()
 export class VideoService extends ElasticsearchService {
     constructor(
@@ -28,10 +30,31 @@ export class VideoService extends ElasticsearchService {
         @InjectModel(Video.name)
         private readonly videoModel: Model<Video>,
         @InjectModel(Bookmark.name)
-        private readonly bookmarkModel: Model<Bookmark>
+        private readonly bookmarkModel: Model<Bookmark>,
+        // private readonly httpService: HttpService,
+        private readonly hotService: HotService
     ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
+
+    // /**
+    //  * URL of live streamming server
+    //  *
+    //  */
+    // private url =
+    //     process.env.URL_HOT_TREND || 'http://localhost:3000/api/v1/hot';
+
+    // /**
+    //  * Username and Password to login live streamming server
+    //  *
+    //  */
+    // private data: any = {};
+
+    // /**
+    //  * Options for request
+    //  *
+    //  */
+    // private options: any = {};
 
     async updateReaction<T>(reactionId: string, reaction: T) {
         return await this.reactionModel.findByIdAndUpdate(
@@ -72,7 +95,7 @@ export class VideoService extends ElasticsearchService {
     }
 
     async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
-        return await this.reactionModel.updateMany({ videoId }, { $set: reaction }, { multi: true });
+        return await this.reactionModel.updateMany({videoId}, { $set: reaction }, { multi: true });
     }
 
     async deleteBookmark(bookmarkId: string) {
@@ -526,11 +549,17 @@ export class VideoService extends ElasticsearchService {
                     query: {
                         multi_match: {
                             query: searchProductDto.search,
-                            fields: ['name', 'description', 'preview', 'tag', 'url']
+                            fields: [
+                                'name',
+                                'description',
+                                'preview',
+                                'tag',
+                                'url'
+                            ]
                         }
                     }
                 }
-            })
+            });
 
             const videos: any[] = response.hits.hits;
 
@@ -619,22 +648,26 @@ export class VideoService extends ElasticsearchService {
                 },
                 {
                     $project: {
-                        _id: '$_id', reaction: {
+                        _id: '$_id',
+                        reaction: {
                             $arrayToObject: '$reaction'
-                        }, type: {
+                        },
+                        type: {
                             $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
+                        },
+                        total_like: '$total_like'
+                    }
                 },
                 {
                     $group: {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_like: '$total_like',
                                     isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
+                                    isLive: '$type.isLive'
                                 }
                             }
                         }
@@ -648,11 +681,12 @@ export class VideoService extends ElasticsearchService {
             let result = {};
 
             if (aggregate.length > 0) {
-                result = aggregate[0]
+                result = aggregate[0];
             }
 
-            const maps = videos.map(video => ({
-                ...video, _source: {
+            const maps = videos.map((video) => ({
+                ...video,
+                _source: {
                     ...video._source,
                     total_like: this.getTotalLike(video._source.videoId || video._id, result),
                     isLiked: this.getBoolean(video._source.videoId || video._id, result),
@@ -660,16 +694,15 @@ export class VideoService extends ElasticsearchService {
                     total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
                     isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
                 }
-            }))
+            }));
 
             return new BaseResponse(
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
                 maps,
                 'Get relate video successfully'
-            )
-        }
-        catch (err) {
-            throw new InternalServerErrorException(err)
+            );
+        } catch (err) {
+            throw new InternalServerErrorException(err);
         }
     }
 
@@ -783,26 +816,20 @@ export class VideoService extends ElasticsearchService {
                 }
             },
             {
-                $project: {
-                    _id: '$_id', reaction: {
-                        $arrayToObject: '$reaction'
-                    }, type: {
-                        $arrayToObject: '$type'
-                    }, total_like: '$total_like'
-                },
+                $project: {_id: '$_id', reaction: {
+                    $arrayToObject: '$reaction'
+                }, type: {
+                    $arrayToObject: '$type'
+                }, total_like: '$total_like'},
             },
             {
                 $group: {
                     _id: null,
-                    root: {
-                        $push: {
-                            k: '$_id', v: {
-                                total_like: '$total_like',
-                                isLiked: '$reaction.isLiked',
-                                isLive: '$type.isLive',
-                            }
-                        }
-                    }
+                    root: { $push: { k: '$_id', v: {
+                        total_like: '$total_like',
+                        isLiked: '$reaction.isLiked',
+                        isLive: '$type.isLive',
+                    }} }
                 }
             },
             {
@@ -885,7 +912,7 @@ export class VideoService extends ElasticsearchService {
             });
             return response.hits.hits;
         } catch (err) {
-            console.log(err, 'errror');
+            console.log(err);
             throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -913,11 +940,33 @@ export class VideoService extends ElasticsearchService {
             });
     }
 
-    async getVideos(userId: string, videoPaginate: VideoPaginateDto) {
+    async getVideos(videoPaginate: VideoPaginateDto) {
+        const hot = await this.hotService.getHotTrend();
+
+        if (hot) {
+            console.log(typeof hot);
+            return this.getTrend(videoPaginate, hot);
+        }
+
+        return this.getAll(videoPaginate);
+    }
+
+    // private async getHotTrend(): Promise<any> {
+    //     try {
+    //         return await this.httpService
+    //             .get(this.url)
+    //             .pipe(map((resp) => resp.data));
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+
+    private async getAll(videoPaginate: VideoPaginateDto) {
         try {
-            const response = await this.search({
+            const videos = await this.search({
                 index: productIndex._index,
                 body: {
+                    sort: [{ createdAt: { order: 'desc' } }],
                     size: videoPaginate.limit,
                     from: videoPaginate.offset,
                     query: {
@@ -926,96 +975,63 @@ export class VideoService extends ElasticsearchService {
                 }
             });
 
-            const videos: any[] = response.hits.hits;
-    
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                        reaction: {
-                            $push: {
-                                k: 'isLiked',
-                                v: '$$ROOT.isLiked'
-                            }
-                        },
-                        type: {
-                            $push: {
-                                k: 'isLive',
-                                v: '$$ROOT.isLive'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id', reaction: {
-                            $arrayToObject: '$reaction'
-                        }, type: {
-                            $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_like: '$total_like',
-                                    isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ]);
-    
-            let result = {};
-    
-            if (aggregate.length > 0) {
-                result = aggregate[0]
-            }
-
-            const maps = videos.map((video) => ({
-                ...video,
-                _source: {
-                    ...video._source,
-                    total_like: this.getTotalLike(
-                        video._source.videoId || video._id,
-                        result
-                    ),
-                    isLiked: this.getBoolean(
-                        video._source.videoId || video._id,
-                        result
-                    ),
-                    isLive: this.getBooleanLive(
-                        video._source.videoId || video._id,
-                        result
-                    )
-                }
-            }));
-
             return new BaseResponse(
                 STATUSCODE.LISTED_SUCCESS_9010,
                 {
-                    videos: maps,
-                    total: response.hits.total
+                    videos: videos.hits.hits,
+                    total: videos.hits.total
                 },
                 MESSAGE.LIST_SUCCESS
             );
         } catch (err) {
+            console.log(err);
             throw new BaseErrorResponse(
                 STATUSCODE.LISTED_FAIL_9011,
                 MESSAGE.LIST_FAILED,
                 err
             );
+        }
+    }
+
+    private async getTrend(videoPaginate: VideoPaginateDto, hot: string) {
+        if (hot != null || hot != undefined) {
+            try {
+                const videos = await this.search({
+                    index: productIndex._index,
+                    body: {
+                        sort: [{ createdAt: { order: 'desc' } }],
+                        size: videoPaginate.limit,
+                        from: videoPaginate.offset,
+                        query: {
+                            multi_match: {
+                                query: hot,
+                                fields: [
+                                    'name',
+                                    'description',
+                                    'preview',
+                                    'tag'
+                                ]
+                            }
+                        }
+                    }
+                });
+
+                return new BaseResponse(
+                    STATUSCODE.LISTED_SUCCESS_9010,
+                    {
+                        videos: videos.hits.hits,
+                        total: videos.hits.total
+                    },
+                    MESSAGE.LIST_SUCCESS
+                );
+            } catch (err) {
+                console.log(err);
+                throw new BaseErrorResponse(
+                    STATUSCODE.LISTED_FAIL_9011,
+                    MESSAGE.LIST_FAILED,
+                    err
+                );
+            }
         }
     }
 }

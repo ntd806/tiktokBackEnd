@@ -10,7 +10,6 @@ import { BaseErrorResponse, BaseResponse } from 'src/common';
 import { MESSAGE, STATUSCODE } from 'src/constants';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
 import { productIndex } from '../search/constant/product.elastic';
-
 @Injectable()
 export class HotService extends ElasticsearchService {
     constructor(
@@ -29,10 +28,10 @@ export class HotService extends ElasticsearchService {
         }
     }
 
-    public async getHotTrend() {
+    public async getHotTrend(): Promise<string> {
         try {
             const trend = await this.hotModel
-                .find()
+                .find({})
                 .select('trend')
                 .limit(1)
                 .skip(0)
@@ -41,14 +40,20 @@ export class HotService extends ElasticsearchService {
                 })
                 .exec();
 
-            return trend;
+            if (trend.length >= 1) {
+                return trend[0].trend;
+            }
+
+            return '';
         } catch (error) {
+            console.log(error);
             throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     async getTrend(paginationQueryDto: PaginationQueryDto) {
         const hot = await this.getHotTrend();
+        console.log(hot);
         try {
             const videos = await this.search({
                 index: productIndex._index,
@@ -57,7 +62,7 @@ export class HotService extends ElasticsearchService {
                     from: paginationQueryDto.offset,
                     query: {
                         multi_match: {
-                            query: hot[0].trend,
+                            query: hot,
                             fields: ['name', 'description', 'preview', 'tag']
                         }
                     }
@@ -80,5 +85,10 @@ export class HotService extends ElasticsearchService {
                 err
             );
         }
+    }
+
+    public async remove(gameId: string): Promise<any> {
+        const deletedCustomer = await this.hotModel.findByIdAndRemove(gameId);
+        return deletedCustomer;
     }
 }
