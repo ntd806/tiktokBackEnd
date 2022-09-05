@@ -251,4 +251,38 @@ export class VideoController {
     async getVideos(@Req() req, @Query() paginate: VideoPaginateDto) {
         return await this.videoService.getVideos(req.user.id, paginate);
     }
+
+    @ApiOperation({
+        summary: 'Search videos'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_SUCCESS_9010,
+        description: 'Get list video successfully'
+    })
+    @ApiResponse({
+        status: STATUSCODE.LISTED_FAIL_9011,
+        description: 'Get list video failed'
+    })
+    @ApiQuery({
+        name: 'search',
+        type: 'string',
+        description: 'filter',
+        required: true
+    })
+    @ApiQuery({
+        name: 'limit',
+        type: 'number',
+        description: 'enter limit of record',
+        required: true
+    })
+    @ApiQuery({
+        name: 'offset',
+        type: 'number',
+        description: 'enter offset of record',
+        required: true
+    })
+    @Get('search')
+    async searchVideo(@Req() req, @Query() paginate: VideoPaginateDto) {
+        return await this.videoService.searchVideo(req.user.id, paginate);
+    }
 }
