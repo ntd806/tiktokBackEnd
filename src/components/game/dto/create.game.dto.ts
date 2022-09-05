@@ -9,7 +9,7 @@ export class CreateGameDto {
 
     @ApiProperty()
     @IsString()
-    @MaxLength(50)
+    @MaxLength(100)
     @IsNotEmpty()
     readonly url: string;
 
