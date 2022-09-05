@@ -527,7 +527,7 @@ export class VideoService extends ElasticsearchService {
 
     async getVideos(videoPaginate: VideoPaginateDto) {
         const hot = await this.hotService.getHotTrend();
-        
+
         if (hot) {
             console.log(typeof hot);
             return this.getTrend(videoPaginate, hot);
