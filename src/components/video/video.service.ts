@@ -198,15 +198,17 @@ export class VideoService extends ElasticsearchService {
                         },
                         pipeline: [
                             {
+                                $addFields: {
+                                    _id: {
+                                        $toString: '$_id'
+                                    }
+                                }
+                            },
+                            {
                                 $match: {
                                     $expr: {
                                         $eq: [
-                                            {
-                                                $convert: {
-                                                    input: "$_id",
-                                                    to: 'string'
-                                                }
-                                            },
+                                            "$_id",
                                             "$$id"
                                         ]
                                     }
@@ -376,15 +378,17 @@ export class VideoService extends ElasticsearchService {
                         },
                         pipeline: [
                             {
+                                $addFields: {
+                                    _id: {
+                                        $toString: '$_id'
+                                    }
+                                }
+                            },
+                            {
                                 $match: {
                                     $expr: {
                                         $eq: [
-                                            {
-                                                $convert: {
-                                                    input: "$_id",
-                                                    to: 'string'
-                                                }
-                                            },
+                                            "$_id",
                                             "$$id"
                                         ]
                                     }
