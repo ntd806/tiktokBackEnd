@@ -245,9 +245,7 @@ export class VideoService extends ElasticsearchService {
                             $cond: {
                                 if: {
                                     $eq: [
-                                        {
-                                            $toString: "$user.userId"
-                                        },
+                                        "$user.userId",
                                         userId
                                     ]
                                 },
@@ -422,9 +420,7 @@ export class VideoService extends ElasticsearchService {
                             $cond: {
                                 if: {
                                     $eq: [
-                                        {
-                                            $toString: "$user.userId"
-                                        },
+                                        "$user.userId",
                                         userId
                                     ]
                                 },
@@ -590,9 +586,7 @@ export class VideoService extends ElasticsearchService {
                             $cond: {
                                 if: {
                                     $eq: [
-                                        {
-                                            $toString: "$user.userId"
-                                        },
+                                        "$user.userId",
                                         userId
                                     ]
                                 },
@@ -759,9 +753,7 @@ export class VideoService extends ElasticsearchService {
                         $cond: {
                             if: {
                                 $eq: [
-                                    {
-                                        $toString: "$user.userId"
-                                    },
+                                    "$user.userId",
                                     userId
                                 ]
                             },
@@ -1004,9 +996,7 @@ export class VideoService extends ElasticsearchService {
                             $cond: {
                                 if: {
                                     $eq: [
-                                        {
-                                            $toString: "$user.userId"
-                                        },
+                                        "$user.userId",
                                         userId
                                     ]
                                 },
@@ -1190,9 +1180,7 @@ export class VideoService extends ElasticsearchService {
                                 $cond: {
                                     if: {
                                         $eq: [
-                                            {
-                                                $toString: "$user.userId"
-                                            },
+                                             "$user.userId",
                                             userId
                                         ]
                                     },
