@@ -351,11 +351,12 @@ export class VideoService extends ElasticsearchService {
                 'Get list video successfully'
             );
         } catch (err) {
-            return new BaseErrorResponse(
-                STATUSCODE.VIDEO_LIST_FAIL_906,
-                'Get list video failed',
-                null
-            );
+            throw new InternalServerErrorException(err);
+            // return new BaseErrorResponse(
+            //     STATUSCODE.VIDEO_LIST_FAIL_906,
+            //     'Get list video failed',
+            //     null
+            // );
         }
     }
 
@@ -527,12 +528,12 @@ export class VideoService extends ElasticsearchService {
                 'Get list video successfully'
             );
         } catch (err) {
-            console.error(err);
-            return new BaseErrorResponse(
-                STATUSCODE.VIDEO_LIST_FAIL_906,
-                'Get list video failed',
-                null
-            );
+            throw new InternalServerErrorException(err)
+            // return new BaseErrorResponse(
+            //     STATUSCODE.VIDEO_LIST_FAIL_906,
+            //     'Get list video failed',
+            //     err
+            // );
         }
     }
 
@@ -1128,12 +1129,13 @@ export class VideoService extends ElasticsearchService {
                 MESSAGE.LIST_SUCCESS
             );
         } catch (err) {
-            console.log(err);
-            throw new BaseErrorResponse(
-                STATUSCODE.LISTED_FAIL_9011,
-                MESSAGE.LIST_FAILED,
-                err
-            );
+            throw new InternalServerErrorException(err);
+            // console.log(err);
+            // throw new BaseErrorResponse(
+            //     STATUSCODE.LISTED_FAIL_9011,
+            //     MESSAGE.LIST_FAILED,
+            //     err
+            // );
         }
     }
 
@@ -1313,12 +1315,13 @@ export class VideoService extends ElasticsearchService {
                     MESSAGE.LIST_SUCCESS
                 );
             } catch (err) {
-                console.log(err);
-                throw new BaseErrorResponse(
-                    STATUSCODE.LISTED_FAIL_9011,
-                    MESSAGE.LIST_FAILED,
-                    err
-                );
+                throw new InternalServerErrorException(err);
+                // console.log(err);
+                // throw new BaseErrorResponse(
+                //     STATUSCODE.LISTED_FAIL_9011,
+                //     MESSAGE.LIST_FAILED,
+                //     err
+                // );
             }
         }
     }

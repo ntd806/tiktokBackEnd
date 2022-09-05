@@ -23,12 +23,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
             timestamp: new Date().toISOString(),
             path: request.url,
             method: request.method,
-            message:
-                status !== HttpStatus.INTERNAL_SERVER_ERROR
-                    ? exception['message']['error'] ||
-                      exception['response']['message'] ||
-                      null
-                    : 'Internal server error'
+            message: exception['message']['error'] ||
+            exception['response']['message'] ||
+            null
+                // status !== HttpStatus.INTERNAL_SERVER_ERROR
+                //     ? exception['message']['error'] ||
+                //       exception['response']['message'] ||
+                //       null
+                //     : exception
         };
 
         response.status(status).json(errorResponse);
