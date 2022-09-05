@@ -248,7 +248,7 @@ export class VideoController {
         required: true
     })
     @Get('get-videos')
-    async getVideos(@Query() paginate: VideoPaginateDto) {
-        return await this.videoService.getVideos(paginate);
+    async getVideos(@Req() req, @Query() paginate: VideoPaginateDto) {
+        return await this.videoService.getVideos(req.user.id, paginate);
     }
 }
