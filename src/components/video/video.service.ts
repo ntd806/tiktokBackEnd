@@ -202,7 +202,10 @@ export class VideoService extends ElasticsearchService {
                                     $expr: {
                                         $eq: [
                                             {
-                                                $toString: "$_id"
+                                                $convert: {
+                                                    input: "$_id",
+                                                    to: 'string'
+                                                }
                                             },
                                             "$$id"
                                         ]
@@ -377,7 +380,10 @@ export class VideoService extends ElasticsearchService {
                                     $expr: {
                                         $eq: [
                                             {
-                                                $toString: "$_id"
+                                                $convert: {
+                                                    input: "$_id",
+                                                    to: 'string'
+                                                }
                                             },
                                             "$$id"
                                         ]
