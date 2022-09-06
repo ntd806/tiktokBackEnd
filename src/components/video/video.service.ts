@@ -1497,4 +1497,58 @@ export class VideoService extends ElasticsearchService {
             throw new InternalServerErrorException(err);
         }
     }
+
+    public async getVideoMostLike(limit: number): Promise<any> {
+        try {
+
+            const aggregate = await this.reactionModel.aggregate([
+                {
+                    $group: {
+                        _id: '$videoId',
+                        total_like: {
+                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
+                        },
+                    }
+                },
+                {
+                    $project: {
+                        _id: '$_id',
+                        total_like: '$total_like'
+                    }
+                },
+                {
+                    $sort: {
+                        total_like: -1
+                    }
+                },
+                {
+                    $limit: limit
+                },
+                {
+                    $group: {
+                        _id: null,
+                        root: {
+                            $push: {
+                                k: '$_id',
+                                v: '$total_like',
+                            }
+                        }
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
+                },
+            ]);
+
+            let result = {};
+
+            if (aggregate.length > 0) {
+                result = aggregate[0];
+            }
+
+            return result;
+        } catch (err) {
+            throw new InternalServerErrorException(err);
+        }
+    }
 }
