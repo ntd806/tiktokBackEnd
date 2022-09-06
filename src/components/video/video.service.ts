@@ -286,6 +286,32 @@ export class VideoService extends ElasticsearchService {
 
             const aggregate = await this.reactionModel.aggregate([
                 {
+                    $addFields: {
+                        isUserLiked: {
+                            $cond: {
+                                if: {
+                                    $and: [
+                                        {
+                                            $eq: [
+                                                "$$ROOT.userId",
+                                                userId
+                                            ]
+                                        },
+                                        {
+                                            $eq: [
+                                                "$$ROOT.isLiked",
+                                                true
+                                            ]
+                                        }
+                                    ],
+                                },
+                                then: true,
+                                else: false
+                            }
+                        }
+                    }
+                },
+                {
                     $group: {
                         _id: '$videoId',
                         total_like: {
@@ -294,7 +320,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$$ROOT.isLiked'
+                                v: '$isUserLiked'
                             }
                         },
                         type: {
@@ -466,6 +492,32 @@ export class VideoService extends ElasticsearchService {
 
             const aggregate = await this.reactionModel.aggregate([
                 {
+                    $addFields: {
+                        isUserLiked: {
+                            $cond: {
+                                if: {
+                                    $and: [
+                                        {
+                                            $eq: [
+                                                "$$ROOT.userId",
+                                                userId
+                                            ]
+                                        },
+                                        {
+                                            $eq: [
+                                                "$$ROOT.isLiked",
+                                                true
+                                            ]
+                                        }
+                                    ],
+                                },
+                                then: true,
+                                else: false
+                            }
+                        }
+                    }
+                },
+                {
                     $group: {
                         _id: '$videoId',
                         total_like: {
@@ -474,7 +526,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$$ROOT.isLiked'
+                                v: '$isUserLiked'
                             }
                         },
                         type: {
@@ -632,6 +684,32 @@ export class VideoService extends ElasticsearchService {
 
             const aggregate = await this.reactionModel.aggregate([
                 {
+                    $addFields: {
+                        isUserLiked: {
+                            $cond: {
+                                if: {
+                                    $and: [
+                                        {
+                                            $eq: [
+                                                "$$ROOT.userId",
+                                                userId
+                                            ]
+                                        },
+                                        {
+                                            $eq: [
+                                                "$$ROOT.isLiked",
+                                                true
+                                            ]
+                                        }
+                                    ],
+                                },
+                                then: true,
+                                else: false
+                            }
+                        }
+                    }
+                },
+                {
                     $group: {
                         _id: '$videoId',
                         total_like: {
@@ -640,7 +718,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$$ROOT.isLiked'
+                                v: '$isUserLiked'
                             }
                         },
                         type: {
@@ -799,6 +877,32 @@ export class VideoService extends ElasticsearchService {
 
         const aggregate = await this.reactionModel.aggregate([
             {
+                $addFields: {
+                    isUserLiked: {
+                        $cond: {
+                            if: {
+                                $and: [
+                                    {
+                                        $eq: [
+                                            "$$ROOT.userId",
+                                            userId
+                                        ]
+                                    },
+                                    {
+                                        $eq: [
+                                            "$$ROOT.isLiked",
+                                            true
+                                        ]
+                                    }
+                                ],
+                            },
+                            then: true,
+                            else: false
+                        }
+                    }
+                }
+            },
+            {
                 $group: {
                     _id: '$videoId',
                     total_like: {
@@ -807,7 +911,7 @@ export class VideoService extends ElasticsearchService {
                     reaction: {
                         $push: {
                             k: 'isLiked',
-                            v: '$$ROOT.isLiked'
+                            v: '$isUserLiked'
                         }
                     },
                     type: {
@@ -1048,6 +1152,32 @@ export class VideoService extends ElasticsearchService {
 
             const aggregate = await this.reactionModel.aggregate([
                 {
+                    $addFields: {
+                        isUserLiked: {
+                            $cond: {
+                                if: {
+                                    $and: [
+                                        {
+                                            $eq: [
+                                                "$$ROOT.userId",
+                                                userId
+                                            ]
+                                        },
+                                        {
+                                            $eq: [
+                                                "$$ROOT.isLiked",
+                                                true
+                                            ]
+                                        }
+                                    ],
+                                },
+                                then: true,
+                                else: false
+                            }
+                        }
+                    }
+                },
+                {
                     $group: {
                         _id: '$videoId',
                         total_like: {
@@ -1056,7 +1186,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$$ROOT.isLiked'
+                                v: '$isUserLiked'
                             }
                         },
                         type: {
@@ -1232,6 +1362,32 @@ export class VideoService extends ElasticsearchService {
 
                 const aggregate = await this.reactionModel.aggregate([
                     {
+                        $addFields: {
+                            isUserLiked: {
+                                $cond: {
+                                    if: {
+                                        $and: [
+                                            {
+                                                $eq: [
+                                                    "$$ROOT.userId",
+                                                    userId
+                                                ]
+                                            },
+                                            {
+                                                $eq: [
+                                                    "$$ROOT.isLiked",
+                                                    true
+                                                ]
+                                            }
+                                        ],
+                                    },
+                                    then: true,
+                                    else: false
+                                }
+                            }
+                        }
+                    },
+                    {
                         $group: {
                             _id: '$videoId',
                             total_like: {
@@ -1240,7 +1396,7 @@ export class VideoService extends ElasticsearchService {
                             reaction: {
                                 $push: {
                                     k: 'isLiked',
-                                    v: '$$ROOT.isLiked'
+                                    v: '$isUserLiked'
                                 }
                             },
                             type: {
@@ -1419,6 +1575,32 @@ export class VideoService extends ElasticsearchService {
 
             const aggregate = await this.reactionModel.aggregate([
                 {
+                    $addFields: {
+                        isUserLiked: {
+                            $cond: {
+                                if: {
+                                    $and: [
+                                        {
+                                            $eq: [
+                                                "$$ROOT.userId",
+                                                userId
+                                            ]
+                                        },
+                                        {
+                                            $eq: [
+                                                "$$ROOT.isLiked",
+                                                true
+                                            ]
+                                        }
+                                    ],
+                                },
+                                then: true,
+                                else: false
+                            }
+                        }
+                    }
+                },
+                {
                     $group: {
                         _id: '$videoId',
                         total_like: {
@@ -1427,7 +1609,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$$ROOT.isLiked'
+                                v: '$isUserLiked'
                             }
                         },
                         type: {
