@@ -1636,7 +1636,7 @@ export class VideoService extends ElasticsearchService {
             }
         });
 
-        if (response.hits.hits.length) {
+        if (response.hits.hits.length >= 1) {
             return response;
         }
 
