@@ -186,8 +186,14 @@ export class VideoController {
         description: 'Internal Server Error Exception'
     })
     @Get('get-relative-video')
-    async getRelativeVideo(@Req() req, @Query() searchProductDto: SearchProductDto) {
-        return await this.videoService.getRelativeVideo(req.user.id, searchProductDto);
+    async getRelativeVideo(
+        @Req() req,
+        @Query() searchProductDto: SearchProductDto
+    ) {
+        return await this.videoService.getRelativeVideo(
+            req.user.id,
+            searchProductDto
+        );
     }
 
     @ApiOperation({
@@ -214,8 +220,14 @@ export class VideoController {
         required: true
     })
     @Get('get-relative-video-by-tag')
-    async getRelativeVideoByTag(@Req() req, @Query() searchProductDto: SearchProductDto) {
-        return await this.videoService.getRelativeVideoByTag(req.user.id, searchProductDto);
+    async getRelativeVideoByTag(
+        @Req() req,
+        @Query() searchProductDto: SearchProductDto
+    ) {
+        return await this.videoService.getRelativeVideoByTag(
+            req.user.id,
+            searchProductDto
+        );
     }
 
     @ApiOperation({

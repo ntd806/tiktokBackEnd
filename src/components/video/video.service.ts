@@ -94,8 +94,15 @@ export class VideoService extends ElasticsearchService {
         return imageURL;
     }
 
-    async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
-        return await this.reactionModel.updateMany({ videoId }, { $set: reaction }, { multi: true });
+    async updateManyReactionByVideoId<T>(
+        videoId: string,
+        reaction: T
+    ): Promise<any> {
+        return await this.reactionModel.updateMany(
+            { videoId },
+            { $set: reaction },
+            { multi: true }
+        );
     }
 
     async deleteBookmark(bookmarkId: string) {
@@ -207,10 +214,7 @@ export class VideoService extends ElasticsearchService {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: [
-                                            "$_id",
-                                            "$$id"
-                                        ]
+                                        $eq: ['$_id', '$$id']
                                     }
                                 }
                             }
@@ -221,13 +225,14 @@ export class VideoService extends ElasticsearchService {
                 { $unwind: '$meta' },
                 { $match: { userId } },
                 { $limit: Number(limit) },
-                { $skip: Number(offset) },
-            ])
+                { $skip: Number(offset) }
+            ]);
 
             const bookmarkAggregate = await this.bookmarkModel.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", count: { $sum: 1 },
+                        _id: '$videoId',
+                        count: { $sum: 1 },
                         user: {
                             $push: {
                                 k: 'userId',
@@ -249,10 +254,7 @@ export class VideoService extends ElasticsearchService {
                         isBookmarked: {
                             $cond: {
                                 if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
+                                    $eq: ['$user.userId', userId]
                                 },
                                 then: true,
                                 else: false
@@ -265,7 +267,8 @@ export class VideoService extends ElasticsearchService {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_bookmark: '$count',
                                     isBookmarked: '$isBookmarked'
                                 }
@@ -276,41 +279,15 @@ export class VideoService extends ElasticsearchService {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
             let bookmark = {};
 
             if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
+                bookmark = bookmarkAggregate[0];
             }
 
             const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
                 {
                     $group: {
                         _id: '$videoId',
@@ -320,7 +297,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$isUserLiked'
+                                v: '$$ROOT.isLiked'
                             }
                         },
                         type: {
@@ -333,22 +310,26 @@ export class VideoService extends ElasticsearchService {
                 },
                 {
                     $project: {
-                        _id: '$_id', reaction: {
+                        _id: '$_id',
+                        reaction: {
                             $arrayToObject: '$reaction'
-                        }, type: {
+                        },
+                        type: {
                             $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
+                        },
+                        total_like: '$total_like'
+                    }
                 },
                 {
                     $group: {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_like: '$total_like',
                                     isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
+                                    isLive: '$type.isLive'
                                 }
                             }
                         }
@@ -362,17 +343,17 @@ export class VideoService extends ElasticsearchService {
             let result = {};
 
             if (aggregate.length > 0) {
-                result = aggregate[0]
+                result = aggregate[0];
             }
 
-            const maps = videos.map(video => ({
+            const maps = videos.map((video) => ({
                 ...video,
                 total_like: this.getTotalLike(video.videoId, result),
                 isLiked: this.getBoolean(video.videoId, result),
                 isLive: this.getBooleanLive(video.videoId, result),
                 total_bookmark: this.getTotalBookmark(video.videoId, bookmark),
-                isBookmarked: this.getBooleanBookmark(video.videoId, bookmark),
-            }))
+                isBookmarked: this.getBooleanBookmark(video.videoId, bookmark)
+            }));
 
             return new BaseResponse(
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
@@ -413,10 +394,7 @@ export class VideoService extends ElasticsearchService {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: [
-                                            "$_id",
-                                            "$$id"
-                                        ]
+                                        $eq: ['$_id', '$$id']
                                     }
                                 }
                             }
@@ -427,13 +405,14 @@ export class VideoService extends ElasticsearchService {
                 { $unwind: '$meta' },
                 { $match: { isLiked: true, userId } },
                 { $limit: Number(limit) },
-                { $skip: Number(offset) },
-            ])
+                { $skip: Number(offset) }
+            ]);
 
             const bookmarkAggregate = await this.bookmarkModel.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", count: { $sum: 1 },
+                        _id: '$videoId',
+                        count: { $sum: 1 },
                         user: {
                             $push: {
                                 k: 'userId',
@@ -455,10 +434,7 @@ export class VideoService extends ElasticsearchService {
                         isBookmarked: {
                             $cond: {
                                 if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
+                                    $eq: ['$user.userId', userId]
                                 },
                                 then: true,
                                 else: false
@@ -471,7 +447,8 @@ export class VideoService extends ElasticsearchService {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_bookmark: '$count',
                                     isBookmarked: '$isBookmarked'
                                 }
@@ -482,41 +459,15 @@ export class VideoService extends ElasticsearchService {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
             let bookmark = {};
 
             if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
+                bookmark = bookmarkAggregate[0];
             }
 
             const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
                 {
                     $group: {
                         _id: '$videoId',
@@ -526,7 +477,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$isUserLiked'
+                                v: '$$ROOT.isLiked'
                             }
                         },
                         type: {
@@ -539,22 +490,26 @@ export class VideoService extends ElasticsearchService {
                 },
                 {
                     $project: {
-                        _id: '$_id', reaction: {
+                        _id: '$_id',
+                        reaction: {
                             $arrayToObject: '$reaction'
-                        }, type: {
+                        },
+                        type: {
                             $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
+                        },
+                        total_like: '$total_like'
+                    }
                 },
                 {
                     $group: {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_like: '$total_like',
                                     isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
+                                    isLive: '$type.isLive'
                                 }
                             }
                         }
@@ -568,17 +523,17 @@ export class VideoService extends ElasticsearchService {
             let result = {};
 
             if (aggregate.length > 0) {
-                result = aggregate[0]
+                result = aggregate[0];
             }
 
-            const maps = videos.map(video => ({
+            const maps = videos.map((video) => ({
                 ...video,
                 total_like: this.getTotalLike(video.videoId, result),
                 isLiked: this.getBoolean(video.videoId, result),
                 isLive: this.getBooleanLive(video.videoId, result),
                 total_bookmark: this.getTotalBookmark(video.videoId, bookmark),
-                isBookmarked: this.getBooleanBookmark(video.videoId, bookmark),
-            }))
+                isBookmarked: this.getBooleanBookmark(video.videoId, bookmark)
+            }));
 
             return new BaseResponse(
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
@@ -586,7 +541,7 @@ export class VideoService extends ElasticsearchService {
                 'Get list video successfully'
             );
         } catch (err) {
-            throw new InternalServerErrorException(err)
+            throw new InternalServerErrorException(err);
             // return new BaseErrorResponse(
             //     STATUSCODE.VIDEO_LIST_FAIL_906,
             //     'Get list video failed',
@@ -625,7 +580,8 @@ export class VideoService extends ElasticsearchService {
             const bookmarkAggregate = await this.bookmarkModel.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", count: { $sum: 1 },
+                        _id: '$videoId',
+                        count: { $sum: 1 },
                         user: {
                             $push: {
                                 k: 'userId',
@@ -647,10 +603,7 @@ export class VideoService extends ElasticsearchService {
                         isBookmarked: {
                             $cond: {
                                 if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
+                                    $eq: ['$user.userId', userId]
                                 },
                                 then: true,
                                 else: false
@@ -663,7 +616,8 @@ export class VideoService extends ElasticsearchService {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_bookmark: '$count',
                                     isBookmarked: '$isBookmarked'
                                 }
@@ -674,41 +628,15 @@ export class VideoService extends ElasticsearchService {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
             let bookmark = {};
 
             if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
+                bookmark = bookmarkAggregate[0];
             }
 
             const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
                 {
                     $group: {
                         _id: '$videoId',
@@ -718,7 +646,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$isUserLiked'
+                                v: '$$ROOT.isLiked'
                             }
                         },
                         type: {
@@ -733,7 +661,7 @@ export class VideoService extends ElasticsearchService {
                     $project: {
                         _id: '$_id',
                         reaction: {
-                            $arrayToObject: '$reaction',
+                            $arrayToObject: '$reaction'
                         },
                         type: {
                             $arrayToObject: '$type'
@@ -771,11 +699,26 @@ export class VideoService extends ElasticsearchService {
                 ...video,
                 _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, result),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, result),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                    total_like: this.getTotalLike(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    isLiked: this.getBoolean(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    isLive: this.getBooleanLive(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    total_bookmark: this.getTotalBookmark(
+                        video._source.videoId || video._id,
+                        bookmark
+                    ),
+                    isBookmarked: this.getBooleanBookmark(
+                        video._source.videoId || video._id,
+                        bookmark
+                    )
                 }
             }));
 
@@ -818,7 +761,8 @@ export class VideoService extends ElasticsearchService {
         const bookmarkAggregate = await this.bookmarkModel.aggregate([
             {
                 $group: {
-                    _id: "$videoId", count: { $sum: 1 },
+                    _id: '$videoId',
+                    count: { $sum: 1 },
                     user: {
                         $push: {
                             k: 'userId',
@@ -840,10 +784,7 @@ export class VideoService extends ElasticsearchService {
                     isBookmarked: {
                         $cond: {
                             if: {
-                                $eq: [
-                                    "$user.userId",
-                                    userId
-                                ]
+                                $eq: ['$user.userId', userId]
                             },
                             then: true,
                             else: false
@@ -856,7 +797,8 @@ export class VideoService extends ElasticsearchService {
                     _id: null,
                     root: {
                         $push: {
-                            k: '$_id', v: {
+                            k: '$_id',
+                            v: {
                                 total_bookmark: '$count',
                                 isBookmarked: '$isBookmarked'
                             }
@@ -867,41 +809,15 @@ export class VideoService extends ElasticsearchService {
             {
                 $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
             }
-        ])
+        ]);
 
         let bookmark = {};
 
         if (bookmarkAggregate.length > 0) {
-            bookmark = bookmarkAggregate[0]
+            bookmark = bookmarkAggregate[0];
         }
 
         const aggregate = await this.reactionModel.aggregate([
-            {
-                $addFields: {
-                    isUserLiked: {
-                        $cond: {
-                            if: {
-                                $and: [
-                                    {
-                                        $eq: [
-                                            "$$ROOT.userId",
-                                            userId
-                                        ]
-                                    },
-                                    {
-                                        $eq: [
-                                            "$$ROOT.isLiked",
-                                            true
-                                        ]
-                                    }
-                                ],
-                            },
-                            then: true,
-                            else: false
-                        }
-                    }
-                }
-            },
             {
                 $group: {
                     _id: '$videoId',
@@ -911,7 +827,7 @@ export class VideoService extends ElasticsearchService {
                     reaction: {
                         $push: {
                             k: 'isLiked',
-                            v: '$isUserLiked'
+                            v: '$$ROOT.isLiked'
                         }
                     },
                     type: {
@@ -924,22 +840,26 @@ export class VideoService extends ElasticsearchService {
             },
             {
                 $project: {
-                    _id: '$_id', reaction: {
+                    _id: '$_id',
+                    reaction: {
                         $arrayToObject: '$reaction'
-                    }, type: {
+                    },
+                    type: {
                         $arrayToObject: '$type'
-                    }, total_like: '$total_like'
-                },
+                    },
+                    total_like: '$total_like'
+                }
             },
             {
                 $group: {
                     _id: null,
                     root: {
                         $push: {
-                            k: '$_id', v: {
+                            k: '$_id',
+                            v: {
                                 total_like: '$total_like',
                                 isLiked: '$reaction.isLiked',
-                                isLive: '$type.isLive',
+                                isLive: '$type.isLive'
                             }
                         }
                     }
@@ -953,7 +873,7 @@ export class VideoService extends ElasticsearchService {
         let result = {};
 
         if (aggregate.length > 0) {
-            result = aggregate[0]
+            result = aggregate[0];
         }
 
         const maps = videos.map((video) => ({
@@ -972,8 +892,14 @@ export class VideoService extends ElasticsearchService {
                     video._source.videoId || video._id,
                     result
                 ),
-                total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                total_bookmark: this.getTotalBookmark(
+                    video._source.videoId || video._id,
+                    bookmark
+                ),
+                isBookmarked: this.getBooleanBookmark(
+                    video._source.videoId || video._id,
+                    bookmark
+                )
             }
         }));
 
@@ -1055,6 +981,7 @@ export class VideoService extends ElasticsearchService {
 
     async getVideos(userId: string, videoPaginate: VideoPaginateDto) {
         const hot = await this.hotService.getHotTrend();
+        const likes = await this.getVideoMostLike(1);
 
         if (hot) {
             console.log(typeof hot);
@@ -1093,7 +1020,8 @@ export class VideoService extends ElasticsearchService {
             const bookmarkAggregate = await this.bookmarkModel.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", count: { $sum: 1 },
+                        _id: '$videoId',
+                        count: { $sum: 1 },
                         user: {
                             $push: {
                                 k: 'userId',
@@ -1115,10 +1043,7 @@ export class VideoService extends ElasticsearchService {
                         isBookmarked: {
                             $cond: {
                                 if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
+                                    $eq: ['$user.userId', userId]
                                 },
                                 then: true,
                                 else: false
@@ -1131,7 +1056,8 @@ export class VideoService extends ElasticsearchService {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_bookmark: '$count',
                                     isBookmarked: '$isBookmarked'
                                 }
@@ -1142,41 +1068,15 @@ export class VideoService extends ElasticsearchService {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
             let bookmark = {};
 
             if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
+                bookmark = bookmarkAggregate[0];
             }
 
             const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
                 {
                     $group: {
                         _id: '$videoId',
@@ -1186,7 +1086,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$isUserLiked'
+                                v: '$$ROOT.isLiked'
                             }
                         },
                         type: {
@@ -1235,7 +1135,7 @@ export class VideoService extends ElasticsearchService {
                 result = aggregate[0];
             }
 
-            const maps = videos.map(video => ({
+            const maps = videos.map((video) => ({
                 ...video,
                 _source: {
                     ...video._source,
@@ -1251,10 +1151,16 @@ export class VideoService extends ElasticsearchService {
                         video._source.videoId || video._id,
                         result
                     ),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                    total_bookmark: this.getTotalBookmark(
+                        video._source.videoId || video._id,
+                        bookmark
+                    ),
+                    isBookmarked: this.getBooleanBookmark(
+                        video._source.videoId || video._id,
+                        bookmark
+                    )
                 }
-            }))
+            }));
 
             return new BaseResponse(
                 STATUSCODE.LISTED_SUCCESS_9010,
@@ -1275,7 +1181,11 @@ export class VideoService extends ElasticsearchService {
         }
     }
 
-    private async getTrend(userId: string, videoPaginate: VideoPaginateDto, hot: string) {
+    private async getTrend(
+        userId: string,
+        videoPaginate: VideoPaginateDto,
+        hot: string
+    ) {
         if (hot != null || hot != undefined) {
             try {
                 const response = await this.search({
@@ -1303,7 +1213,8 @@ export class VideoService extends ElasticsearchService {
                 const bookmarkAggregate = await this.bookmarkModel.aggregate([
                     {
                         $group: {
-                            _id: "$videoId", count: { $sum: 1 },
+                            _id: '$videoId',
+                            count: { $sum: 1 },
                             user: {
                                 $push: {
                                     k: 'userId',
@@ -1325,10 +1236,7 @@ export class VideoService extends ElasticsearchService {
                             isBookmarked: {
                                 $cond: {
                                     if: {
-                                        $eq: [
-                                            "$user.userId",
-                                            userId
-                                        ]
+                                        $eq: ['$user.userId', userId]
                                     },
                                     then: true,
                                     else: false
@@ -1341,7 +1249,8 @@ export class VideoService extends ElasticsearchService {
                             _id: null,
                             root: {
                                 $push: {
-                                    k: '$_id', v: {
+                                    k: '$_id',
+                                    v: {
                                         total_bookmark: '$count',
                                         isBookmarked: '$isBookmarked'
                                     }
@@ -1352,51 +1261,27 @@ export class VideoService extends ElasticsearchService {
                     {
                         $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                     }
-                ])
+                ]);
 
                 let bookmark = {};
 
                 if (bookmarkAggregate.length > 0) {
-                    bookmark = bookmarkAggregate[0]
+                    bookmark = bookmarkAggregate[0];
                 }
 
                 const aggregate = await this.reactionModel.aggregate([
                     {
-                        $addFields: {
-                            isUserLiked: {
-                                $cond: {
-                                    if: {
-                                        $and: [
-                                            {
-                                                $eq: [
-                                                    "$$ROOT.userId",
-                                                    userId
-                                                ]
-                                            },
-                                            {
-                                                $eq: [
-                                                    "$$ROOT.isLiked",
-                                                    true
-                                                ]
-                                            }
-                                        ],
-                                    },
-                                    then: true,
-                                    else: false
-                                }
-                            }
-                        }
-                    },
-                    {
                         $group: {
                             _id: '$videoId',
                             total_like: {
-                                $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
+                                $sum: {
+                                    $cond: [{ $eq: ['$isLiked', true] }, 1, 0]
+                                }
                             },
                             reaction: {
                                 $push: {
                                     k: 'isLiked',
-                                    v: '$isUserLiked'
+                                    v: '$$ROOT.isLiked'
                                 }
                             },
                             type: {
@@ -1445,7 +1330,7 @@ export class VideoService extends ElasticsearchService {
                     result = aggregate[0];
                 }
 
-                const maps = videos.map(video => ({
+                const maps = videos.map((video) => ({
                     ...video,
                     _source: {
                         ...video._source,
@@ -1461,10 +1346,16 @@ export class VideoService extends ElasticsearchService {
                             video._source.videoId || video._id,
                             result
                         ),
-                        total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                        isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                        total_bookmark: this.getTotalBookmark(
+                            video._source.videoId || video._id,
+                            bookmark
+                        ),
+                        isBookmarked: this.getBooleanBookmark(
+                            video._source.videoId || video._id,
+                            bookmark
+                        )
                     }
-                }))
+                }));
 
                 return new BaseResponse(
                     STATUSCODE.LISTED_SUCCESS_9010,
@@ -1516,7 +1407,8 @@ export class VideoService extends ElasticsearchService {
             const bookmarkAggregate = await this.bookmarkModel.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", count: { $sum: 1 },
+                        _id: '$videoId',
+                        count: { $sum: 1 },
                         user: {
                             $push: {
                                 k: 'userId',
@@ -1538,10 +1430,7 @@ export class VideoService extends ElasticsearchService {
                         isBookmarked: {
                             $cond: {
                                 if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
+                                    $eq: ['$user.userId', userId]
                                 },
                                 then: true,
                                 else: false
@@ -1554,7 +1443,8 @@ export class VideoService extends ElasticsearchService {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_bookmark: '$count',
                                     isBookmarked: '$isBookmarked'
                                 }
@@ -1565,41 +1455,15 @@ export class VideoService extends ElasticsearchService {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
             let bookmark = {};
 
             if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
+                bookmark = bookmarkAggregate[0];
             }
 
             const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
                 {
                     $group: {
                         _id: '$videoId',
@@ -1609,7 +1473,7 @@ export class VideoService extends ElasticsearchService {
                         reaction: {
                             $push: {
                                 k: 'isLiked',
-                                v: '$isUserLiked'
+                                v: '$$ROOT.isLiked'
                             }
                         },
                         type: {
@@ -1624,7 +1488,7 @@ export class VideoService extends ElasticsearchService {
                     $project: {
                         _id: '$_id',
                         reaction: {
-                            $arrayToObject: '$reaction',
+                            $arrayToObject: '$reaction'
                         },
                         type: {
                             $arrayToObject: '$type'
@@ -1662,11 +1526,26 @@ export class VideoService extends ElasticsearchService {
                 ...video,
                 _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, result),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, result),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                    total_like: this.getTotalLike(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    isLiked: this.getBoolean(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    isLive: this.getBooleanLive(
+                        video._source.videoId || video._id,
+                        result
+                    ),
+                    total_bookmark: this.getTotalBookmark(
+                        video._source.videoId || video._id,
+                        bookmark
+                    ),
+                    isBookmarked: this.getBooleanBookmark(
+                        video._source.videoId || video._id,
+                        bookmark
+                    )
                 }
             }));
 
@@ -1682,14 +1561,13 @@ export class VideoService extends ElasticsearchService {
 
     public async getVideoMostLike(limit: number): Promise<any> {
         try {
-
             const aggregate = await this.reactionModel.aggregate([
                 {
                     $group: {
                         _id: '$videoId',
                         total_like: {
                             $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
+                        }
                     }
                 },
                 {
@@ -1712,14 +1590,14 @@ export class VideoService extends ElasticsearchService {
                         root: {
                             $push: {
                                 k: '$_id',
-                                v: '$total_like',
+                                v: '$total_like'
                             }
                         }
                     }
                 },
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                },
+                }
             ]);
 
             let result = {};
@@ -1732,5 +1610,36 @@ export class VideoService extends ElasticsearchService {
         } catch (err) {
             throw new InternalServerErrorException(err);
         }
+    }
+
+    public async getVideoByLike(): Promise<any> {
+        const likes = await this.getVideoMostLike(1);
+        let like = '';
+        for (const l in likes) {
+            like = l;
+            break;
+        }
+
+        if (!like) return '';
+
+        const response = await this.search({
+            index: productIndex._index,
+            body: {
+                size: 1,
+                from: 0,
+                query: {
+                    multi_match: {
+                        query: like,
+                        fields: ['videoId']
+                    }
+                }
+            }
+        });
+
+        if (response.hits.hits.length) {
+            return response;
+        }
+
+        return '';
     }
 }
