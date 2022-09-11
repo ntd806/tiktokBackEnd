@@ -16,23 +16,22 @@ import { SearchProductDto } from '../search/dto';
 import { VideoPaginateDto } from './dto';
 import { BaseErrorResponse, BaseResponse } from 'src/common';
 import { MESSAGE, STATUSCODE } from 'src/constants';
-import { Reaction } from './model/reaction.schema';
 import { Video } from './model/video.schema';
 import * as moment from 'moment';
-import { Bookmark } from './model/bookmark.schema';
 // import { map } from 'rxjs/operators';
 import { HotService } from '../hot/hot.service';
+import { CommentService } from 'src/services';
+import { BookmarkRepository, ReactionRepository } from 'src/repositories';
 @Injectable()
 export class VideoService extends ElasticsearchService {
     constructor(
-        @InjectModel(Reaction.name)
-        private readonly reactionModel: Model<Reaction>,
         @InjectModel(Video.name)
         private readonly videoModel: Model<Video>,
-        @InjectModel(Bookmark.name)
-        private readonly bookmarkModel: Model<Bookmark>,
         // private readonly httpService: HttpService,
-        private readonly hotService: HotService
+        private readonly hotService: HotService,
+        private readonly commentService: CommentService,
+        private readonly reactionRepo: ReactionRepository,
+        private readonly bookmarkRepo: BookmarkRepository,
     ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
@@ -57,15 +56,11 @@ export class VideoService extends ElasticsearchService {
     // private options: any = {};
 
     async updateReaction<T>(reactionId: string, reaction: T) {
-        return await this.reactionModel.findByIdAndUpdate(
-            { _id: reactionId },
-            { $set: reaction },
-            { new: true }
-        );
+        return await this.reactionRepo.update(reactionId, reaction);
     }
 
     async createReaction<T>(reaction: T) {
-        return await this.reactionModel.create(reaction);
+        return await this.reactionRepo.create(reaction);
     }
 
     async getImageURL(videoId: string) {
@@ -95,15 +90,15 @@ export class VideoService extends ElasticsearchService {
     }
 
     async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
-        return await this.reactionModel.updateMany({ videoId }, { $set: reaction }, { multi: true });
+        return await this.reactionRepo.updateMany({ videoId }, reaction);
     }
 
     async deleteBookmark(bookmarkId: string) {
-        return await this.bookmarkModel.findByIdAndDelete(bookmarkId);
+        return await this.bookmarkRepo.deleteById(bookmarkId);
     }
 
     async createBookmark<T>(bookmark: T) {
-        return await this.bookmarkModel.create(bookmark);
+        return await this.bookmarkRepo.create(bookmark);
     }
 
     async reactionVideo(userId: string, reactionDto: ReactionDto) {
@@ -114,7 +109,7 @@ export class VideoService extends ElasticsearchService {
             isLiked: true
         };
         try {
-            const reactionFind = await this.reactionModel.findOne({
+            const reactionFind = await this.reactionRepo.getOne({
                 userId,
                 videoId: reaction.videoId
             });
@@ -158,7 +153,7 @@ export class VideoService extends ElasticsearchService {
             bookmarkDate: moment().toISOString()
         };
         try {
-            const bookmarkFind = await this.bookmarkModel.findOne({
+            const bookmarkFind = await this.bookmarkRepo.getOne({
                 userId,
                 videoId: bookmark.videoId
             });
@@ -188,190 +183,23 @@ export class VideoService extends ElasticsearchService {
 
     async getVideoBookmarks(userId: string, pagination: PaginationQueryDto) {
         try {
-            const { limit, offset } = pagination;
-            const videos = await this.bookmarkModel.aggregate([
-                {
-                    $lookup: {
-                        from: 'videos',
-                        let: {
-                            id: '$videoId'
-                        },
-                        pipeline: [
-                            {
-                                $addFields: {
-                                    _id: {
-                                        $toString: '$_id'
-                                    }
-                                }
-                            },
-                            {
-                                $match: {
-                                    $expr: {
-                                        $eq: [
-                                            "$_id",
-                                            "$$id"
-                                        ]
-                                    }
-                                }
-                            }
-                        ],
-                        as: 'meta'
-                    }
-                },
-                { $unwind: '$meta' },
-                { $match: { userId } },
-                { $limit: Number(limit) },
-                { $skip: Number(offset) },
-            ])
 
-            const bookmarkAggregate = await this.bookmarkModel.aggregate([
-                {
-                    $group: {
-                        _id: "$videoId", count: { $sum: 1 },
-                        user: {
-                            $push: {
-                                k: 'userId',
-                                v: '$userId'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        count: '$count',
-                        user: {
-                            $arrayToObject: '$user'
-                        }
-                    }
-                },
-                {
-                    $addFields: {
-                        isBookmarked: {
-                            $cond: {
-                                if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_bookmark: '$count',
-                                    isBookmarked: '$isBookmarked'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ])
+            const videos = await this.bookmarkRepo.paginateAggregate(userId, pagination)
 
-            let bookmark = {};
+            const resultComment = await this.commentService.countCommentsAllVideos();
 
-            if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
-            }
+            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                        reaction: {
-                            $push: {
-                                k: 'isLiked',
-                                v: '$isUserLiked'
-                            }
-                        },
-                        type: {
-                            $push: {
-                                k: 'isLive',
-                                v: '$$ROOT.isLive'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id', reaction: {
-                            $arrayToObject: '$reaction'
-                        }, type: {
-                            $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_like: '$total_like',
-                                    isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ]);
-
-            let result = {};
-
-            if (aggregate.length > 0) {
-                result = aggregate[0]
-            }
+            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
             const maps = videos.map(video => ({
                 ...video,
-                total_like: this.getTotalLike(video.videoId, result),
-                isLiked: this.getBoolean(video.videoId, result),
-                isLive: this.getBooleanLive(video.videoId, result),
-                total_bookmark: this.getTotalBookmark(video.videoId, bookmark),
-                isBookmarked: this.getBooleanBookmark(video.videoId, bookmark),
+                total_like: this.getTotalLike(video.videoId, resultReaction),
+                isLiked: this.getBoolean(video.videoId, resultReaction),
+                isLive: this.getBooleanLive(video.videoId, resultReaction),
+                total_bookmark: this.getTotalBookmark(video.videoId, resultBookmark),
+                isBookmarked: this.getBooleanBookmark(video.videoId, resultBookmark),
+                total_comment: this.getTotalComment(video.videoId, resultComment),
             }))
 
             return new BaseResponse(
@@ -380,6 +208,7 @@ export class VideoService extends ElasticsearchService {
                 'Get list video successfully'
             );
         } catch (err) {
+            console.log(err)
             throw new InternalServerErrorException(err);
             // return new BaseErrorResponse(
             //     STATUSCODE.VIDEO_LIST_FAIL_906,
@@ -394,190 +223,185 @@ export class VideoService extends ElasticsearchService {
         paginationQuery: PaginationQueryDto
     ) {
         try {
-            const { limit, offset } = paginationQuery;
-            const videos = await this.reactionModel.aggregate([
-                {
-                    $lookup: {
-                        from: 'videos',
-                        let: {
-                            id: '$videoId'
-                        },
-                        pipeline: [
-                            {
-                                $addFields: {
-                                    _id: {
-                                        $toString: '$_id'
-                                    }
-                                }
-                            },
-                            {
-                                $match: {
-                                    $expr: {
-                                        $eq: [
-                                            "$_id",
-                                            "$$id"
-                                        ]
-                                    }
-                                }
-                            }
-                        ],
-                        as: 'meta'
-                    }
-                },
-                { $unwind: '$meta' },
-                { $match: { isLiked: true, userId } },
-                { $limit: Number(limit) },
-                { $skip: Number(offset) },
-            ])
+            const videos = await this.reactionRepo.paginateAggregate(userId, paginationQuery)
+            // const videos = await this.reactionModel.aggregate([
+            //     {
+            //         $lookup: {
+            //             from: 'videos',
+            //             let: {
+            //                 id: '$videoId'
+            //             },
+            //             pipeline: [
+            //                 {
+            //                     $addFields: {
+            //                         _id: {
+            //                             $toString: '$_id'
+            //                         }
+            //                     }
+            //                 },
+            //                 {
+            //                     $match: {
+            //                         $expr: {
+            //                             $eq: [
+            //                                 "$_id",
+            //                                 "$$id"
+            //                             ]
+            //                         }
+            //                     }
+            //                 }
+            //             ],
+            //             as: 'meta'
+            //         }
+            //     },
+            //     { $unwind: '$meta' },
+            //     { $match: { isLiked: true, userId } },
+            //     { $limit: Number(limit) },
+            //     { $skip: Number(offset) },
+            // ])
 
-            const bookmarkAggregate = await this.bookmarkModel.aggregate([
-                {
-                    $group: {
-                        _id: "$videoId", count: { $sum: 1 },
-                        user: {
-                            $push: {
-                                k: 'userId',
-                                v: '$userId'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        count: '$count',
-                        user: {
-                            $arrayToObject: '$user'
-                        }
-                    }
-                },
-                {
-                    $addFields: {
-                        isBookmarked: {
-                            $cond: {
-                                if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_bookmark: '$count',
-                                    isBookmarked: '$isBookmarked'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ])
+            const resultComment = await this.commentService.countCommentsAllVideos();
 
-            let bookmark = {};
+            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId)
+            
+            // aggregate([
+            //     {
+            //         $group: {
+            //             _id: "$videoId", count: { $sum: 1 },
+            //             user: {
+            //                 $push: {
+            //                     k: 'userId',
+            //                     v: '$userId'
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $project: {
+            //             count: '$count',
+            //             user: {
+            //                 $arrayToObject: '$user'
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $addFields: {
+            //             isBookmarked: {
+            //                 $cond: {
+            //                     if: {
+            //                         $eq: [
+            //                             "$user.userId",
+            //                             userId
+            //                         ]
+            //                     },
+            //                     then: true,
+            //                     else: false
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $group: {
+            //             _id: null,
+            //             root: {
+            //                 $push: {
+            //                     k: '$_id', v: {
+            //                         total_bookmark: '$count',
+            //                         isBookmarked: '$isBookmarked'
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
+            //     }
+            // ])
 
-            if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
-            }
+            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                        reaction: {
-                            $push: {
-                                k: 'isLiked',
-                                v: '$isUserLiked'
-                            }
-                        },
-                        type: {
-                            $push: {
-                                k: 'isLive',
-                                v: '$$ROOT.isLive'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id', reaction: {
-                            $arrayToObject: '$reaction'
-                        }, type: {
-                            $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_like: '$total_like',
-                                    isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ]);
-
-            let result = {};
-
-            if (aggregate.length > 0) {
-                result = aggregate[0]
-            }
+            // const aggregate = await this.reactionModel.aggregate([
+            //     {
+            //         $addFields: {
+            //             isUserLiked: {
+            //                 $cond: {
+            //                     if: {
+            //                         $and: [
+            //                             {
+            //                                 $eq: [
+            //                                     "$$ROOT.userId",
+            //                                     userId
+            //                                 ]
+            //                             },
+            //                             {
+            //                                 $eq: [
+            //                                     "$$ROOT.isLiked",
+            //                                     true
+            //                                 ]
+            //                             }
+            //                         ],
+            //                     },
+            //                     then: true,
+            //                     else: false
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $group: {
+            //             _id: '$videoId',
+            //             total_like: {
+            //                 $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
+            //             },
+            //             reaction: {
+            //                 $push: {
+            //                     k: 'isLiked',
+            //                     v: '$isUserLiked'
+            //                 }
+            //             },
+            //             type: {
+            //                 $push: {
+            //                     k: 'isLive',
+            //                     v: '$$ROOT.isLive'
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $project: {
+            //             _id: '$_id', reaction: {
+            //                 $arrayToObject: '$reaction'
+            //             }, type: {
+            //                 $arrayToObject: '$type'
+            //             }, total_like: '$total_like'
+            //         },
+            //     },
+            //     {
+            //         $group: {
+            //             _id: null,
+            //             root: {
+            //                 $push: {
+            //                     k: '$_id', v: {
+            //                         total_like: '$total_like',
+            //                         isLiked: '$reaction.isLiked',
+            //                         isLive: '$type.isLive',
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     },
+            //     {
+            //         $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
+            //     }
+            // ]);
 
             const maps = videos.map(video => ({
                 ...video,
-                total_like: this.getTotalLike(video.videoId, result),
-                isLiked: this.getBoolean(video.videoId, result),
-                isLive: this.getBooleanLive(video.videoId, result),
-                total_bookmark: this.getTotalBookmark(video.videoId, bookmark),
-                isBookmarked: this.getBooleanBookmark(video.videoId, bookmark),
+                total_like: this.getTotalLike(video.videoId, resultReaction),
+                isLiked: this.getBoolean(video.videoId, resultReaction),
+                isLive: this.getBooleanLive(video.videoId, resultReaction),
+                total_bookmark: this.getTotalBookmark(video.videoId, resultBookmark),
+                isBookmarked: this.getBooleanBookmark(video.videoId, resultBookmark),
+                total_comment: this.getTotalComment(video.videoId, resultComment),
             }))
 
             return new BaseResponse(
@@ -622,160 +446,22 @@ export class VideoService extends ElasticsearchService {
 
             const videos: any[] = response.hits.hits;
 
-            const bookmarkAggregate = await this.bookmarkModel.aggregate([
-                {
-                    $group: {
-                        _id: "$videoId", count: { $sum: 1 },
-                        user: {
-                            $push: {
-                                k: 'userId',
-                                v: '$userId'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        count: '$count',
-                        user: {
-                            $arrayToObject: '$user'
-                        }
-                    }
-                },
-                {
-                    $addFields: {
-                        isBookmarked: {
-                            $cond: {
-                                if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_bookmark: '$count',
-                                    isBookmarked: '$isBookmarked'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ])
+            const resultComment = await this.commentService.countCommentsAllVideos();
 
-            let bookmark = {};
+            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
-            }
-
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                        reaction: {
-                            $push: {
-                                k: 'isLiked',
-                                v: '$isUserLiked'
-                            }
-                        },
-                        type: {
-                            $push: {
-                                k: 'isLive',
-                                v: '$$ROOT.isLive'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id',
-                        reaction: {
-                            $arrayToObject: '$reaction',
-                        },
-                        type: {
-                            $arrayToObject: '$type'
-                        },
-                        total_like: '$total_like'
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id',
-                                v: {
-                                    total_like: '$total_like',
-                                    isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ]);
-
-            let result = {};
-
-            if (aggregate.length > 0) {
-                result = aggregate[0];
-            }
+            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
             const maps = videos.map((video) => ({
                 ...video,
                 _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, result),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, result),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                    total_like: this.getTotalLike(video._source.videoId || video._id, resultReaction),
+                    isLiked: this.getBoolean(video._source.videoId || video._id, resultReaction),
+                    isLive: this.getBooleanLive(video._source.videoId || video._id, resultReaction),
+                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
+                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
+                    total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment)
                 }
             }));
 
@@ -809,152 +495,21 @@ export class VideoService extends ElasticsearchService {
         return object[key]?.isBookmarked || false;
     }
 
+    getTotalComment(key: string, object: any) {
+        return object[key]?.total_comment || 0;
+    }
+
     public async getRelativeVideoByTag(
         userId: string,
         searchProductDto: SearchProductDto
     ): Promise<any> {
         const videos = await this.getVideoByTag(searchProductDto);
 
-        const bookmarkAggregate = await this.bookmarkModel.aggregate([
-            {
-                $group: {
-                    _id: "$videoId", count: { $sum: 1 },
-                    user: {
-                        $push: {
-                            k: 'userId',
-                            v: '$userId'
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    count: '$count',
-                    user: {
-                        $arrayToObject: '$user'
-                    }
-                }
-            },
-            {
-                $addFields: {
-                    isBookmarked: {
-                        $cond: {
-                            if: {
-                                $eq: [
-                                    "$user.userId",
-                                    userId
-                                ]
-                            },
-                            then: true,
-                            else: false
-                        }
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    root: {
-                        $push: {
-                            k: '$_id', v: {
-                                total_bookmark: '$count',
-                                isBookmarked: '$isBookmarked'
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-            }
-        ])
+        const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-        let bookmark = {};
+        const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
-        if (bookmarkAggregate.length > 0) {
-            bookmark = bookmarkAggregate[0]
-        }
-
-        const aggregate = await this.reactionModel.aggregate([
-            {
-                $addFields: {
-                    isUserLiked: {
-                        $cond: {
-                            if: {
-                                $and: [
-                                    {
-                                        $eq: [
-                                            "$$ROOT.userId",
-                                            userId
-                                        ]
-                                    },
-                                    {
-                                        $eq: [
-                                            "$$ROOT.isLiked",
-                                            true
-                                        ]
-                                    }
-                                ],
-                            },
-                            then: true,
-                            else: false
-                        }
-                    }
-                }
-            },
-            {
-                $group: {
-                    _id: '$videoId',
-                    total_like: {
-                        $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                    },
-                    reaction: {
-                        $push: {
-                            k: 'isLiked',
-                            v: '$isUserLiked'
-                        }
-                    },
-                    type: {
-                        $push: {
-                            k: 'isLive',
-                            v: '$$ROOT.isLive'
-                        }
-                    }
-                }
-            },
-            {
-                $project: {
-                    _id: '$_id', reaction: {
-                        $arrayToObject: '$reaction'
-                    }, type: {
-                        $arrayToObject: '$type'
-                    }, total_like: '$total_like'
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    root: {
-                        $push: {
-                            k: '$_id', v: {
-                                total_like: '$total_like',
-                                isLiked: '$reaction.isLiked',
-                                isLive: '$type.isLive',
-                            }
-                        }
-                    }
-                }
-            },
-            {
-                $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-            }
-        ]);
-
-        let result = {};
-
-        if (aggregate.length > 0) {
-            result = aggregate[0]
-        }
+        const resultComment = await this.commentService.countCommentsAllVideos();
 
         const maps = videos.map((video) => ({
             ...video,
@@ -962,18 +517,19 @@ export class VideoService extends ElasticsearchService {
                 ...video._source,
                 total_like: this.getTotalLike(
                     video._source.videoId || video._id,
-                    result
+                    resultReaction
                 ),
                 isLiked: this.getBoolean(
                     video._source.videoId || video._id,
-                    result
+                    resultReaction
                 ),
                 isLive: this.getBooleanLive(
                     video._source.videoId || video._id,
-                    result
+                    resultReaction
                 ),
-                total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
+                isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
+                total_comment: this.getTotalComment(video._source.video || video._id, resultComment)
             }
         }));
 
@@ -1090,150 +646,11 @@ export class VideoService extends ElasticsearchService {
 
             const videos: any[] = response.hits.hits;
 
-            const bookmarkAggregate = await this.bookmarkModel.aggregate([
-                {
-                    $group: {
-                        _id: "$videoId", count: { $sum: 1 },
-                        user: {
-                            $push: {
-                                k: 'userId',
-                                v: '$userId'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        count: '$count',
-                        user: {
-                            $arrayToObject: '$user'
-                        }
-                    }
-                },
-                {
-                    $addFields: {
-                        isBookmarked: {
-                            $cond: {
-                                if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_bookmark: '$count',
-                                    isBookmarked: '$isBookmarked'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ])
+            const resultComment = await this.commentService.countCommentsAllVideos();
 
-            let bookmark = {};
+            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
-            }
-
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                        reaction: {
-                            $push: {
-                                k: 'isLiked',
-                                v: '$isUserLiked'
-                            }
-                        },
-                        type: {
-                            $push: {
-                                k: 'isLive',
-                                v: '$$ROOT.isLive'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id',
-                        reaction: {
-                            $arrayToObject: '$reaction'
-                        },
-                        type: {
-                            $arrayToObject: '$type'
-                        },
-                        total_like: '$total_like'
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id',
-                                v: {
-                                    total_like: '$total_like',
-                                    isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ]);
-
-            let result = {};
-
-            if (aggregate.length > 0) {
-                result = aggregate[0];
-            }
+            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
             const maps = videos.map(video => ({
                 ...video,
@@ -1241,18 +658,19 @@ export class VideoService extends ElasticsearchService {
                     ...video._source,
                     total_like: this.getTotalLike(
                         video._source.videoId || video._id,
-                        result
+                        resultReaction
                     ),
                     isLiked: this.getBoolean(
                         video._source.videoId || video._id,
-                        result
+                        resultReaction
                     ),
                     isLive: this.getBooleanLive(
                         video._source.videoId || video._id,
-                        result
+                        resultReaction
                     ),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
+                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
+                    total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment),
                 }
             }))
 
@@ -1300,150 +718,11 @@ export class VideoService extends ElasticsearchService {
 
                 const videos: any[] = response.hits.hits;
 
-                const bookmarkAggregate = await this.bookmarkModel.aggregate([
-                    {
-                        $group: {
-                            _id: "$videoId", count: { $sum: 1 },
-                            user: {
-                                $push: {
-                                    k: 'userId',
-                                    v: '$userId'
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: '$count',
-                            user: {
-                                $arrayToObject: '$user'
-                            }
-                        }
-                    },
-                    {
-                        $addFields: {
-                            isBookmarked: {
-                                $cond: {
-                                    if: {
-                                        $eq: [
-                                            "$user.userId",
-                                            userId
-                                        ]
-                                    },
-                                    then: true,
-                                    else: false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: null,
-                            root: {
-                                $push: {
-                                    k: '$_id', v: {
-                                        total_bookmark: '$count',
-                                        isBookmarked: '$isBookmarked'
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                    }
-                ])
+                const resultComment = await this.commentService.countCommentsAllVideos();
 
-                let bookmark = {};
+                const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-                if (bookmarkAggregate.length > 0) {
-                    bookmark = bookmarkAggregate[0]
-                }
-
-                const aggregate = await this.reactionModel.aggregate([
-                    {
-                        $addFields: {
-                            isUserLiked: {
-                                $cond: {
-                                    if: {
-                                        $and: [
-                                            {
-                                                $eq: [
-                                                    "$$ROOT.userId",
-                                                    userId
-                                                ]
-                                            },
-                                            {
-                                                $eq: [
-                                                    "$$ROOT.isLiked",
-                                                    true
-                                                ]
-                                            }
-                                        ],
-                                    },
-                                    then: true,
-                                    else: false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: '$videoId',
-                            total_like: {
-                                $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                            },
-                            reaction: {
-                                $push: {
-                                    k: 'isLiked',
-                                    v: '$isUserLiked'
-                                }
-                            },
-                            type: {
-                                $push: {
-                                    k: 'isLive',
-                                    v: '$$ROOT.isLive'
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            _id: '$_id',
-                            reaction: {
-                                $arrayToObject: '$reaction'
-                            },
-                            type: {
-                                $arrayToObject: '$type'
-                            },
-                            total_like: '$total_like'
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: null,
-                            root: {
-                                $push: {
-                                    k: '$_id',
-                                    v: {
-                                        total_like: '$total_like',
-                                        isLiked: '$reaction.isLiked',
-                                        isLive: '$type.isLive'
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                    }
-                ]);
-
-                let result = {};
-
-                if (aggregate.length > 0) {
-                    result = aggregate[0];
-                }
+                const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
                 const maps = videos.map(video => ({
                     ...video,
@@ -1451,18 +730,19 @@ export class VideoService extends ElasticsearchService {
                         ...video._source,
                         total_like: this.getTotalLike(
                             video._source.videoId || video._id,
-                            result
+                            resultReaction
                         ),
                         isLiked: this.getBoolean(
                             video._source.videoId || video._id,
-                            result
+                            resultReaction
                         ),
                         isLive: this.getBooleanLive(
                             video._source.videoId || video._id,
-                            result
+                            resultReaction
                         ),
-                        total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                        isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                        total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
+                        isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
+                        total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment)
                     }
                 }))
 
@@ -1513,160 +793,22 @@ export class VideoService extends ElasticsearchService {
 
             const videos: any[] = response.hits.hits;
 
-            const bookmarkAggregate = await this.bookmarkModel.aggregate([
-                {
-                    $group: {
-                        _id: "$videoId", count: { $sum: 1 },
-                        user: {
-                            $push: {
-                                k: 'userId',
-                                v: '$userId'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        count: '$count',
-                        user: {
-                            $arrayToObject: '$user'
-                        }
-                    }
-                },
-                {
-                    $addFields: {
-                        isBookmarked: {
-                            $cond: {
-                                if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id', v: {
-                                    total_bookmark: '$count',
-                                    isBookmarked: '$isBookmarked'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ])
+            const resultComment = await this.commentService.countCommentsAllVideos();
 
-            let bookmark = {};
+            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            if (bookmarkAggregate.length > 0) {
-                bookmark = bookmarkAggregate[0]
-            }
-
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $addFields: {
-                        isUserLiked: {
-                            $cond: {
-                                if: {
-                                    $and: [
-                                        {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
-                                        },
-                                        {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
-                                        }
-                                    ],
-                                },
-                                then: true,
-                                else: false
-                            }
-                        }
-                    }
-                },
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                        reaction: {
-                            $push: {
-                                k: 'isLiked',
-                                v: '$isUserLiked'
-                            }
-                        },
-                        type: {
-                            $push: {
-                                k: 'isLive',
-                                v: '$$ROOT.isLive'
-                            }
-                        }
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id',
-                        reaction: {
-                            $arrayToObject: '$reaction',
-                        },
-                        type: {
-                            $arrayToObject: '$type'
-                        },
-                        total_like: '$total_like'
-                    }
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id',
-                                v: {
-                                    total_like: '$total_like',
-                                    isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive'
-                                }
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                }
-            ]);
-
-            let result = {};
-
-            if (aggregate.length > 0) {
-                result = aggregate[0];
-            }
+            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
 
             const maps = videos.map((video) => ({
                 ...video,
                 _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, result),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, result),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, result),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, bookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, bookmark),
+                    total_like: this.getTotalLike(video._source.videoId || video._id, resultReaction),
+                    isLiked: this.getBoolean(video._source.videoId || video._id, resultReaction),
+                    isLive: this.getBooleanLive(video._source.videoId || video._id, resultReaction),
+                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
+                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
+                    total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment)
                 }
             }));
 
@@ -1682,53 +824,8 @@ export class VideoService extends ElasticsearchService {
 
     public async getVideoMostLike(limit: number): Promise<any> {
         try {
-
-            const aggregate = await this.reactionModel.aggregate([
-                {
-                    $group: {
-                        _id: '$videoId',
-                        total_like: {
-                            $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
-                    }
-                },
-                {
-                    $project: {
-                        _id: '$_id',
-                        total_like: '$total_like'
-                    }
-                },
-                {
-                    $sort: {
-                        total_like: -1
-                    }
-                },
-                {
-                    $limit: limit
-                },
-                {
-                    $group: {
-                        _id: null,
-                        root: {
-                            $push: {
-                                k: '$_id',
-                                v: '$total_like',
-                            }
-                        }
-                    }
-                },
-                {
-                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                },
-            ]);
-
-            let result = {};
-
-            if (aggregate.length > 0) {
-                result = aggregate[0];
-            }
-
-            return result;
+            const aggregate = await this.reactionRepo.getVideoMostLike(limit);
+            return aggregate
         } catch (err) {
             throw new InternalServerErrorException(err);
         }

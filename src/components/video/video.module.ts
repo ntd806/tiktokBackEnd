@@ -3,11 +3,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { VideoController } from './video.controller';
 import { VideoService } from './video.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Reaction, ReactionSchema } from './model/reaction.schema';
+import { Reaction, ReactionSchema, Bookmark, BookmarkSchema } from 'src/entities';
 import { Video, VideoSchema } from './model/video.schema';
-import { Bookmark, BookmarkSchema } from './model/bookmark.schema';
 import { HotService } from '../hot/hot.service';
 import { Hot, HotSchema } from '../hot/model/hot.schema';
+import { CommentService } from 'src/services';
+import { CommentModule } from 'src/modules';
+import { BookmarkRepository, ReactionRepository } from 'src/repositories';
 @Module({
     imports: [
         HttpModule,
@@ -23,9 +25,12 @@ import { Hot, HotSchema } from '../hot/model/hot.schema';
                 schema: BookmarkSchema
             },
             { name: Hot.name, schema: HotSchema }
-        ])
+        ]),
+        CommentModule
     ],
-    providers: [VideoService, HotService],
+    providers: [VideoService, HotService, CommentService,
+        ReactionRepository, BookmarkRepository
+    ],
     controllers: [VideoController]
 })
-export class VideoModule {}
+export class VideoModule { }
