@@ -43,8 +43,9 @@ dotenv.config();
         MulterModule.register({
             dest: './public/image'
         }),
-        HotModule
+        HotModule,
     ],
-    controllers: []
+    controllers: [],
+    providers: []
 })
 export class AppModule {}

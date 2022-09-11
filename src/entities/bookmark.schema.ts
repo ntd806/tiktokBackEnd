@@ -1,5 +1,8 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+
+export type BookmarkDocument = Bookmark & Document;
+
 @Schema()
 export class Bookmark extends Document {
     @Prop()
