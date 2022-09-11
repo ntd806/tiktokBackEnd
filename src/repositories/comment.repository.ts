@@ -16,9 +16,14 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
 
     async getComments(videoId: string, paging: Paging) {
         try {
-            return await this.model.find({ videoId}).populate('author', {
+            const comments = await this.model.find({ videoId}).populate('author', {
                 _id: 1, fullname: 1,  metadata: 1
-            }).skip(paging.offset).limit(paging.limit);
+            }).skip(paging.offset).limit(paging.limit).lean();
+            const eachCommentReplyCount = await this.countReplyEachComment(videoId);
+            return comments.map(comment => ({
+                ...comment,
+                total_reply: eachCommentReplyCount[comment._id] || 0
+            }))
         } catch (err) {
             throw err
         }
@@ -144,6 +149,81 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                                 k: '$_id', v: {
                                     total_comment: '$total_comment'
                                 }
+                            }
+                        }
+                    }
+                },
+                {
+                    $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
+                }
+            ])
+
+            return result?.[0] || {}
+        } catch (err) {
+            throw err
+        }
+    }
+
+    async countReplyEachComment(videoId: string) {
+        try {
+            const result = await this.model.aggregate([
+                {
+                    $match: {
+                        videoId
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'replies',
+                        let: {
+                            id: '$_id'
+                        },
+                        pipeline: [
+                            {
+                                $match: {
+                                    $expr: {
+                                        $and: [
+                                            // {
+                                            //     $eq: [
+                                            //         "$videoId",
+                                            //         "$$ROOT.videoId",
+                                            //     ]
+                                            // },
+                                            {
+                                                $eq: [
+                                                    {
+                                                        $toString: "$parent"
+                                                    },
+                                                    {
+                                                        $toString: "$$id"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                $group: {
+                                    _id: '$parent',
+                                    total_reply: {
+                                        $sum: 1
+                                    }
+                                }
+                            },
+                        ],
+                        as: 'reply'
+                    }
+                },
+                { $unwind: '$reply' },
+                {
+                    $group: {
+                        _id: null,
+                        root: {
+                            $push: {
+                                k: {
+                                    $toString: '$_id'
+                                }, v: '$reply.total_reply'
                             }
                         }
                     }
