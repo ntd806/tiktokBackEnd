@@ -1,15 +1,16 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose/dist";
-import { Model } from "mongoose";
-import { Reaction, ReactionDocument } from "src/entities";
-import { Paging } from "src/interfaces";
-import { BaseRepository } from "./base.repository";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose/dist';
+import { Model } from 'mongoose';
+import { Reaction, ReactionDocument } from 'src/entities';
+import { Paging } from 'src/interfaces';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class ReactionRepository extends BaseRepository<ReactionDocument> {
     constructor(
         @InjectModel(Reaction.name)
-        reactionModel: Model<Reaction>) {
+        reactionModel: Model<Reaction>
+    ) {
         super(reactionModel);
     }
 
@@ -23,18 +24,12 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                                 if: {
                                     $and: [
                                         {
-                                            $eq: [
-                                                "$$ROOT.userId",
-                                                userId
-                                            ]
+                                            $eq: ['$$ROOT.userId', userId]
                                         },
                                         {
-                                            $eq: [
-                                                "$$ROOT.isLiked",
-                                                true
-                                            ]
+                                            $eq: ['$$ROOT.isLiked', true]
                                         }
-                                    ],
+                                    ]
                                 },
                                 then: true,
                                 else: false
@@ -64,22 +59,26 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                 },
                 {
                     $project: {
-                        _id: '$_id', reaction: {
+                        _id: '$_id',
+                        reaction: {
                             $arrayToObject: '$reaction'
-                        }, type: {
+                        },
+                        type: {
                             $arrayToObject: '$type'
-                        }, total_like: '$total_like'
-                    },
+                        },
+                        total_like: '$total_like'
+                    }
                 },
                 {
                     $group: {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_like: '$total_like',
                                     isLiked: '$reaction.isLiked',
-                                    isLive: '$type.isLive',
+                                    isLive: '$type.isLive'
                                 }
                             }
                         }
@@ -89,9 +88,9 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
             ]);
-            return result?.[0] || {}
+            return result?.[0] || {};
         } catch (e) {
-            throw e
+            throw e;
         }
     }
 
@@ -116,10 +115,7 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: [
-                                            "$_id",
-                                            "$$id"
-                                        ]
+                                        $eq: ['$_id', '$$id']
                                     }
                                 }
                             }
@@ -130,12 +126,12 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                 { $unwind: '$meta' },
                 { $match: { isLiked: true, userId } },
                 { $limit: Number(limit) },
-                { $skip: Number(offset) },
-            ])
+                { $skip: Number(offset) }
+            ]);
 
-            return videos
+            return videos;
         } catch (e) {
-            throw e
+            throw e;
         }
     }
 
@@ -147,7 +143,7 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                         _id: '$videoId',
                         total_like: {
                             $sum: { $cond: [{ $eq: ['$isLiked', true] }, 1, 0] }
-                        },
+                        }
                     }
                 },
                 {
@@ -170,19 +166,19 @@ export class ReactionRepository extends BaseRepository<ReactionDocument> {
                         root: {
                             $push: {
                                 k: '$_id',
-                                v: '$total_like',
+                                v: '$total_like'
                             }
                         }
                     }
                 },
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
-                },
+                }
             ]);
 
-            return result?.[0] || {}
+            return result?.[0] || {};
         } catch (e) {
-            throw e
+            throw e;
         }
     }
 }

@@ -1,8 +1,28 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    Post,
+    Query,
+    Req,
+    UseGuards
+} from '@nestjs/common';
+import {
+    ApiBearerAuth,
+    ApiBody,
+    ApiOperation,
+    ApiResponse,
+    ApiTags
+} from '@nestjs/swagger';
 import { JwtGuard } from 'src/components/auth/guard';
 import { STATUSCODE } from 'src/constants';
-import { BaseCommentDto, BaseReplyDto, PaginationDto, ReplyPaginationDto } from 'src/entities';
+import {
+    BaseCommentDto,
+    BaseReplyDto,
+    PaginationDto,
+    ReplyPaginationDto
+} from 'src/entities';
 import { CommentService } from 'src/services';
 
 @ApiBearerAuth('Authorization')
@@ -40,8 +60,15 @@ export class CommentController {
         description: 'Failed'
     })
     @Post(':commentId')
-    async replyComment(@Req() req, @Param('commentId') commentId: string, @Body() comment: BaseCommentDto) {
-        return await this.commentService.replyComment(req.user.id, {...comment, parent: commentId});
+    async replyComment(
+        @Req() req,
+        @Param('commentId') commentId: string,
+        @Body() comment: BaseCommentDto
+    ) {
+        return await this.commentService.replyComment(req.user.id, {
+            ...comment,
+            parent: commentId
+        });
     }
 
     @ApiOperation({
@@ -56,8 +83,14 @@ export class CommentController {
         description: 'Failed'
     })
     @Get('root/:videoId')
-    async getRootVideoComments(@Param('videoId') videoId: string, @Query() pagination: PaginationDto) {
-        return await this.commentService.getRootVideoComments(videoId, pagination);
+    async getRootVideoComments(
+        @Param('videoId') videoId: string,
+        @Query() pagination: PaginationDto
+    ) {
+        return await this.commentService.getRootVideoComments(
+            videoId,
+            pagination
+        );
     }
 
     @ApiOperation({
@@ -72,8 +105,14 @@ export class CommentController {
         description: 'Failed'
     })
     @Get('child/:commentId')
-    async getReplyComments(@Param('commentId') commentId: string, @Query() pagination: PaginationDto) {
-        return await this.commentService.getReplies({...pagination, commentId});
+    async getReplyComments(
+        @Param('commentId') commentId: string,
+        @Query() pagination: PaginationDto
+    ) {
+        return await this.commentService.getReplies({
+            ...pagination,
+            commentId
+        });
     }
 
     @Get('count/:videoId')

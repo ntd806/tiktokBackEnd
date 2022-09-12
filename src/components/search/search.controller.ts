@@ -193,7 +193,7 @@ export class SearchController {
     findProfileImage(
         @Param('imagename') imagename: string,
         @Res() res
-    ): Observable<Object> {
+    ): Observable<Record<string, any>> {
         return of(
             res.sendFile(join(process.cwd(), 'public/image/' + imagename))
         );

@@ -18,11 +18,11 @@ export class Auth {
     ip: string;
 
     @Column()
-    mac: object;
+    mac: string[];
 
     @Column({ unique: true })
     phone: string;
 
     @Column()
-    like: object;
+    like: [];
 }

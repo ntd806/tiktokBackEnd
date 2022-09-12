@@ -31,7 +31,7 @@ export class VideoService extends ElasticsearchService {
         private readonly hotService: HotService,
         private readonly commentService: CommentService,
         private readonly reactionRepo: ReactionRepository,
-        private readonly bookmarkRepo: BookmarkRepository,
+        private readonly bookmarkRepo: BookmarkRepository
     ) {
         super(ConfigSearch.searchConfig(process.env.ELASTIC_SEARCH_URL));
     }
@@ -89,7 +89,10 @@ export class VideoService extends ElasticsearchService {
         return imageURL;
     }
 
-    async updateManyReactionByVideoId<T>(videoId: string, reaction: T): Promise<any> {
+    async updateManyReactionByVideoId<T>(
+        videoId: string,
+        reaction: T
+    ): Promise<any> {
         return await this.reactionRepo.updateMany({ videoId }, reaction);
     }
 
@@ -183,24 +186,38 @@ export class VideoService extends ElasticsearchService {
 
     async getVideoBookmarks(userId: string, pagination: PaginationQueryDto) {
         try {
+            const videos = await this.bookmarkRepo.paginateAggregate(
+                userId,
+                pagination
+            );
 
-            const videos = await this.bookmarkRepo.paginateAggregate(userId, pagination)
+            const resultComment =
+                await this.commentService.countCommentsAllVideos();
 
-            const resultComment = await this.commentService.countCommentsAllVideos();
+            const resultBookmark =
+                await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
+            const resultReaction =
+                await this.reactionRepo.countReactionsAllVideo(userId);
 
-            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
-
-            const maps = videos.map(video => ({
+            const maps = videos.map((video) => ({
                 ...video,
                 total_like: this.getTotalLike(video.videoId, resultReaction),
                 isLiked: this.getBoolean(video.videoId, resultReaction),
                 isLive: this.getBooleanLive(video.videoId, resultReaction),
-                total_bookmark: this.getTotalBookmark(video.videoId, resultBookmark),
-                isBookmarked: this.getBooleanBookmark(video.videoId, resultBookmark),
-                total_comment: this.getTotalComment(video.videoId, resultComment),
-            }))
+                total_bookmark: this.getTotalBookmark(
+                    video.videoId,
+                    resultBookmark
+                ),
+                isBookmarked: this.getBooleanBookmark(
+                    video.videoId,
+                    resultBookmark
+                ),
+                total_comment: this.getTotalComment(
+                    video.videoId,
+                    resultComment
+                )
+            }));
 
             return new BaseResponse(
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
@@ -208,7 +225,7 @@ export class VideoService extends ElasticsearchService {
                 'Get list video successfully'
             );
         } catch (err) {
-            console.log(err)
+            console.log(err);
             throw new InternalServerErrorException(err);
             // return new BaseErrorResponse(
             //     STATUSCODE.VIDEO_LIST_FAIL_906,
@@ -223,7 +240,10 @@ export class VideoService extends ElasticsearchService {
         paginationQuery: PaginationQueryDto
     ) {
         try {
-            const videos = await this.reactionRepo.paginateAggregate(userId, paginationQuery)
+            const videos = await this.reactionRepo.paginateAggregate(
+                userId,
+                paginationQuery
+            );
             // const videos = await this.reactionModel.aggregate([
             //     {
             //         $lookup: {
@@ -259,10 +279,12 @@ export class VideoService extends ElasticsearchService {
             //     { $skip: Number(offset) },
             // ])
 
-            const resultComment = await this.commentService.countCommentsAllVideos();
+            const resultComment =
+                await this.commentService.countCommentsAllVideos();
 
-            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId)
-            
+            const resultBookmark =
+                await this.bookmarkRepo.countBookmarksAllVideo(userId);
+
             // aggregate([
             //     {
             //         $group: {
@@ -317,7 +339,8 @@ export class VideoService extends ElasticsearchService {
             //     }
             // ])
 
-            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
+            const resultReaction =
+                await this.reactionRepo.countReactionsAllVideo(userId);
 
             // const aggregate = await this.reactionModel.aggregate([
             //     {
@@ -394,15 +417,24 @@ export class VideoService extends ElasticsearchService {
             //     }
             // ]);
 
-            const maps = videos.map(video => ({
+            const maps = videos.map((video) => ({
                 ...video,
                 total_like: this.getTotalLike(video.videoId, resultReaction),
                 isLiked: this.getBoolean(video.videoId, resultReaction),
                 isLive: this.getBooleanLive(video.videoId, resultReaction),
-                total_bookmark: this.getTotalBookmark(video.videoId, resultBookmark),
-                isBookmarked: this.getBooleanBookmark(video.videoId, resultBookmark),
-                total_comment: this.getTotalComment(video.videoId, resultComment),
-            }))
+                total_bookmark: this.getTotalBookmark(
+                    video.videoId,
+                    resultBookmark
+                ),
+                isBookmarked: this.getBooleanBookmark(
+                    video.videoId,
+                    resultBookmark
+                ),
+                total_comment: this.getTotalComment(
+                    video.videoId,
+                    resultComment
+                )
+            }));
 
             return new BaseResponse(
                 STATUSCODE.VIDEO_LIST_SUCCESS_905,
@@ -410,7 +442,7 @@ export class VideoService extends ElasticsearchService {
                 'Get list video successfully'
             );
         } catch (err) {
-            throw new InternalServerErrorException(err)
+            throw new InternalServerErrorException(err);
             // return new BaseErrorResponse(
             //     STATUSCODE.VIDEO_LIST_FAIL_906,
             //     'Get list video failed',
@@ -446,22 +478,43 @@ export class VideoService extends ElasticsearchService {
 
             const videos: any[] = response.hits.hits;
 
-            const resultComment = await this.commentService.countCommentsAllVideos();
+            const resultComment =
+                await this.commentService.countCommentsAllVideos();
 
-            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
+            const resultBookmark =
+                await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
+            const resultReaction =
+                await this.reactionRepo.countReactionsAllVideo(userId);
 
             const maps = videos.map((video) => ({
                 ...video,
                 _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, resultReaction),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, resultReaction),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, resultReaction),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
-                    total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment)
+                    total_like: this.getTotalLike(
+                        video._source.videoId || video._id,
+                        resultReaction
+                    ),
+                    isLiked: this.getBoolean(
+                        video._source.videoId || video._id,
+                        resultReaction
+                    ),
+                    isLive: this.getBooleanLive(
+                        video._source.videoId || video._id,
+                        resultReaction
+                    ),
+                    total_bookmark: this.getTotalBookmark(
+                        video._source.videoId || video._id,
+                        resultBookmark
+                    ),
+                    isBookmarked: this.getBooleanBookmark(
+                        video._source.videoId || video._id,
+                        resultBookmark
+                    ),
+                    total_comment: this.getTotalComment(
+                        video._source.videoId || video._id,
+                        resultComment
+                    )
                 }
             }));
 
@@ -505,11 +558,16 @@ export class VideoService extends ElasticsearchService {
     ): Promise<any> {
         const videos = await this.getVideoByTag(searchProductDto);
 
-        const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
+        const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(
+            userId
+        );
 
-        const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
+        const resultReaction = await this.reactionRepo.countReactionsAllVideo(
+            userId
+        );
 
-        const resultComment = await this.commentService.countCommentsAllVideos();
+        const resultComment =
+            await this.commentService.countCommentsAllVideos();
 
         const maps = videos.map((video) => ({
             ...video,
@@ -527,9 +585,18 @@ export class VideoService extends ElasticsearchService {
                     video._source.videoId || video._id,
                     resultReaction
                 ),
-                total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
-                isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
-                total_comment: this.getTotalComment(video._source.video || video._id, resultComment)
+                total_bookmark: this.getTotalBookmark(
+                    video._source.videoId || video._id,
+                    resultBookmark
+                ),
+                isBookmarked: this.getBooleanBookmark(
+                    video._source.videoId || video._id,
+                    resultBookmark
+                ),
+                total_comment: this.getTotalComment(
+                    video._source.video || video._id,
+                    resultComment
+                )
             }
         }));
 
@@ -646,13 +713,16 @@ export class VideoService extends ElasticsearchService {
 
             const videos: any[] = response.hits.hits;
 
-            const resultComment = await this.commentService.countCommentsAllVideos();
+            const resultComment =
+                await this.commentService.countCommentsAllVideos();
 
-            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
+            const resultBookmark =
+                await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
+            const resultReaction =
+                await this.reactionRepo.countReactionsAllVideo(userId);
 
-            const maps = videos.map(video => ({
+            const maps = videos.map((video) => ({
                 ...video,
                 _source: {
                     ...video._source,
@@ -668,11 +738,20 @@ export class VideoService extends ElasticsearchService {
                         video._source.videoId || video._id,
                         resultReaction
                     ),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
-                    total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment),
+                    total_bookmark: this.getTotalBookmark(
+                        video._source.videoId || video._id,
+                        resultBookmark
+                    ),
+                    isBookmarked: this.getBooleanBookmark(
+                        video._source.videoId || video._id,
+                        resultBookmark
+                    ),
+                    total_comment: this.getTotalComment(
+                        video._source.videoId || video._id,
+                        resultComment
+                    )
                 }
-            }))
+            }));
 
             return new BaseResponse(
                 STATUSCODE.LISTED_SUCCESS_9010,
@@ -693,7 +772,11 @@ export class VideoService extends ElasticsearchService {
         }
     }
 
-    private async getTrend(userId: string, videoPaginate: VideoPaginateDto, hot: string) {
+    private async getTrend(
+        userId: string,
+        videoPaginate: VideoPaginateDto,
+        hot: string
+    ) {
         if (hot != null || hot != undefined) {
             try {
                 const response = await this.search({
@@ -718,13 +801,16 @@ export class VideoService extends ElasticsearchService {
 
                 const videos: any[] = response.hits.hits;
 
-                const resultComment = await this.commentService.countCommentsAllVideos();
+                const resultComment =
+                    await this.commentService.countCommentsAllVideos();
 
-                const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
+                const resultBookmark =
+                    await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-                const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
+                const resultReaction =
+                    await this.reactionRepo.countReactionsAllVideo(userId);
 
-                const maps = videos.map(video => ({
+                const maps = videos.map((video) => ({
                     ...video,
                     _source: {
                         ...video._source,
@@ -740,11 +826,20 @@ export class VideoService extends ElasticsearchService {
                             video._source.videoId || video._id,
                             resultReaction
                         ),
-                        total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
-                        isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
-                        total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment)
+                        total_bookmark: this.getTotalBookmark(
+                            video._source.videoId || video._id,
+                            resultBookmark
+                        ),
+                        isBookmarked: this.getBooleanBookmark(
+                            video._source.videoId || video._id,
+                            resultBookmark
+                        ),
+                        total_comment: this.getTotalComment(
+                            video._source.videoId || video._id,
+                            resultComment
+                        )
                     }
-                }))
+                }));
 
                 return new BaseResponse(
                     STATUSCODE.LISTED_SUCCESS_9010,
@@ -793,22 +888,43 @@ export class VideoService extends ElasticsearchService {
 
             const videos: any[] = response.hits.hits;
 
-            const resultComment = await this.commentService.countCommentsAllVideos();
+            const resultComment =
+                await this.commentService.countCommentsAllVideos();
 
-            const resultBookmark = await this.bookmarkRepo.countBookmarksAllVideo(userId);
+            const resultBookmark =
+                await this.bookmarkRepo.countBookmarksAllVideo(userId);
 
-            const resultReaction = await this.reactionRepo.countReactionsAllVideo(userId);
+            const resultReaction =
+                await this.reactionRepo.countReactionsAllVideo(userId);
 
             const maps = videos.map((video) => ({
                 ...video,
                 _source: {
                     ...video._source,
-                    total_like: this.getTotalLike(video._source.videoId || video._id, resultReaction),
-                    isLiked: this.getBoolean(video._source.videoId || video._id, resultReaction),
-                    isLive: this.getBooleanLive(video._source.videoId || video._id, resultReaction),
-                    total_bookmark: this.getTotalBookmark(video._source.videoId || video._id, resultBookmark),
-                    isBookmarked: this.getBooleanBookmark(video._source.videoId || video._id, resultBookmark),
-                    total_comment: this.getTotalComment(video._source.videoId || video._id, resultComment)
+                    total_like: this.getTotalLike(
+                        video._source.videoId || video._id,
+                        resultReaction
+                    ),
+                    isLiked: this.getBoolean(
+                        video._source.videoId || video._id,
+                        resultReaction
+                    ),
+                    isLive: this.getBooleanLive(
+                        video._source.videoId || video._id,
+                        resultReaction
+                    ),
+                    total_bookmark: this.getTotalBookmark(
+                        video._source.videoId || video._id,
+                        resultBookmark
+                    ),
+                    isBookmarked: this.getBooleanBookmark(
+                        video._source.videoId || video._id,
+                        resultBookmark
+                    ),
+                    total_comment: this.getTotalComment(
+                        video._source.videoId || video._id,
+                        resultComment
+                    )
                 }
             }));
 
@@ -825,7 +941,7 @@ export class VideoService extends ElasticsearchService {
     public async getVideoMostLike(limit: number): Promise<any> {
         try {
             const aggregate = await this.reactionRepo.getVideoMostLike(limit);
-            return aggregate
+            return aggregate;
         } catch (err) {
             throw new InternalServerErrorException(err);
         }

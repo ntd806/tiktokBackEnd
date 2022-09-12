@@ -8,7 +8,6 @@ export type CommentDocument = Comment & Document;
     timestamps: {}
 })
 export class Comment extends Document {
-
     @Prop({ required: true, name: 'videoId', default: '' })
     videoId: string;
 
@@ -17,7 +16,6 @@ export class Comment extends Document {
 
     @Prop({ required: true, name: 'content' })
     content: string;
-
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comment);

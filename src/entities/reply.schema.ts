@@ -9,7 +9,6 @@ export type ReplyDocument = Reply & Document;
     timestamps: {}
 })
 export class Reply extends Document {
-
     @Prop({ required: true, name: 'videoId', default: '' })
     videoId: string;
 
@@ -19,9 +18,13 @@ export class Reply extends Document {
     @Prop({ required: true, name: 'content' })
     content: string;
 
-    @Prop({ required: true, name: 'parent', type: Types.ObjectId, ref: 'Comment'  })
+    @Prop({
+        required: true,
+        name: 'parent',
+        type: Types.ObjectId,
+        ref: 'Comment'
+    })
     parent: Comment;
-
 }
 
 export const ReplySchema = SchemaFactory.createForClass(Reply);

@@ -11,8 +11,8 @@ export class User extends Document {
     @Prop()
     birthdate: Date;
 
-    @Prop({ type: 'object' })
-    ip: object;
+    @Prop()
+    ip: string;
 
     @Prop({ type: [String] })
     mac: string[];
@@ -35,13 +35,13 @@ export class User extends Document {
         }
     ];
 
-    @Prop({ type: 'object' })
+    @Prop({ type: Object })
     metadata: {
         url: string;
         name: string;
     };
 
-    @Prop({ type: 'object' })
+    @Prop({ type: Object })
     social: {
         token: string;
         isGoogle: boolean;
