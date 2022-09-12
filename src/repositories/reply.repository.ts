@@ -30,6 +30,7 @@ export class ReplyRepository extends BaseRepository<ReplyDocument> {
                         select: '_id fullname metadata'
                     }
                 })
+                .sort({createdAt: -1})
                 .skip(paging.offset)
                 .limit(paging.limit);
         } catch (e) {

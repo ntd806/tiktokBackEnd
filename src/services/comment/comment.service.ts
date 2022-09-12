@@ -54,9 +54,13 @@ export class CommentService {
                 videoId,
                 paging
             );
+            const total = await this.commentRepository.countCommentsByVideoId(videoId)
             return new BaseResponse(
                 STATUSCODE.COMMON_SUCCESS,
-                comments,
+                {
+                    total,
+                    comments
+                },
                 'Successfully'
             );
         } catch (err) {
@@ -127,7 +131,7 @@ export class CommentService {
                 videoId
             );
             return new BaseResponse(
-                STATUSCODE.COMMON_DELETE_SUCCESS,
+                STATUSCODE.COMMON_SUCCESS,
                 result,
                 'Successfully'
             );
