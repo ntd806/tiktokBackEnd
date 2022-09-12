@@ -43,7 +43,7 @@ dotenv.config();
         MulterModule.register({
             dest: './public/image'
         }),
-        HotModule,
+        HotModule
     ],
     controllers: [],
     providers: []

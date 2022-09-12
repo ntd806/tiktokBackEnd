@@ -1,5 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
+import {
+    IsNotEmpty,
+    IsNumberString,
+    IsOptional,
+    IsString
+} from 'class-validator';
 
 export class PaginationDto {
     @IsOptional()
@@ -13,9 +18,7 @@ export class PaginationDto {
     offset: number;
 }
 
-
 export class ReplyPaginationDto extends PaginationDto {
-
     @ApiProperty({ default: '' })
     @IsString()
     @IsNotEmpty()

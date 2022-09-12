@@ -11,8 +11,8 @@ export class User extends Document {
     @Prop()
     birthdate: Date;
 
-    @Prop({ type: 'object' })
-    ip: any;
+    @Prop()
+    ip: string;
 
     @Prop({ type: [String] })
     mac: string[];

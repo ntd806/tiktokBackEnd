@@ -1,34 +1,39 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose/dist";
-import { Model } from "mongoose";
-import { Reply, ReplyDocument } from "src/entities";
-import { Paging } from "src/interfaces";
-import { BaseRepository } from "./base.repository";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose/dist';
+import { Model } from 'mongoose';
+import { Reply, ReplyDocument } from 'src/entities';
+import { Paging } from 'src/interfaces';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class ReplyRepository extends BaseRepository<ReplyDocument> {
     constructor(
         @InjectModel(Reply.name)
-        replyModel: Model<Reply>) {
-            super(replyModel);
-        }
+        replyModel: Model<Reply>
+    ) {
+        super(replyModel);
+    }
 
-        async deleteRepliesByParentCommentId(commentId: string): Promise<any> {
-            return await this.model.deleteMany({commentId})
-        }
+    async deleteRepliesByParentCommentId(commentId: string): Promise<any> {
+        return await this.model.deleteMany({ commentId });
+    }
 
-        async getReplies(commentId: string, paging: Paging) {
-            try {
-                return await this.model.find({parent: commentId})
-                .populate('author', { _id: 1, fullname: 1, metadata: 1})
+    async getReplies(commentId: string, paging: Paging) {
+        try {
+            return await this.model
+                .find({ parent: commentId })
+                .populate('author', { _id: 1, fullname: 1, metadata: 1 })
                 .populate({
                     path: 'parent',
-                    populate: { path: 'author', select: '_id fullname metadata' }
+                    populate: {
+                        path: 'author',
+                        select: '_id fullname metadata'
+                    }
                 })
                 .skip(paging.offset)
                 .limit(paging.limit);
-            } catch (e) {
-                throw e
-            }
+        } catch (e) {
+            throw e;
         }
+    }
 }

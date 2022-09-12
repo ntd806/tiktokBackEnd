@@ -1,1 +1,1 @@
-export * from './comment/comment.service'
+export * from './comment/comment.service';

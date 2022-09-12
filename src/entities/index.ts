@@ -1,4 +1,4 @@
-export * from './comment.schema'
+export * from './comment.schema';
 export * from './reply.schema';
 export * from './reaction.schema';
 export * from './bookmark.schema';

@@ -19,15 +19,7 @@ import { CommentService } from 'src/services';
         ])
     ],
     controllers: [CommentController],
-    providers: [
-        CommentRepository,
-        ReplyRepository,
-        CommentService
-    ],
-    exports: [
-        CommentService,
-        CommentRepository,
-        ReplyRepository,
-    ]
+    providers: [CommentRepository, ReplyRepository, CommentService],
+    exports: [CommentService, CommentRepository, ReplyRepository]
 })
-export class CommentModule { }
+export class CommentModule {}

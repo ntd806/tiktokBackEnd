@@ -1,15 +1,16 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose/dist";
-import { Model } from "mongoose";
-import { Bookmark, BookmarkDocument } from "src/entities";
-import { Paging } from "src/interfaces";
-import { BaseRepository } from "./base.repository";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose/dist';
+import { Model } from 'mongoose';
+import { Bookmark, BookmarkDocument } from 'src/entities';
+import { Paging } from 'src/interfaces';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
     constructor(
         @InjectModel(Bookmark.name)
-        bookmarkModel: Model<Bookmark>) {
+        bookmarkModel: Model<Bookmark>
+    ) {
         super(bookmarkModel);
     }
 
@@ -18,7 +19,8 @@ export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
             const result = await this.model.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", count: { $sum: 1 },
+                        _id: '$videoId',
+                        count: { $sum: 1 },
                         user: {
                             $push: {
                                 k: 'userId',
@@ -40,10 +42,7 @@ export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
                         isBookmarked: {
                             $cond: {
                                 if: {
-                                    $eq: [
-                                        "$user.userId",
-                                        userId
-                                    ]
+                                    $eq: ['$user.userId', userId]
                                 },
                                 then: true,
                                 else: false
@@ -56,7 +55,8 @@ export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_bookmark: '$count',
                                     isBookmarked: '$isBookmarked'
                                 }
@@ -67,10 +67,10 @@ export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
-            return result?.[0] || {}
+            ]);
+            return result?.[0] || {};
         } catch (e) {
-            throw e
+            throw e;
         }
     }
 
@@ -95,10 +95,7 @@ export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: [
-                                            "$_id",
-                                            "$$id"
-                                        ]
+                                        $eq: ['$_id', '$$id']
                                     }
                                 }
                             }
@@ -109,12 +106,12 @@ export class BookmarkRepository extends BaseRepository<BookmarkDocument> {
                 { $unwind: '$meta' },
                 { $match: { userId } },
                 { $limit: Number(limit) },
-                { $skip: Number(offset) },
-            ])
+                { $skip: Number(offset) }
+            ]);
 
             return videos;
         } catch (e) {
-            throw e
+            throw e;
         }
     }
 }

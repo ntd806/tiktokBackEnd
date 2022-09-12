@@ -1,5 +1,5 @@
-import { ApiProperty } from "@nestjs/swagger";
-import { IsDateString, IsNotEmpty, IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsNotEmpty, IsString } from 'class-validator';
 
 export class BaseCommentDto {
     @ApiProperty({
@@ -14,7 +14,6 @@ export class BaseCommentDto {
     })
     @IsString()
     content: string;
-
 }
 
 export class CommentDto extends BaseCommentDto {

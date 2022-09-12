@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { Model } from "mongoose";
-import { Comment, CommentDocument } from "src/entities";
-import { Paging } from "src/interfaces";
-import { BaseRepository } from "./base.repository";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Comment, CommentDocument } from 'src/entities';
+import { Paging } from 'src/interfaces';
+import { BaseRepository } from './base.repository';
 
 @Injectable()
 export class CommentRepository extends BaseRepository<CommentDocument> {
@@ -16,16 +16,25 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
 
     async getComments(videoId: string, paging: Paging) {
         try {
-            const comments = await this.model.find({ videoId}).populate('author', {
-                _id: 1, fullname: 1,  metadata: 1
-            }).skip(paging.offset).limit(paging.limit).lean();
-            const eachCommentReplyCount = await this.countReplyEachComment(videoId);
-            return comments.map(comment => ({
+            const comments = await this.model
+                .find({ videoId })
+                .populate('author', {
+                    _id: 1,
+                    fullname: 1,
+                    metadata: 1
+                })
+                .skip(paging.offset)
+                .limit(paging.limit)
+                .lean();
+            const eachCommentReplyCount = await this.countReplyEachComment(
+                videoId
+            );
+            return comments.map((comment) => ({
                 ...comment,
                 total_reply: eachCommentReplyCount[comment._id] || 0
-            }))
+            }));
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 
@@ -39,7 +48,8 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 },
                 {
                     $group: {
-                        _id: "$videoId", root_count: { $sum: 1 },
+                        _id: '$videoId',
+                        root_count: { $sum: 1 }
                     }
                 },
                 {
@@ -52,10 +62,7 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: [
-                                            "$videoId",
-                                            "$$id"
-                                        ]
+                                        $eq: ['$videoId', '$$id']
                                     }
                                 }
                             },
@@ -66,7 +73,7 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                                         $sum: 1
                                     }
                                 }
-                            },
+                            }
                         ],
                         as: 'reply'
                     }
@@ -74,7 +81,9 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 { $unwind: '$reply' },
                 {
                     $addFields: {
-                        total_comment: { $add: ["$reply.total_reply", "$root_count"] }
+                        total_comment: {
+                            $add: ['$reply.total_reply', '$root_count']
+                        }
                     }
                 },
                 {
@@ -82,7 +91,8 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                         _id: null,
                         root: {
                             $push: {
-                                k: 'total_comment', v: '$total_comment'
+                                k: 'total_comment',
+                                v: '$total_comment'
                             }
                         }
                     }
@@ -90,11 +100,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
-            return result?.[0] || {total_comment: 0}
+            return result?.[0] || { total_comment: 0 };
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 
@@ -103,7 +113,8 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
             const result = await this.model.aggregate([
                 {
                     $group: {
-                        _id: "$videoId", root_count: { $sum: 1 },
+                        _id: '$videoId',
+                        root_count: { $sum: 1 }
                     }
                 },
                 {
@@ -116,10 +127,7 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: [
-                                            "$videoId",
-                                            "$$id"
-                                        ]
+                                        $eq: ['$videoId', '$$id']
                                     }
                                 }
                             },
@@ -130,7 +138,7 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                                         $sum: 1
                                     }
                                 }
-                            },
+                            }
                         ],
                         as: 'reply'
                     }
@@ -138,7 +146,9 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 { $unwind: '$reply' },
                 {
                     $addFields: {
-                        total_comment: { $add: ["$reply.total_reply", "$root_count"] }
+                        total_comment: {
+                            $add: ['$reply.total_reply', '$root_count']
+                        }
                     }
                 },
                 {
@@ -146,7 +156,8 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                         _id: null,
                         root: {
                             $push: {
-                                k: '$_id', v: {
+                                k: '$_id',
+                                v: {
                                     total_comment: '$total_comment'
                                 }
                             }
@@ -156,11 +167,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
-            return result?.[0] || {}
+            return result?.[0] || {};
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 
@@ -192,10 +203,10 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                                             {
                                                 $eq: [
                                                     {
-                                                        $toString: "$parent"
+                                                        $toString: '$parent'
                                                     },
                                                     {
-                                                        $toString: "$$id"
+                                                        $toString: '$$id'
                                                     }
                                                 ]
                                             }
@@ -210,7 +221,7 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                                         $sum: 1
                                     }
                                 }
-                            },
+                            }
                         ],
                         as: 'reply'
                     }
@@ -223,7 +234,8 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                             $push: {
                                 k: {
                                     $toString: '$_id'
-                                }, v: '$reply.total_reply'
+                                },
+                                v: '$reply.total_reply'
                             }
                         }
                     }
@@ -231,11 +243,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
-            ])
+            ]);
 
-            return result?.[0] || {}
+            return result?.[0] || {};
         } catch (err) {
-            throw err
+            throw err;
         }
     }
 }
