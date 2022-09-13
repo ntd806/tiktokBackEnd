@@ -48,12 +48,6 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                     }
                 },
                 {
-                    $group: {
-                        _id: '$videoId',
-                        root_count: { $sum: 1 }
-                    }
-                },
-                {
                     $lookup: {
                         from: 'replies',
                         let: {
@@ -63,15 +57,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: ['$videoId', '$$id']
-                                    }
-                                }
-                            },
-                            {
-                                $group: {
-                                    _id: '$videoId',
-                                    total_reply: {
-                                        $sum: 1
+                                        $eq: [{
+                                            $toString: '$parent'
+                                        }, {
+                                            $toString: '$$id'
+                                        }]
                                     }
                                 }
                             }
@@ -79,11 +69,32 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                         as: 'reply'
                     }
                 },
-                { $unwind: '$reply' },
+                {
+                    $project: {
+                        _id: '$_id',
+                        videoId: '$videoId',
+                        total_reply: {
+                            $size: '$reply'
+                        },
+                        reply: '$reply'
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$videoId',
+                        root_count: { $sum: 1 },
+                        replies: {$addToSet: '$total_reply'}
+                    }
+                },
+                {
+                    $addFields: {
+                        total_reply: { $sum: '$replies' },
+                    }
+                },
                 {
                     $addFields: {
                         total_comment: {
-                            $add: ['$reply.total_reply', '$root_count']
+                            $add: ['$root_count', '$total_reply']
                         }
                     }
                 },
@@ -102,7 +113,6 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
             ]);
-
             return result?.[0] || { total_comment: 0 };
         } catch (err) {
             throw err;
@@ -113,12 +123,6 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
         try {
             const result = await this.model.aggregate([
                 {
-                    $group: {
-                        _id: '$videoId',
-                        root_count: { $sum: 1 }
-                    }
-                },
-                {
                     $lookup: {
                         from: 'replies',
                         let: {
@@ -128,15 +132,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                             {
                                 $match: {
                                     $expr: {
-                                        $eq: ['$videoId', '$$id']
-                                    }
-                                }
-                            },
-                            {
-                                $group: {
-                                    _id: '$videoId',
-                                    total_reply: {
-                                        $sum: 1
+                                        $eq: [{
+                                            $toString: '$parent'
+                                        }, {
+                                            $toString: '$$id'
+                                        }]
                                     }
                                 }
                             }
@@ -144,11 +144,32 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                         as: 'reply'
                     }
                 },
-                { $unwind: '$reply' },
+                {
+                    $project: {
+                        _id: '$_id',
+                        videoId: '$videoId',
+                        total_reply: {
+                            $size: '$reply'
+                        },
+                        reply: '$reply'
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$videoId',
+                        root_count: { $sum: 1 },
+                        replies: {$addToSet: '$total_reply'}
+                    }
+                },
+                {
+                    $addFields: {
+                        total_reply: { $sum: '$replies' },
+                    }
+                },
                 {
                     $addFields: {
                         total_comment: {
-                            $add: ['$reply.total_reply', '$root_count']
+                            $add: ['$root_count', '$total_reply']
                         }
                     }
                 },
@@ -169,7 +190,6 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                     $replaceRoot: { newRoot: { $arrayToObject: '$root' } }
                 }
             ]);
-
             return result?.[0] || {};
         } catch (err) {
             throw err;
@@ -195,12 +215,6 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                                 $match: {
                                     $expr: {
                                         $and: [
-                                            // {
-                                            //     $eq: [
-                                            //         "$videoId",
-                                            //         "$$ROOT.videoId",
-                                            //     ]
-                                            // },
                                             {
                                                 $eq: [
                                                     {
