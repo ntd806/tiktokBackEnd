@@ -981,11 +981,24 @@ export class VideoService extends ElasticsearchService {
 
     async getVideos(userId: string, videoPaginate: VideoPaginateDto) {
         const hot = await this.hotService.getHotTrend();
-        const likes = await this.getVideoMostLike(1);
+        const like = await this.getVideoByLike();
+
+        if (like) {
+            // console.log(typeof hot);
+            const videos = await this.getTrend(userId, videoPaginate, like);
+
+            if (videos.data.videos.length >= 1) {
+                return videos;
+            }
+        }
 
         if (hot) {
-            console.log(typeof hot);
-            return this.getTrend(userId, videoPaginate, hot);
+            // console.log(typeof hot);
+            const videos = await this.getTrend(userId, videoPaginate, hot);
+
+            if (videos.data.videos.length >= 1) {
+                return videos;
+            }
         }
 
         return this.getAll(userId, videoPaginate);
@@ -1612,34 +1625,45 @@ export class VideoService extends ElasticsearchService {
         }
     }
 
-    public async getVideoByLike(): Promise<any> {
+    private async getVideoByLike(): Promise<any> {
         const likes = await this.getVideoMostLike(1);
-        let like = '';
-        for (const l in likes) {
-            like = l;
-            break;
-        }
+        try {
+            let like = '';
+            for (const l in likes) {
+                like = l;
+                break;
+            }
 
-        if (!like) return '';
+            if (!like) return '';
 
-        const response = await this.search({
-            index: productIndex._index,
-            body: {
-                size: 1,
-                from: 0,
+            const response = await this.search({
+                index: productIndex._index,
                 query: {
-                    multi_match: {
-                        query: like,
-                        fields: ['videoId']
+                    match: {
+                        videoId: like
                     }
                 }
+            });
+
+            if (response.hits.hits.length >= 1) {
+                for (let i = 0; i < response.hits.hits.length; i++) {
+                    const tag = Object.entries(
+                        response.hits.hits[i]._source
+                    ).find(([key, value]) => {
+                        if (key === 'tag') {
+                            // console.log(value);
+                            return value;
+                        }
+                    });
+
+                    return tag[1];
+                }
             }
-        });
 
-        if (response.hits.hits.length >= 1) {
-            return response;
+            return '';
+        } catch (error) {
+            console.log(error);
+            throw new InternalServerErrorException(error);
         }
-
-        return '';
     }
 }
