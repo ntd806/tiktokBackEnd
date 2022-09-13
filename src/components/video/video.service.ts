@@ -594,7 +594,7 @@ export class VideoService extends ElasticsearchService {
                     resultBookmark
                 ),
                 total_comment: this.getTotalComment(
-                    video._source.video || video._id,
+                    video._source.videoId || video._id,
                     resultComment
                 )
             }
