@@ -401,5 +401,5 @@ esdata
 .env
 dist
 public
-src/config/Dev Tools - Elastic_files
-src/config/Dev Tools - Elastic.html
+# src/config/Dev Tools - Elastic_files
+# src/config/Dev Tools - Elastic.html
