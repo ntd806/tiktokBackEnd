@@ -54,7 +54,9 @@ export class CommentService {
                 videoId,
                 paging
             );
-            const total = await this.commentRepository.countCommentsByVideoId(videoId)
+            const total = await this.commentRepository.countCommentsByVideoId(
+                videoId
+            );
             return new BaseResponse(
                 STATUSCODE.COMMON_SUCCESS,
                 {

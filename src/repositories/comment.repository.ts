@@ -25,11 +25,11 @@ export class CommentRepository extends BaseRepository<CommentDocument> {
                 })
                 .skip(paging.offset)
                 .limit(paging.limit)
-                .sort({createdAt: -1})
+                .sort({ createdAt: -1 })
                 .lean();
             const eachCommentReplyCount = await this.countReplyEachComment(
                 videoId
-            )
+            );
             return comments.map((comment) => ({
                 ...comment,
                 total_reply: eachCommentReplyCount[comment._id] || 0
