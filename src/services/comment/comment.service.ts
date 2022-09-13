@@ -22,7 +22,11 @@ export class CommentService {
                 ...comment,
                 author: userId
             });
-            const result = await response.populate('author', { _id: 1, fullname: 1, metadata: 1 })
+            const result = await response.populate('author', {
+                _id: 1,
+                fullname: 1,
+                metadata: 1
+            });
             return new BaseResponse(
                 STATUSCODE.COMMON_CREATE_SUCCESS,
                 result,
@@ -55,7 +59,9 @@ export class CommentService {
                 videoId,
                 paging
             );
-            const total = await this.commentRepository.countCommentsByVideoId(videoId)
+            const total = await this.commentRepository.countCommentsByVideoId(
+                videoId
+            );
             return new BaseResponse(
                 STATUSCODE.COMMON_SUCCESS,
                 {
