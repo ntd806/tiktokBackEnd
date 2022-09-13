@@ -22,9 +22,10 @@ export class CommentService {
                 ...comment,
                 author: userId
             });
+            const result = await response.populate('author', { _id: 1, fullname: 1, metadata: 1 })
             return new BaseResponse(
                 STATUSCODE.COMMON_CREATE_SUCCESS,
-                response,
+                result,
                 'Successfully'
             );
         } catch (err) {
