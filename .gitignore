@@ -398,3 +398,8 @@ tiktok/.env
 tiktok/dist
 data
 esdata
+.env
+dist
+public
+# src/config/Dev Tools - Elastic_files
+# src/config/Dev Tools - Elastic.html

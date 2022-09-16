@@ -1,4 +1,8 @@
-/tiktok/node_modules
-/tiktok/npm-debug.log
-/tiktok/Dockerfile
+node_modules
+npm-debug.log
+Dockerfile
+package-lock.json
 .dockerignore
+data
+dist
+esdata

@@ -5,7 +5,7 @@ services:
         container_name: nestjs_api_dev
         image: nestjs-api-dev:1.0.0
         build:
-            context: ./tiktok
+            context: ./
             target: development
             dockerfile: ./Dockerfile
         command: npm run start:debug
@@ -18,18 +18,19 @@ services:
             - mongo-express
             - kibana
             - redis
+            # - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
         volumes:
-            - ./tiktok:/usr/src/app
+            - ./:/usr/src/app
             - /usr/src/app/node_modules
         restart: unless-stopped
     prod:
         container_name: nestjs_api_prod
         image: nestjs-api-prod:1.0.0
         build:
-            context: ./tiktok
+            context: ./
             target: production
             dockerfile: ./Dockerfile
         command: npm run start:prod
@@ -42,11 +43,12 @@ services:
             - mongo-express
             - kibana
             - redis
+            - nginx
         networks:
             - nesjs-network
             - elasticsearch-network
         volumes:
-            - ./tiktok:/usr/src/app
+            - ./:/usr/src/app
             - /usr/src/app/node_modules
         restart: unless-stopped
     mongo:
@@ -97,8 +99,17 @@ services:
             - elasticsearch-network
     redis:
         image: 'redis:alpine'
+        container_name: redis
         ports:
             - '6379:6379'
+        networks:
+            - nesjs-network
+    # nginx:
+    #     build: ./nginx
+    #     ports:
+    #         - 80:80
+        # depends_on:
+            # - dev
 networks:
     nesjs-network:
         driver: bridge

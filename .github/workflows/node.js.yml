@@ -5,15 +5,15 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "release.v0.1" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "release.v0.1" ]
   issues:
     types: [opened, reopened, deleted, closed]
 jobs:
   notify:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - name: Send notifications to Telegram
@@ -22,20 +22,24 @@ jobs:
         MESSAGE: "Issue ${{ github.event.action }}: \n${{ github.event.issue.html_url }}"
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       matrix:
         node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
     steps:
+    - run: cp -r public /tmp
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: cp -b .env.example .env
     - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - run: pm2 stop 0
+    - run: pm2 start 0
+    # - run: npm run start:prod
+    - run: cp -r /tmp/public /var/www/html/toto/actions-runner/_work/tiktokBackEnd/tiktokBackEnd/public
+    # run: rm -rf /tmp/public/*
+    - run: sudo systemctl restart nginx
