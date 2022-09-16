@@ -678,16 +678,16 @@ export class VideoService extends ElasticsearchService {
 
     async getVideos(userId: string, videoPaginate: VideoPaginateDto) {
         const hot = await this.hotService.getHotTrend();
-        const like = await this.getVideoByLike();
+        // const like = await this.getVideoByLike();
 
-        if (like) {
-            // console.log(typeof hot);
-            const videos = await this.getTrend(userId, videoPaginate, like);
+        // if (like) {
+        //     // console.log(typeof hot);
+        //     const videos = await this.getTrend(userId, videoPaginate, like);
 
-            if (videos.data.videos.length >= 1) {
-                return videos;
-            }
-        }
+        //     if (videos.data.videos.length >= 1) {
+        //         return videos;
+        //     }
+        // }
 
         if (hot) {
             // console.log(typeof hot);
