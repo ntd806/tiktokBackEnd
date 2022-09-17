@@ -5,7 +5,9 @@ import {
     Length,
     Matches,
     IsUrl,
-    IsBoolean
+    IsBoolean,
+    ValidateIf,
+    IsDateString
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -13,9 +15,9 @@ export class SocialDto {
     @ApiProperty({
         description: 'email of user'
     })
-    @IsNotEmpty()
     @IsString()
     @IsEmail()
+    @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
     email: string;
 
     @ApiProperty({
@@ -26,22 +28,28 @@ export class SocialDto {
     mac: string;
 
     @ApiProperty({
-        description: 'token of Google or Facebook'
-    })
-    @ApiProperty()
-    @IsNotEmpty()
-    @IsString()
-    //todo: don't know format
-    token: string;
-
-    @ApiProperty({
         description: 'Id of Google or Facebook'
     })
     @ApiProperty()
     @IsString()
-    @IsNotEmpty()
+    @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
     //todo: don't know format
     id: string;
+
+    @ApiProperty({
+        description: 'Birthday of user'
+    })
+    @IsDateString()
+    birthdate: Date;
+
+    @ApiProperty({
+        description: 'M: male, F: female'
+    })
+    @IsString()
+    @Matches(/[M|F]/, {
+        message: 'no gender specified'
+    })
+    sex: string;
 
     @ApiProperty({
         description: 'fullname of user'
@@ -75,13 +83,12 @@ export class SocialDto {
     phone: string;
 
     @ApiProperty({
-        description: 'url of user'
+        description: 'photo url of user'
     })
     @ApiProperty()
-    @IsNotEmpty()
     @IsString()
-    @IsUrl()
-    url: string;
+    @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
+    photo: string;
 
     @ApiProperty({
         description: 'Is Google or not Google'
