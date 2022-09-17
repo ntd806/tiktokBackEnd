@@ -208,7 +208,9 @@ export class SearchController {
         status: 200,
         description: 'delete document success'
     })
-    public async delByQuery(@Body() deleteProductDto: DeleteProductDto): Promise<any> {
+    public async delByQuery(
+        @Body() deleteProductDto: DeleteProductDto
+    ): Promise<any> {
         return this.searchService.delByQuery(deleteProductDto);
     }
 }

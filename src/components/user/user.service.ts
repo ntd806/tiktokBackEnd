@@ -25,7 +25,9 @@ export class UserService {
     }
 
     async findByEmail(email: string) {
-        return await this.userModel.findOne({ email, notInSchema: 1 }).setOptions({ strictQuery: false });
+        return await this.userModel
+            .findOne({ email, notInSchema: 1 })
+            .setOptions({ strictQuery: false });
     }
 
     async findByPhoneNumber(phone: string) {
