@@ -1,6 +1,6 @@
 import { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from 'src/components/user/model/user.schema';
+import { User } from 'src/entities';
 import { Comment } from './comment.schema';
 
 export type ReplyDocument = Reply & Document;

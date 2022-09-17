@@ -80,13 +80,17 @@ export class AuthService {
                     mac: [socialDto.mac],
                     phone: socialDto.phone,
                     fullname: socialDto.fullname,
-                    social: {
-                        token: socialDto.url,
-                        isGoogle: socialDto.isGoogle,
-                        email: socialDto.email,
-                        id: socialDto.id,
-                        url: socialDto.url
-                    }
+                    email: socialDto.email,
+                    socialId: socialDto.id,
+                    sex: socialDto.sex,
+                    birthdate: socialDto.birthdate,
+                    isGoogle: socialDto.isGoogle,
+                    metadata: socialDto.photo
+                        ? {
+                              name: 'social.jpg',
+                              url: socialDto.photo
+                          }
+                        : {}
                 };
                 const newUser = await this.userService.createUserByGGFb(
                     dataInsert

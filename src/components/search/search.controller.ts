@@ -28,7 +28,8 @@ import {
     CreateProductDto,
     UpdateProductDto,
     SearchProductDto,
-    ProductMetadata
+    ProductMetadata,
+    DeleteProductDto
 } from './dto/index';
 import { multerOptions } from '../../vender/helper/Helper';
 import { Observable, of } from 'rxjs';
@@ -197,5 +198,19 @@ export class SearchController {
         return of(
             res.sendFile(join(process.cwd(), 'public/image/' + imagename))
         );
+    }
+
+    @Delete('delete-by-query')
+    @ApiOperation({
+        summary: 'delete document'
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'delete document success'
+    })
+    public async delByQuery(
+        @Body() deleteProductDto: DeleteProductDto
+    ): Promise<any> {
+        return this.searchService.delByQuery(deleteProductDto);
     }
 }
