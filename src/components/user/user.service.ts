@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserDto, UpdateUserDto, AvataDto } from './dto';
-import { User } from './model/user.schema';
+import { User } from 'src/entities';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PaginationQueryDto } from '../video/dto/pagination.query.dto';
@@ -10,7 +10,6 @@ import { BaseErrorResponse, BaseResponse } from '../../common';
 import { UserDto as UserCreateDto } from '../../models';
 import { readFileSync, unlinkSync, existsSync } from 'fs';
 import { HttpAdapterHost } from '@nestjs/core';
-import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -26,7 +25,7 @@ export class UserService {
     }
 
     async findByEmail(email: string) {
-        return await this.userModel.findOne({ email });
+        return await this.userModel.findOne({ email, notInSchema: 1 }).setOptions({ strictQuery: false });
     }
 
     async findByPhoneNumber(phone: string) {
@@ -232,7 +231,7 @@ export class UserService {
             if (
                 userById.metadata &&
                 Object.keys(userById.metadata).length > 0 &&
-                !userById.social
+                !userById.socialId
             ) {
                 const pathLocation = `./public/image/${userById.metadata.name}`;
                 const isExisted = existsSync(pathLocation);
