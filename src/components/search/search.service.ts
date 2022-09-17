@@ -8,6 +8,7 @@ import { MESSAGE, STATUSCODE } from 'src/constants';
 import { Model } from 'mongoose';
 import { Video } from '../video/model/video.schema';
 import { CreateVideoDto } from '../video/dto';
+import { DeleteProductDto } from './dto';
 import { InjectModel } from '@nestjs/mongoose';
 // import { ProductSearchObject } from './model/product.search.object';
 @Injectable()
@@ -101,6 +102,22 @@ export class SearchService
         return this.delete(indexData)
             .then((res) => res)
             .catch((err) => {
+                throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+            });
+    }
+
+    public async delByQuery(deleteProductDto: DeleteProductDto): Promise<any> {
+        return this.deleteByQuery({
+            index: productIndex._index,
+            body: {
+                query: {
+                    match: { videoId: deleteProductDto.id }
+                }
+            }
+        })
+            .then((res) => res)
+            .catch((err) => {
+                console.log(err);
                 throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
             });
     }
