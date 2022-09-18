@@ -85,10 +85,12 @@ export class AuthService {
                     sex: socialDto.sex,
                     birthdate: socialDto.birthdate,
                     isGoogle: socialDto.isGoogle,
-                    metadata: socialDto.photo ? {
-                        name: 'social.jpg',
-                        url: socialDto.photo
-                    }: {},
+                    metadata: socialDto.photo
+                        ? {
+                              name: 'social.jpg',
+                              url: socialDto.photo
+                          }
+                        : {}
                 };
                 const newUser = await this.userService.createUserByGGFb(
                     dataInsert

@@ -32,7 +32,7 @@ export class User extends Document {
     };
 
     @Prop()
-    socialId: string
+    socialId: string;
 
     @Prop()
     isGoogle: boolean;

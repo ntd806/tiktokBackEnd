@@ -17,7 +17,9 @@ export class SocialDto {
     })
     @IsString()
     @IsEmail()
-    @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
+    @ValidateIf(
+        (object, value) => value !== null && value !== undefined && value !== ''
+    )
     email: string;
 
     @ApiProperty({
@@ -32,7 +34,9 @@ export class SocialDto {
     })
     @ApiProperty()
     @IsString()
-    @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
+    @ValidateIf(
+        (object, value) => value !== null && value !== undefined && value !== ''
+    )
     //todo: don't know format
     id: string;
 
@@ -87,7 +91,9 @@ export class SocialDto {
     })
     @ApiProperty()
     @IsString()
-    @ValidateIf((object, value) => value !== null && value !== undefined && value !== '')
+    @ValidateIf(
+        (object, value) => value !== null && value !== undefined && value !== ''
+    )
     photo: string;
 
     @ApiProperty({
